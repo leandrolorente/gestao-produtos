@@ -1,0 +1,77 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h1 mat-dialog-title>
+      <mat-icon>{{ isEditMode ? 'edit' : 'add_box' }}</mat-icon>
+      {{ isEditMode ? 'Editar Produto' : 'Novo Produto' }}
+    </h1>
+  </div>
+
+  <div mat-dialog-content class="dialog-content" [formGroup]="form">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nome do Produto</mat-label>
+        <input matInput
+               formControlName="name"
+               placeholder="Ex: Teclado Mecânico RGB"
+               maxlength="100">
+        <mat-icon matSuffix>inventory_2</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('name') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>SKU (Código)</mat-label>
+        <input matInput
+               formControlName="sku"
+               placeholder="Ex: TEC-001"
+               maxlength="20"
+               style="text-transform: uppercase;">
+        <mat-icon matSuffix>qr_code</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('sku') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row-split">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Quantidade em Estoque</mat-label>
+        <input matInput
+               type="text"
+               formControlName="quantity"
+               placeholder="0"
+               (input)="formatQuantity($event)">
+        <mat-icon matSuffix>inventory</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('quantity') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Preço</mat-label>
+        <input matInput
+               type="text"
+               formControlName="price"
+               placeholder="0,00"
+               (input)="formatPrice($event)">
+        <span matPrefix>R$ </span>
+        <mat-icon matSuffix>attach_money</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('price') }}</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button
+            (click)="onCancel()"
+            class="cancel-btn">
+      <mat-icon>cancel</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button
+            color="primary"
+            (click)="onSave()"
+            [disabled]="!form.valid"
+            class="save-btn">
+      <mat-icon>{{ isEditMode ? 'update' : 'save' }}</mat-icon>
+      {{ isEditMode ? 'Atualizar' : 'Salvar' }}
+    </button>
+  </div>
+</div>

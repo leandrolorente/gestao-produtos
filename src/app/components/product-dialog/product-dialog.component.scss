@@ -1,0 +1,216 @@
+/* src/app/components/product-dialog/product-dialog.component.scss */
+
+.dialog-container {
+  background: #f8f9fa;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  background: #5a67d8;
+  color: white;
+  padding: 1.5rem;
+  margin: -24px -24px 24px -24px;
+
+  h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+}
+
+.dialog-content {
+  padding: 1rem 1.5rem;
+  min-height: 350px;
+}
+
+.form-row {
+  margin-bottom: 1.5rem;
+}
+
+.form-row-split {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0;
+
+    .half-width {
+      width: 100%;
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  flex: 1;
+}
+
+mat-form-field {
+  margin-bottom: 0.5rem;
+
+  &.mat-form-field-appearance-outline {
+    .mat-form-field-outline {
+      border-radius: 12px;
+    }
+
+    .mat-form-field-outline-thick {
+      border-width: 2px;
+    }
+
+    &.mat-focused {
+      .mat-form-field-outline-thick {
+        border-color: #667eea;
+      }
+
+      .mat-form-field-label {
+        color: #667eea;
+      }
+    }
+  }
+
+  .mat-form-field-suffix mat-icon {
+    color: #6c757d;
+    transition: color 0.3s ease;
+  }
+
+  &.mat-focused .mat-form-field-suffix mat-icon {
+    color: #667eea;
+  }
+
+  .mat-form-field-prefix {
+    color: #28a745;
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+}
+
+.mat-mdc-form-field-error {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: #dc3545;
+  display: flex;
+  align-items: center;
+}
+
+.dialog-actions {
+  padding: 1.5rem 1rem 1rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid #e9ecef;
+  margin: 1rem -1rem 0 -1rem;
+  background: #f8f9fa;
+
+  @media (max-width: 480px) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.cancel-btn {
+  color: #6c757d !important;
+  border: 2px solid #dee2e6 !important;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    background: #f8f9fa !important;
+    border-color: #6c757d !important;
+    color: #495057 !important;
+  }
+}
+
+.save-btn {
+  background: linear-gradient(45deg, #28a745, #20c997) !important;
+  color: white !important;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  transition: all 0.3s ease;
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+  }
+
+  &:disabled {
+    background: #dee2e6 !important;
+    color: #6c757d !important;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+/* Animações */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dialog-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Melhorias responsivas */
+@media (max-width: 600px) {
+  .dialog-content {
+    padding: 0 0.5rem;
+  }
+
+  .dialog-header {
+    padding: 1rem;
+
+    h1 {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+/* Estilização específica para inputs */
+input[type="text"] {
+  transition: all 0.3s ease;
+}
+
+/* Feedback visual para campos válidos */
+.mat-form-field.mat-form-field-valid:not(.mat-focused) {
+  .mat-form-field-outline {
+    border-color: #28a745;
+  }
+
+  .mat-form-field-suffix mat-icon {
+    color: #28a745;
+  }
+}
