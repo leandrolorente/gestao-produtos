@@ -6,9 +6,9 @@
   <mat-nav-list class="nav-list">
     <ng-container *ngFor="let item of menuItems">
       <!-- Item sem filhos -->
-      <a 
-        *ngIf="!item.children" 
-        mat-list-item 
+      <a
+        *ngIf="!item.children"
+        mat-list-item
         [routerLink]="item.route"
         routerLinkActive="active"
         class="nav-item"
@@ -20,8 +20,8 @@
 
       <!-- Item com filhos -->
       <div *ngIf="item.children" class="nav-group">
-        <a 
-          mat-list-item 
+        <a
+          mat-list-item
           (click)="toggleExpanded(item)"
           class="nav-item expandable"
           [class.expanded]="isExpanded(item)">
@@ -33,9 +33,9 @@
         </a>
 
         <div class="sub-menu" [class.expanded]="isExpanded(item)">
-          <a 
+          <a
             *ngFor="let child of item.children"
-            mat-list-item 
+            mat-list-item
             [routerLink]="child.route"
             routerLinkActive="active"
             class="nav-item sub-item"

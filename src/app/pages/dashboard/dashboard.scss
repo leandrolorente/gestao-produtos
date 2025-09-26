@@ -5,14 +5,14 @@
 
   .welcome-section {
     margin-bottom: 32px;
-    
+
     h1 {
       font-size: 2rem;
       font-weight: 500;
       margin-bottom: 8px;
       color: #1976d2;
     }
-    
+
     p {
       color: #666;
       font-size: 1.1rem;
@@ -27,7 +27,7 @@
 
     .stat-card {
       transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      
+
       &:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.12);
@@ -45,7 +45,7 @@
         .stat-icon {
           color: #ff9800;
         }
-        
+
         &.alert {
           background-color: #fff3e0;
           border-left-color: #f57c00;
@@ -76,14 +76,14 @@
 
         .stat-info {
           flex: 1;
-          
+
           h3 {
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 4px 0;
             color: #333;
           }
-          
+
           p {
             margin: 0;
             color: #666;

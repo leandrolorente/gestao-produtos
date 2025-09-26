@@ -17,7 +17,7 @@ import { Sidebar } from '../../components/sidebar/sidebar';
   styleUrl: './main-layout.scss'
 })
 export class MainLayout {
-  
+
   protected isSidebarOpen = signal(false);
 
   protected toggleSidebar(): void {

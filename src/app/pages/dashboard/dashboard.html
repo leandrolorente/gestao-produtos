@@ -66,9 +66,9 @@
       </mat-card-header>
       <mat-card-content>
         <div class="actions-grid">
-          <button 
+          <button
             *ngFor="let action of quickActions"
-            mat-raised-button 
+            mat-raised-button
             [color]="action.color"
             [routerLink]="action.route"
             class="action-button">
@@ -90,7 +90,7 @@
       </mat-card-header>
       <mat-card-content>
         <div class="products-list">
-          <div 
+          <div
             *ngFor="let product of stats().topSellingProducts; let i = index"
             class="product-item">
             <div class="product-rank">{{ i + 1 }}</div>
@@ -99,7 +99,7 @@
               <p>{{ product.sales }} vendas • {{ product.quantity }} em estoque</p>
             </div>
             <div class="product-status">
-              <span 
+              <span
                 class="stock-indicator"
                 [class]="getStockLevel(product.quantity)">
               </span>
@@ -117,7 +117,7 @@
         <mat-icon class="alert-icon">warning</mat-icon>
         <div class="alert-text">
           <h3>Atenção: Estoque Baixo</h3>
-          <p>Você tem {{ stats().lowStockProducts }} produto(s) com estoque baixo. 
+          <p>Você tem {{ stats().lowStockProducts }} produto(s) com estoque baixo.
              <a routerLink="/produtos" class="alert-link">Clique aqui para verificar</a>
           </p>
         </div>

@@ -122,7 +122,7 @@ export class ClientListComponent {
 
   protected readonly displayedColumns: string[] = [
     'nome',
-    'email', 
+    'email',
     'telefone',
     'cpfCnpj',
     'cidade',
@@ -164,7 +164,7 @@ export class ClientListComponent {
       const updatedClientes = this.clientes().filter(c => c.id !== cliente.id);
       this.clientes.set(updatedClientes);
       this.applyFilter();
-      
+
       this.snackBar.open('Cliente excluído com sucesso!', 'Fechar', {
         duration: 3000
       });
@@ -177,7 +177,7 @@ export class ClientListComponent {
     );
     this.clientes.set(updatedClientes);
     this.applyFilter();
-    
+
     const status = cliente.ativo ? 'desativado' : 'ativado';
     this.snackBar.open(`Cliente ${status} com sucesso!`, 'Fechar', {
       duration: 3000
@@ -204,7 +204,7 @@ export class ClientListComponent {
     const headers = Object.keys(csvData[0]);
     const csvContent = [
       headers.join(','),
-      ...csvData.map(row => 
+      ...csvData.map(row =>
         headers.map(header => {
           const value = row[header as keyof typeof row]?.toString() || '';
           return value.includes(',') ? `"${value}"` : value;

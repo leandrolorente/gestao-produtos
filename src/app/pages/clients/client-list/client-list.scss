@@ -70,17 +70,17 @@
         mat-chip {
           font-size: 0.75rem;
           min-height: 24px;
-          
+
           &[color="primary"] {
             background-color: #e3f2fd;
             color: #1976d2;
           }
-          
+
           &[color="accent"] {
             background-color: #f3e5f5;
             color: #7b1fa2;
           }
-          
+
           &[color="warn"] {
             background-color: #ffebee;
             color: #d32f2f;

@@ -25,10 +25,10 @@ import { DashboardService } from '../../services/dashboard';
 })
 export class HeaderComponent {
   private dashboardService = inject(DashboardService);
-  
+
   isSidebarOpen = input<boolean>(false);
   sidebarToggle = output<void>();
-  
+
   currentUser = this.dashboardService.getCurrentUser();
 
   protected toggleSidebar(): void {

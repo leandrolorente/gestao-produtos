@@ -18,7 +18,7 @@
   // Comportamento no desktop
   @media (min-width: 769px) {
     left: -280px; // Sempre oculta por padrão no desktop também
-    
+
     &.open {
       left: 0;
     }
@@ -54,7 +54,7 @@
       &.active {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        
+
         mat-icon {
           color: white;
         }
