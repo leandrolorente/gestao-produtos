@@ -1,0 +1,25 @@
+<div class="main-layout">
+  <app-header 
+    (sidebarToggle)="toggleSidebar()"
+    [isSidebarOpen]="isSidebarOpen()">
+  </app-header>
+  
+  <div class="layout-container" [class.sidebar-open]="isSidebarOpen()">
+    <app-sidebar 
+      [isOpen]="isSidebarOpen()"
+      (closeSidebar)="closeSidebar()">
+    </app-sidebar>
+    
+    <main class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+  
+  <div 
+    class="sidebar-overlay"
+    [class.show]="isSidebarOpen()"
+    (click)="closeSidebar()">
+  </div>
+</div>

@@ -1,0 +1,149 @@
+<div class="client-list-container">
+  <!-- Header -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <div mat-card-avatar class="header-avatar">
+        <mat-icon>people</mat-icon>
+      </div>
+      <mat-card-title>Gerenciamento de Clientes</mat-card-title>
+      <mat-card-subtitle>Cadastro e controle de clientes</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="header-actions">
+        <!-- Campo de busca -->
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar cliente</mat-label>
+          <input matInput placeholder="Nome, email, CPF/CNPJ ou cidade"
+                 (input)="onSearchChange($event)">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        
+        <!-- Botões de ação -->
+        <div class="action-buttons">
+          <button mat-raised-button color="primary" (click)="addCliente()">
+            <mat-icon>add</mat-icon>
+            Novo Cliente
+          </button>
+          
+          <button mat-stroked-button (click)="exportToCsv()">
+            <mat-icon>download</mat-icon>
+            Exportar CSV
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabela de clientes -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="clientesFiltrados()" class="clients-table">
+          
+          <!-- Coluna Nome -->
+          <ng-container matColumnDef="nome">
+            <th mat-header-cell *matHeaderCellDef>Nome</th>
+            <td mat-cell *matCellDef="let cliente">
+              <div class="client-name">
+                <strong>{{ cliente.nome }}</strong>
+                <span class="client-type">{{ cliente.tipo }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Email -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let cliente">{{ cliente.email }}</td>
+          </ng-container>
+
+          <!-- Coluna Telefone -->
+          <ng-container matColumnDef="telefone">
+            <th mat-header-cell *matHeaderCellDef>Telefone</th>
+            <td mat-cell *matCellDef="let cliente">{{ cliente.telefone }}</td>
+          </ng-container>
+
+          <!-- Coluna CPF/CNPJ -->
+          <ng-container matColumnDef="cpfCnpj">
+            <th mat-header-cell *matHeaderCellDef>CPF/CNPJ</th>
+            <td mat-cell *matCellDef="let cliente">{{ cliente.cpfCnpj }}</td>
+          </ng-container>
+
+          <!-- Coluna Cidade -->
+          <ng-container matColumnDef="cidade">
+            <th mat-header-cell *matHeaderCellDef>Localização</th>
+            <td mat-cell *matCellDef="let cliente">
+              {{ cliente.cidade }}/{{ cliente.estado }}
+            </td>
+          </ng-container>
+
+          <!-- Coluna Tipo -->
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let cliente">
+              <mat-chip [color]="cliente.tipo === 'Pessoa Jurídica' ? 'primary' : 'accent'">
+                {{ cliente.tipo === 'Pessoa Jurídica' ? 'PJ' : 'PF' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Status -->
+          <ng-container matColumnDef="ativo">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let cliente">
+              <mat-chip [color]="cliente.ativo ? 'primary' : 'warn'"
+                       (click)="toggleClienteStatus(cliente)"
+                       style="cursor: pointer;">
+                {{ cliente.ativo ? 'Ativo' : 'Inativo' }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Última Compra -->
+          <ng-container matColumnDef="ultimaCompra">
+            <th mat-header-cell *matHeaderCellDef>Última Compra</th>
+            <td mat-cell *matCellDef="let cliente">
+              <span *ngIf="cliente.ultimaCompra; else noDate">
+                {{ cliente.ultimaCompra.toLocaleDateString('pt-BR') }}
+              </span>
+              <ng-template #noDate>
+                <span class="no-date">Nunca</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Ações -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Ações</th>
+            <td mat-cell *matCellDef="let cliente">
+              <div class="action-buttons">
+                <button mat-icon-button color="primary" 
+                        (click)="editCliente(cliente)"
+                        matTooltip="Editar cliente">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                
+                <button mat-icon-button color="warn" 
+                        (click)="deleteCliente(cliente)"
+                        matTooltip="Excluir cliente">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Mensagem quando não há dados -->
+        <div *ngIf="clientesFiltrados().length === 0" class="no-data">
+          <mat-icon>people_outline</mat-icon>
+          <h3>Nenhum cliente encontrado</h3>
+          <p>{{ searchTerm() ? 'Tente ajustar os filtros de busca' : 'Comece adicionando seu primeiro cliente' }}</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

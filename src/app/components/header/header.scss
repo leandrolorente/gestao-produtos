@@ -1,0 +1,98 @@
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .menu-button {
+      color: white;
+    }
+
+    .app-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .header-center {
+    flex: 1;
+    text-align: center;
+
+    .breadcrumb {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .notification-btn {
+      color: white;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .user-details {
+        display: flex;
+        flex-direction: column;
+
+        .user-name {
+          font-size: 0.9rem;
+          font-weight: 600;
+          line-height: 1.2;
+        }
+
+        .user-role {
+          font-size: 0.75rem;
+          opacity: 0.8;
+          line-height: 1.2;
+        }
+      }
+    }
+
+    .user-menu-btn {
+      color: white;
+    }
+  }
+}
+
+// Estilos do menu dropdown
+::ng-deep .user-menu {
+  .logout-item {
+    color: #dc3545 !important;
+    
+    mat-icon {
+      color: #dc3545 !important;
+    }
+  }
+}

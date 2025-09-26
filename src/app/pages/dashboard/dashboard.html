@@ -1,0 +1,127 @@
+<div class="dashboard-container">
+  <!-- Boas-vindas -->
+  <div class="welcome-section">
+    <h1>Bem-vindo de volta, {{ user().name }}!</h1>
+    <p>Aqui está um resumo das informações do seu sistema de gestão.</p>
+  </div>
+
+  <!-- Cards de estatísticas -->
+  <div class="stats-grid">
+    <mat-card class="stat-card primary">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats().totalProducts }}</h3>
+            <p>Total de Produtos</p>
+          </div>
+          <mat-icon class="stat-icon">inventory</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card warning" [class.alert]="stats().lowStockProducts > 0">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats().lowStockProducts }}</h3>
+            <p>Estoque Baixo</p>
+          </div>
+          <mat-icon class="stat-icon">warning</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card success">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats().totalValue | currency:'BRL' }}</h3>
+            <p>Valor Total do Estoque</p>
+          </div>
+          <mat-icon class="stat-icon">attach_money</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card info">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats().recentTransactions }}</h3>
+            <p>Transações Recentes</p>
+          </div>
+          <mat-icon class="stat-icon">trending_up</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Seção de ações rápidas e informações -->
+  <div class="content-grid">
+    <!-- Ações rápidas -->
+    <mat-card class="quick-actions-card">
+      <mat-card-header>
+        <mat-card-title>Ações Rápidas</mat-card-title>
+        <mat-card-subtitle>Acesse rapidamente as principais funcionalidades</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="actions-grid">
+          <button 
+            *ngFor="let action of quickActions"
+            mat-raised-button 
+            [color]="action.color"
+            [routerLink]="action.route"
+            class="action-button">
+            <mat-icon>{{ action.icon }}</mat-icon>
+            <div class="action-text">
+              <span class="action-title">{{ action.title }}</span>
+              <span class="action-description">{{ action.description }}</span>
+            </div>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Produtos mais vendidos -->
+    <mat-card class="top-products-card">
+      <mat-card-header>
+        <mat-card-title>Produtos Mais Vendidos</mat-card-title>
+        <mat-card-subtitle>Top 3 produtos por vendas</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="products-list">
+          <div 
+            *ngFor="let product of stats().topSellingProducts; let i = index"
+            class="product-item">
+            <div class="product-rank">{{ i + 1 }}</div>
+            <div class="product-info">
+              <h4>{{ product.name }}</h4>
+              <p>{{ product.sales }} vendas • {{ product.quantity }} em estoque</p>
+            </div>
+            <div class="product-status">
+              <span 
+                class="stock-indicator"
+                [class]="getStockLevel(product.quantity)">
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Alerta de estoque baixo -->
+  <mat-card *ngIf="stats().lowStockProducts > 0" class="alert-card">
+    <mat-card-content>
+      <div class="alert-content">
+        <mat-icon class="alert-icon">warning</mat-icon>
+        <div class="alert-text">
+          <h3>Atenção: Estoque Baixo</h3>
+          <p>Você tem {{ stats().lowStockProducts }} produto(s) com estoque baixo. 
+             <a routerLink="/produtos" class="alert-link">Clique aqui para verificar</a>
+          </p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

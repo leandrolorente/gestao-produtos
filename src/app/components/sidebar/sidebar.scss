@@ -1,0 +1,136 @@
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: #fff;
+  border-right: 1px solid #e0e0e0;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  left: -280px; // Inicialmente oculta
+  top: 64px; // Altura do header
+  z-index: 999;
+  overflow-y: auto;
+  transition: left 0.3s ease-in-out;
+
+  &.open {
+    left: 0; // Mostra quando aberta
+  }
+
+  // Comportamento no desktop
+  @media (min-width: 769px) {
+    left: -280px; // Sempre oculta por padrão no desktop também
+    
+    &.open {
+      left: 0;
+    }
+  }
+
+  .sidebar-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  .nav-list {
+    padding: 8px 0;
+
+    .nav-item {
+      margin: 0 12px 4px 12px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      position: relative;
+      cursor: pointer;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+
+      &.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        
+        mat-icon {
+          color: white;
+        }
+      }
+
+      &.expandable {
+        .expand-icon {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          transition: transform 0.2s ease;
+        }
+
+        &.expanded .expand-icon {
+          transform: translateY(-50%) rotate(180deg);
+        }
+      }
+
+      .badge {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #dc3545;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-width: 20px;
+        text-align: center;
+      }
+    }
+
+    .nav-group {
+      .sub-menu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin-left: 24px;
+
+        &.expanded {
+          max-height: 200px;
+        }
+
+        .sub-item {
+          margin: 0 12px 2px 12px;
+          font-size: 0.9rem;
+          padding-left: 40px;
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Scroll personalizado
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
