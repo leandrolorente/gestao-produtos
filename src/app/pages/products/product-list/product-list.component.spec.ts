@@ -151,4 +151,98 @@ describe('ProductListComponent', () => {
 
     expect(document.createElement).not.toHaveBeenCalled();
   });
+
+  it('should trigger file input when import button is clicked', () => {
+    spyOn(component.fileInput.nativeElement, 'click');
+    
+    component.triggerFileInput();
+    
+    expect(component.fileInput.nativeElement.click).toHaveBeenCalled();
+  });
+
+  it('should handle file selection correctly', () => {
+    const file = new File(['test content'], 'test.csv', { type: 'text/csv' });
+    const event = {
+      target: {
+        files: [file]
+      }
+    } as any;
+    
+    spyOn(component as any, 'importCsv');
+    
+    component.onFileSelected(event);
+    
+    expect((component as any).importCsv).toHaveBeenCalledWith(file);
+  });
+
+  it('should reject non-CSV files', () => {
+    const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
+    const event = {
+      target: {
+        files: [file]
+      }
+    } as any;
+    
+    spyOn(window, 'alert');
+    spyOn(component as any, 'importCsv');
+    
+    component.onFileSelected(event);
+    
+    expect(window.alert).toHaveBeenCalledWith('Por favor, selecione um arquivo CSV válido.');
+    expect((component as any).importCsv).not.toHaveBeenCalled();
+  });
+
+  it('should parse CSV data correctly', () => {
+    const csvData = `name,sku,quantity,price
+Produto Teste,TEST-001,10,99.99
+Outro Produto,TEST-002,5,49.99`;
+    
+    const products = (component as any).parseCsvToProducts(csvData);
+    
+    expect(products.length).toBe(2);
+    expect(products[0].name).toBe('Produto Teste');
+    expect(products[0].sku).toBe('TEST-001');
+    expect(products[0].quantity).toBe(10);
+    expect(products[0].price).toBe(99.99);
+  });
+
+  it('should add imported products to existing data', () => {
+    const initialCount = component.dataSource.data.length;
+    const newProducts = [
+      {
+        id: 999,
+        name: 'Produto Importado',
+        sku: 'IMP-001',
+        quantity: 15,
+        price: 199.99,
+        lastUpdated: new Date()
+      }
+    ];
+    
+    (component as any).addImportedProducts(newProducts);
+    
+    expect(component.dataSource.data.length).toBe(initialCount + 1);
+    expect(component.dataSource.data[component.dataSource.data.length - 1].name).toBe('Produto Importado');
+  });
+
+  it('should not add duplicate products based on SKU', () => {
+    const initialCount = component.dataSource.data.length;
+    const existingSku = component.dataSource.data[0].sku;
+    const duplicateProducts = [
+      {
+        id: 999,
+        name: 'Produto Duplicado',
+        sku: existingSku, // SKU que já existe
+        quantity: 15,
+        price: 199.99,
+        lastUpdated: new Date()
+      }
+    ];
+    
+    spyOn(window, 'alert');
+    (component as any).addImportedProducts(duplicateProducts);
+    
+    expect(component.dataSource.data.length).toBe(initialCount);
+    expect(window.alert).toHaveBeenCalled();
+  });
 });

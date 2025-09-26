@@ -6,15 +6,24 @@
 
   <mat-card-content>
     <div class="actions-header">
-      <button mat-raised-button color="accent" (click)="exportToCsv()" aria-label="Exportar para CSV" class="export-btn">
-        <mat-icon>cloud_download</mat-icon>
-        Exportar CSV
-      </button>
+      <div class="import-export-buttons">
+        <button mat-raised-button color="warn" (click)="triggerFileInput()" aria-label="Importar CSV" class="import-btn">
+          <mat-icon>cloud_upload</mat-icon>
+          Importar CSV
+        </button>
+        <button mat-raised-button color="accent" (click)="exportToCsv()" aria-label="Exportar para CSV" class="export-btn">
+          <mat-icon>cloud_download</mat-icon>
+          Exportar CSV
+        </button>
+      </div>
       <button mat-fab extended color="primary" (click)="openProductDialog()" aria-label="Adicionar novo produto" class="add-btn">
         <mat-icon>add</mat-icon>
         Adicionar Produto
       </button>
     </div>
+
+    <!-- Input file hidden para importação -->
+    <input #fileInput type="file" accept=".csv" (change)="onFileSelected($event)" style="display: none;" />
 
     <div class="desktop-view">
       <div class="mat-elevation-z8 table-container">

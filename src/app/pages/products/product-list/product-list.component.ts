@@ -1,5 +1,5 @@
 // src/app/pages/product-list/product-list.component.ts
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common'; // <-- 1. GARANTA QUE ESTA LINHA ESTEJA AQUI
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
@@ -56,6 +56,8 @@ export class ProductListComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'name', 'sku', 'quantity', 'price', 'lastUpdated', 'actions'];
   dataSource = new MatTableDataSource<Product>(ELEMENT_DATA);
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  
   constructor(public dialog: MatDialog) {}
 
   ngAfterViewInit() {
@@ -121,5 +123,172 @@ export class ProductListComponent implements AfterViewInit {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        this.importCsv(file);
+      } else {
+        alert('Por favor, selecione um arquivo CSV válido.');
+      }
+    }
+  }
+
+  private importCsv(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const csv = e.target?.result as string;
+        const products = this.parseCsvToProducts(csv);
+        
+        if (products.length > 0) {
+          this.addImportedProducts(products);
+          alert(`${products.length} produto${products.length > 1 ? 's' : ''} importado${products.length > 1 ? 's' : ''} com sucesso!`);
+        } else {
+          alert('Nenhum produto válido encontrado no arquivo CSV.');
+        }
+      } catch (error) {
+        console.error('Erro ao importar CSV:', error);
+        alert('Erro ao processar o arquivo CSV. Verifique o formato e tente novamente.');
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  private parseCsvToProducts(csv: string): Product[] {
+    const lines = csv.split('\n').filter(line => line.trim());
+    if (lines.length < 2) return []; // Precisa ter pelo menos header + 1 linha
+
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    const products: Product[] = [];
+
+    // Validar se tem as colunas necessárias
+    const requiredColumns = ['name', 'sku', 'quantity', 'price'];
+    const hasRequiredColumns = requiredColumns.every(col => 
+      headers.some(header => header.toLowerCase().includes(col.toLowerCase()))
+    );
+
+    if (!hasRequiredColumns) {
+      throw new Error('O arquivo CSV deve conter as colunas: name, sku, quantity, price');
+    }
+
+    // Mapear índices das colunas
+    const columnIndexes = {
+      name: this.findColumnIndex(headers, ['name', 'nome', 'produto']),
+      sku: this.findColumnIndex(headers, ['sku', 'código', 'codigo']),
+      quantity: this.findColumnIndex(headers, ['quantity', 'quantidade', 'qtd', 'estoque']),
+      price: this.findColumnIndex(headers, ['price', 'preço', 'preco', 'valor'])
+    };
+
+    // Processar cada linha de dados
+    for (let i = 1; i < lines.length; i++) {
+      const values = this.parseCsvLine(lines[i]);
+      
+      if (values.length >= Math.max(...Object.values(columnIndexes)) + 1) {
+        try {
+          const product: Product = {
+            id: new Date().getTime() + i, // ID único baseado em timestamp
+            name: values[columnIndexes.name]?.trim() || '',
+            sku: values[columnIndexes.sku]?.trim() || '',
+            quantity: this.parseNumber(values[columnIndexes.quantity]) || 0,
+            price: this.parseNumber(values[columnIndexes.price]) || 0,
+            lastUpdated: new Date()
+          };
+
+          // Validar produto antes de adicionar
+          if (this.isValidProduct(product)) {
+            products.push(product);
+          }
+        } catch (error) {
+          console.warn(`Erro ao processar linha ${i + 1}:`, error);
+        }
+      }
+    }
+
+    return products;
+  }
+
+  private findColumnIndex(headers: string[], possibleNames: string[]): number {
+    for (const name of possibleNames) {
+      const index = headers.findIndex(header => 
+        header.toLowerCase().includes(name.toLowerCase())
+      );
+      if (index !== -1) return index;
+    }
+    return -1;
+  }
+
+  private parseCsvLine(line: string): string[] {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim().replace(/^"|"$/g, ''));
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+
+    result.push(current.trim().replace(/^"|"$/g, ''));
+    return result;
+  }
+
+  private parseNumber(value: string): number {
+    if (!value) return 0;
+    
+    // Remove caracteres não numéricos exceto vírgula, ponto e sinal negativo
+    const cleanValue = value.replace(/[^\d.,-]/g, '');
+    
+    // Converte vírgula para ponto (formato brasileiro)
+    const normalizedValue = cleanValue.replace(',', '.');
+    
+    const parsed = parseFloat(normalizedValue);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  private isValidProduct(product: Product): boolean {
+    return !!(
+      product.name && 
+      product.name.length >= 3 &&
+      product.sku && 
+      product.sku.length >= 3 &&
+      product.quantity >= 0 &&
+      product.price > 0
+    );
+  }
+
+  private addImportedProducts(newProducts: Product[]): void {
+    const currentData = this.dataSource.data;
+    const existingSkus = new Set(currentData.map(p => p.sku.toLowerCase()));
+    
+    // Filtrar produtos que não existem (baseado no SKU)
+    const productsToAdd = newProducts.filter(product => 
+      !existingSkus.has(product.sku.toLowerCase())
+    );
+
+    if (productsToAdd.length < newProducts.length) {
+      const duplicateCount = newProducts.length - productsToAdd.length;
+      alert(`${duplicateCount} produto${duplicateCount > 1 ? 's' : ''} ${duplicateCount > 1 ? 'foram ignorados' : 'foi ignorado'} por já ${duplicateCount > 1 ? 'existirem' : 'existir'} no estoque (SKU duplicado).`);
+    }
+
+    if (productsToAdd.length > 0) {
+      // Adicionar novos produtos
+      const updatedData = [...currentData, ...productsToAdd];
+      this.dataSource.data = updatedData;
+    }
   }
 }
