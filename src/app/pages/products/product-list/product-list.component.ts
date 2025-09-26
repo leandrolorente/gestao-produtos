@@ -9,6 +9,8 @@ import { ProductDialogComponent } from '../../../components/product-dialog/produ
 import { Product } from '../../../models/Product';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 // Dados mockados (simulando um banco de dados)
 const ELEMENT_DATA: Product[] = [
@@ -42,12 +44,14 @@ const ELEMENT_DATA: Product[] = [
   selector: 'app-product-list',
   standalone: true,
   imports: [
-    CommonModule, // <-- 2. A ADIÇÃO DESTE MÓDULO RESOLVE O PROBLEMA
+    CommonModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
     MatSortModule,
     MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
@@ -62,7 +66,19 @@ export class ProductListComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
+    // Configurar filtro customizado para buscar por nome ou SKU
+    this.dataSource.filterPredicate = (data: Product, filter: string) => {
+      const searchTerm = filter.toLowerCase();
+      return data.name.toLowerCase().includes(searchTerm) || 
+             data.sku.toLowerCase().includes(searchTerm);
+    };
   }
+
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
   openProductDialog(product?: Product): void {
     const dialogRef = this.dialog.open(ProductDialogComponent, {
       width: '450px',

@@ -245,4 +245,47 @@ Outro Produto,TEST-002,5,49.99`;
     expect(component.dataSource.data.length).toBe(initialCount);
     expect(window.alert).toHaveBeenCalled();
   });
+
+  it('should filter products by name', () => {
+    const event = {
+      target: { value: 'Teclado' }
+    } as any;
+    
+    component.applyFilter(event);
+    
+    expect(component.dataSource.filter).toBe('teclado');
+  });
+
+  it('should filter products by SKU', () => {
+    const event = {
+      target: { value: 'TEC-001' }
+    } as any;
+    
+    component.applyFilter(event);
+    
+    expect(component.dataSource.filter).toBe('tec-001');
+  });
+
+  it('should use custom filter predicate for name and SKU', () => {
+    const mockProduct = {
+      id: 1,
+      name: 'Teclado Mecânico',
+      sku: 'TEC-001',
+      quantity: 10,
+      price: 99.99,
+      lastUpdated: new Date()
+    };
+
+    // Testa busca por nome
+    const nameMatch = component.dataSource.filterPredicate(mockProduct, 'teclado');
+    expect(nameMatch).toBe(true);
+
+    // Testa busca por SKU
+    const skuMatch = component.dataSource.filterPredicate(mockProduct, 'tec-001');
+    expect(skuMatch).toBe(true);
+
+    // Testa busca que não encontra nada
+    const noMatch = component.dataSource.filterPredicate(mockProduct, 'mouse');
+    expect(noMatch).toBe(false);
+  });
 });
