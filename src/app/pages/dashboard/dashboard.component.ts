@@ -18,8 +18,8 @@ import { DashboardService } from '../../services/dashboard';
     MatIconModule,
     MatGridListModule
   ],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss'
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
   private dashboardService = inject(DashboardService);

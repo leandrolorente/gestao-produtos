@@ -1,8 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header';
-import { Sidebar } from '../../components/sidebar/sidebar';
+import { HeaderComponent } from '../../components/header/header.component';
+import { Sidebar } from '../../components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-main-layout',
@@ -13,8 +13,8 @@ import { Sidebar } from '../../components/sidebar/sidebar';
     HeaderComponent,
     Sidebar
   ],
-  templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss'
+  templateUrl: './main-layout.component.html',
+  styleUrl: './main-layout.component.scss'
 })
 export class MainLayout {
 

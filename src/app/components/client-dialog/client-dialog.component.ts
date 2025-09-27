@@ -27,8 +27,8 @@ export interface ClientDialogData {
     MatSelectModule,
     MatCheckboxModule
   ],
-  templateUrl: './client-dialog.html',
-  styleUrl: './client-dialog.scss'
+  templateUrl: './client-dialog.component.html',
+  styleUrl: './client-dialog.component.scss'
 })
 export class ClientDialogComponent {
   private fb = inject(FormBuilder);

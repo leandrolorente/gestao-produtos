@@ -11,7 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Cliente } from '../../../models/Cliente';
-import { ClientDialogComponent } from '../../../components/client-dialog/client-dialog';
+import { ClientDialogComponent } from '../../../components/client-dialog/client-dialog.component';
 
 // Dados mock para demonstração
 const CLIENTES_DATA: Cliente[] = [
@@ -109,8 +109,8 @@ const CLIENTES_DATA: Cliente[] = [
     MatChipsModule,
     MatTooltipModule
   ],
-  templateUrl: './client-list.html',
-  styleUrl: './client-list.scss'
+  templateUrl: './client-list.component.html',
+  styleUrl: './client-list.component.scss'
 })
 export class ClientListComponent {
   private dialog = inject(MatDialog);

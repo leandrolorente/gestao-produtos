@@ -23,8 +23,8 @@ interface MenuItem {
     MatIconModule,
     MatDividerModule
   ],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss'
+  templateUrl: './sidebar.component.html',
+  styleUrl: './sidebar.component.scss'
 })
 export class Sidebar {
   isOpen = input<boolean>(false);
