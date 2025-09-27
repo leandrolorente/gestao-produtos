@@ -1,1 +1,112 @@
-<p>client-dialog works!</p>
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Cliente' : 'Novo Cliente' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="clienteForm" class="client-form">
+    
+    <!-- Nome e Email -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nome Completo / Razão Social</mat-label>
+        <input matInput formControlName="nome" placeholder="Digite o nome do cliente">
+        <mat-error>{{ getFieldErrorMessage('nome') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="exemplo@email.com">
+        <mat-error>{{ getFieldErrorMessage('email') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Telefone e CPF/CNPJ -->
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone</mat-label>
+        <input matInput formControlName="telefone" placeholder="(00) 00000-0000" 
+               (input)="formatTelefone($event)">
+        <mat-error>{{ getFieldErrorMessage('telefone') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>CPF/CNPJ</mat-label>
+        <input matInput formControlName="cpfCnpj" 
+               (input)="formatCpfCnpj($event)">
+        <mat-error>{{ getFieldErrorMessage('cpfCnpj') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Tipo de Pessoa -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Tipo de Pessoa</mat-label>
+        <mat-select formControlName="tipo">
+          <mat-option value="Pessoa Física">Pessoa Física</mat-option>
+          <mat-option value="Pessoa Jurídica">Pessoa Jurídica</mat-option>
+        </mat-select>
+        <mat-error>{{ getFieldErrorMessage('tipo') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Endereço -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Endereço</mat-label>
+        <input matInput formControlName="endereco" placeholder="Rua, Avenida, número">
+        <mat-error>{{ getFieldErrorMessage('endereco') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Cidade, Estado e CEP -->
+    <div class="form-row three-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Cidade</mat-label>
+        <input matInput formControlName="cidade" placeholder="Nome da cidade">
+        <mat-error>{{ getFieldErrorMessage('cidade') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="estado">
+          <mat-option *ngFor="let estado of estados" [value]="estado">
+            {{ estado }}
+          </mat-option>
+        </mat-select>
+        <mat-error>{{ getFieldErrorMessage('estado') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>CEP</mat-label>
+        <input matInput formControlName="cep" placeholder="00000-000"
+               (input)="formatCep($event)">
+        <mat-error>{{ getFieldErrorMessage('cep') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Status Ativo -->
+    <div class="form-row" *ngIf="isEdit">
+      <mat-checkbox formControlName="ativo">
+        Cliente Ativo
+      </mat-checkbox>
+    </div>
+
+    <!-- Observações -->
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observações</mat-label>
+        <textarea matInput formControlName="observacoes" rows="3" 
+                  placeholder="Informações adicionais sobre o cliente"></textarea>
+      </mat-form-field>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSave()" 
+          [disabled]="clienteForm.invalid">
+    {{ isEdit ? 'Atualizar' : 'Salvar' }}
+  </button>
+</mat-dialog-actions>

@@ -11,7 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Cliente } from '../../../models/Cliente';
-// import { ClientDialogComponent } from '../../../components/client-dialog/client-dialog';
+import { ClientDialogComponent } from '../../../components/client-dialog/client-dialog';
 
 // Dados mock para demonstração
 const CLIENTES_DATA: Cliente[] = [
@@ -150,13 +150,50 @@ export class ClientListComponent {
   }
 
   protected addCliente(): void {
-    // TODO: Implementar dialog quando estiver pronto
-    console.log('Adicionar cliente');
+    const dialogRef = this.dialog.open(ClientDialogComponent, {
+      width: '600px',
+      data: { cliente: null, isEdit: false }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const newCliente: Cliente = {
+          ...result,
+          id: new Date().getTime(),
+          dataCadastro: new Date(),
+          ativo: true
+        };
+        
+        const updatedClientes = [...this.clientes(), newCliente];
+        this.clientes.set(updatedClientes);
+        this.applyFilter();
+        
+        this.snackBar.open('Cliente adicionado com sucesso!', 'Fechar', {
+          duration: 3000
+        });
+      }
+    });
   }
 
   protected editCliente(cliente: Cliente): void {
-    // TODO: Implementar dialog quando estiver pronto
-    console.log('Editar cliente:', cliente);
+    const dialogRef = this.dialog.open(ClientDialogComponent, {
+      width: '600px',
+      data: { cliente, isEdit: true }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const updatedClientes = this.clientes().map(c =>
+          c.id === cliente.id ? { ...result, id: cliente.id, dataCadastro: cliente.dataCadastro } : c
+        );
+        this.clientes.set(updatedClientes);
+        this.applyFilter();
+        
+        this.snackBar.open('Cliente atualizado com sucesso!', 'Fechar', {
+          duration: 3000
+        });
+      }
+    });
   }
 
   protected deleteCliente(cliente: Cliente): void {
