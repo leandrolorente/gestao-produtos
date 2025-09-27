@@ -121,6 +121,7 @@ export class ClientListComponent {
   protected readonly searchTerm = signal<string>('');
 
   protected readonly displayedColumns: string[] = [
+    'id',
     'nome',
     'email',
     'telefone',
