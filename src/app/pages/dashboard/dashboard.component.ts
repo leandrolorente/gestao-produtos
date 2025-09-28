@@ -1,11 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DashboardService } from '../../services/dashboard';
+import { DashboardStats, User } from '../../models/User';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,16 +19,67 @@ import { DashboardService } from '../../services/dashboard';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatGridListModule
+    MatGridListModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
+  private snackBar = inject(MatSnackBar);
 
-  protected readonly stats = this.dashboardService.getDashboardStats();
-  protected readonly user = this.dashboardService.getCurrentUser();
+  protected readonly stats = signal<DashboardStats | null>(null);
+  protected readonly user = signal<User | null>(null);
+  protected readonly isLoading = signal(false);
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  /**
+   * Carrega dados do dashboard (usuário e estatísticas)
+   */
+  protected loadDashboardData(): void {
+    this.isLoading.set(true);
+    
+    // Carrega usuário atual
+    this.dashboardService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.user.set(user);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar usuário:', error);
+        this.snackBar.open('Erro ao carregar dados do usuário', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
+
+    // Carrega estatísticas
+    this.dashboardService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.stats.set(stats);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar estatísticas:', error);
+        this.snackBar.open('Erro ao carregar estatísticas', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Força atualização dos dados
+   */
+  protected refreshData(): void {
+    this.loadDashboardData();
+  }
 
   protected readonly quickActions = [
     {

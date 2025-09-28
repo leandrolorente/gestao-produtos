@@ -1,18 +1,22 @@
 // src/app/pages/product-list/product-list.component.ts
-import { AfterViewInit, Component, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ElementRef, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common'; // <-- 1. GARANTA QUE ESTA LINHA ESTEJA AQUI
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductDialogComponent } from '../../../components/product-dialog/product-dialog.component';
 import { Product } from '../../../models/Product';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ProdutoService } from '../../../services/produto.service';
 
-// Dados mockados (simulando um banco de dados)
+// Dados mockados (comentados para uso posterior se necessário)
+/*
 const ELEMENT_DATA: Product[] = [
   {
     id: 1,
@@ -39,6 +43,7 @@ const ELEMENT_DATA: Product[] = [
     lastUpdated: new Date(),
   },
 ];
+*/
 
 @Component({
   selector: 'app-product-list',
@@ -52,17 +57,29 @@ const ELEMENT_DATA: Product[] = [
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
-export class ProductListComponent implements AfterViewInit {
+export class ProductListComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['id', 'name', 'sku', 'quantity', 'price', 'lastUpdated', 'actions'];
-  dataSource = new MatTableDataSource<Product>(ELEMENT_DATA);
+  dataSource = new MatTableDataSource<Product>([]);
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   
-  constructor(public dialog: MatDialog) {}
+  // Signal para controlar loading local
+  isLoading = signal(false);
+  
+  constructor(
+    public dialog: MatDialog,
+    private produtoService: ProdutoService,
+    private snackBar: MatSnackBar
+  ) {}
+
+  ngOnInit() {
+    this.loadProducts();
+  }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
@@ -72,6 +89,29 @@ export class ProductListComponent implements AfterViewInit {
       return data.name.toLowerCase().includes(searchTerm) || 
              data.sku.toLowerCase().includes(searchTerm);
     };
+  }
+
+  /**
+   * Carrega todos os produtos da API
+   */
+  loadProducts(): void {
+    this.isLoading.set(true);
+    this.produtoService.getAllProducts().subscribe({
+      next: (products) => {
+        this.dataSource.data = products;
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar produtos:', error);
+        this.snackBar.open('Erro ao carregar produtos', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
+        // Em caso de erro, mantém a tabela vazia ou pode usar dados mockados
+        // this.dataSource.data = ELEMENT_DATA;
+      }
+    });
   }
 
   applyFilter(event: Event): void {
@@ -87,30 +127,94 @@ export class ProductListComponent implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        const data = this.dataSource.data;
         if (result.id) {
-          const index = data.findIndex((p) => p.id === result.id);
-          if (index > -1) {
-            data[index] = { ...result, lastUpdated: new Date() };
-            this.dataSource.data = [...data];
-          }
+          // Editar produto existente
+          this.updateProduct(result);
         } else {
-          const newProduct: Product = {
-            ...result,
-            id: new Date().getTime(),
-            lastUpdated: new Date(),
-          };
-          const newData = [...data, newProduct];
-          this.dataSource.data = newData;
+          // Criar novo produto
+          this.createProduct(result);
         }
+      }
+    });
+  }
+
+  /**
+   * Cria um novo produto
+   */
+  private createProduct(productData: any): void {
+    this.isLoading.set(true);
+    this.produtoService.createProduct(productData).subscribe({
+      next: (newProduct) => {
+        this.dataSource.data = [...this.dataSource.data, newProduct];
+        this.snackBar.open('Produto criado com sucesso!', 'Fechar', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao criar produto:', error);
+        this.snackBar.open('Erro ao criar produto', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Atualiza um produto existente
+   */
+  private updateProduct(productData: Product): void {
+    this.isLoading.set(true);
+    this.produtoService.updateProduct(productData).subscribe({
+      next: (updatedProduct) => {
+        const data = this.dataSource.data;
+        const index = data.findIndex((p) => p.id === updatedProduct.id);
+        if (index > -1) {
+          data[index] = updatedProduct;
+          this.dataSource.data = [...data];
+        }
+        this.snackBar.open('Produto atualizado com sucesso!', 'Fechar', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar produto:', error);
+        this.snackBar.open('Erro ao atualizar produto', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
       }
     });
   }
 
   deleteProduct(id: number): void {
     if (confirm('Tem certeza que deseja excluir este produto?')) {
-      const filteredData = this.dataSource.data.filter((p) => p.id !== id);
-      this.dataSource.data = filteredData;
+      this.isLoading.set(true);
+      this.produtoService.deleteProduct(id).subscribe({
+        next: () => {
+          const filteredData = this.dataSource.data.filter((p) => p.id !== id);
+          this.dataSource.data = filteredData;
+          this.snackBar.open('Produto excluído com sucesso!', 'Fechar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Erro ao excluir produto:', error);
+          this.snackBar.open('Erro ao excluir produto', 'Fechar', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+          this.isLoading.set(false);
+        }
+      });
     }
   }
 

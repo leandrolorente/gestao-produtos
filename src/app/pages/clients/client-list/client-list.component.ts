@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,10 +10,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Cliente } from '../../../models/Cliente';
 import { ClientDialogComponent } from '../../../components/client-dialog/client-dialog.component';
+import { ClienteService } from '../../../services/cliente.service';
 
-// Dados mock para demonstração
+// Dados mock para demonstração (comentados para uso posterior se necessário)
+/*
 const CLIENTES_DATA: Cliente[] = [
   {
     id: 1,
@@ -94,6 +97,7 @@ const CLIENTES_DATA: Cliente[] = [
     ultimaCompra: new Date('2024-09-22')
   }
 ];
+*/
 
 @Component({
   selector: 'app-client-list',
@@ -107,18 +111,21 @@ const CLIENTES_DATA: Cliente[] = [
     MatFormFieldModule,
     MatCardModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './client-list.component.html',
   styleUrl: './client-list.component.scss'
 })
-export class ClientListComponent {
+export class ClientListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private clienteService = inject(ClienteService);
 
-  protected readonly clientes = signal<Cliente[]>(CLIENTES_DATA);
-  protected readonly clientesFiltrados = signal<Cliente[]>(CLIENTES_DATA);
+  protected readonly clientes = signal<Cliente[]>([]);
+  protected readonly clientesFiltrados = signal<Cliente[]>([]);
   protected readonly searchTerm = signal<string>('');
+  protected readonly isLoading = signal(false);
 
   protected readonly displayedColumns: string[] = [
     'id',
@@ -132,6 +139,35 @@ export class ClientListComponent {
     'ultimaCompra',
     'actions'
   ];
+
+  ngOnInit(): void {
+    this.loadClientes();
+  }
+
+  /**
+   * Carrega todos os clientes da API
+   */
+  protected loadClientes(): void {
+    this.isLoading.set(true);
+    this.clienteService.getAllClientes().subscribe({
+      next: (clientes) => {
+        this.clientes.set(clientes);
+        this.clientesFiltrados.set(clientes);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao carregar clientes:', error);
+        this.snackBar.open('Erro ao carregar clientes', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
+        // Em caso de erro, mantém a lista vazia ou pode usar dados mockados
+        // this.clientes.set(CLIENTES_DATA);
+        // this.clientesFiltrados.set(CLIENTES_DATA);
+      }
+    });
+  }
 
   protected applyFilter(): void {
     const term = this.searchTerm().toLowerCase();
@@ -158,20 +194,34 @@ export class ClientListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const newCliente: Cliente = {
-          ...result,
-          id: new Date().getTime(),
-          dataCadastro: new Date(),
-          ativo: true
-        };
-        
+        this.createCliente(result);
+      }
+    });
+  }
+
+  /**
+   * Cria um novo cliente
+   */
+  private createCliente(clienteData: any): void {
+    this.isLoading.set(true);
+    this.clienteService.createCliente(clienteData).subscribe({
+      next: (newCliente) => {
         const updatedClientes = [...this.clientes(), newCliente];
         this.clientes.set(updatedClientes);
         this.applyFilter();
-        
         this.snackBar.open('Cliente adicionado com sucesso!', 'Fechar', {
-          duration: 3000
+          duration: 3000,
+          panelClass: ['success-snackbar']
         });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao criar cliente:', error);
+        this.snackBar.open('Erro ao criar cliente', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
       }
     });
   }
@@ -184,41 +234,93 @@ export class ClientListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.updateCliente({ ...result, id: cliente.id });
+      }
+    });
+  }
+
+  /**
+   * Atualiza um cliente existente
+   */
+  private updateCliente(clienteData: Cliente): void {
+    this.isLoading.set(true);
+    this.clienteService.updateCliente(clienteData).subscribe({
+      next: (updatedCliente) => {
         const updatedClientes = this.clientes().map(c =>
-          c.id === cliente.id ? { ...result, id: cliente.id, dataCadastro: cliente.dataCadastro } : c
+          c.id === updatedCliente.id ? updatedCliente : c
         );
         this.clientes.set(updatedClientes);
         this.applyFilter();
-        
         this.snackBar.open('Cliente atualizado com sucesso!', 'Fechar', {
-          duration: 3000
+          duration: 3000,
+          panelClass: ['success-snackbar']
         });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar cliente:', error);
+        this.snackBar.open('Erro ao atualizar cliente', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
       }
     });
   }
 
   protected deleteCliente(cliente: Cliente): void {
     if (confirm(`Tem certeza que deseja excluir o cliente "${cliente.nome}"?`)) {
-      const updatedClientes = this.clientes().filter(c => c.id !== cliente.id);
-      this.clientes.set(updatedClientes);
-      this.applyFilter();
-
-      this.snackBar.open('Cliente excluído com sucesso!', 'Fechar', {
-        duration: 3000
+      this.isLoading.set(true);
+      this.clienteService.deleteCliente(cliente.id).subscribe({
+        next: () => {
+          const updatedClientes = this.clientes().filter(c => c.id !== cliente.id);
+          this.clientes.set(updatedClientes);
+          this.applyFilter();
+          this.snackBar.open('Cliente excluído com sucesso!', 'Fechar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Erro ao excluir cliente:', error);
+          this.snackBar.open('Erro ao excluir cliente', 'Fechar', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+          this.isLoading.set(false);
+        }
       });
     }
   }
 
   protected toggleClienteStatus(cliente: Cliente): void {
-    const updatedClientes = this.clientes().map(c =>
-      c.id === cliente.id ? { ...c, ativo: !c.ativo } : c
-    );
-    this.clientes.set(updatedClientes);
-    this.applyFilter();
-
-    const status = cliente.ativo ? 'desativado' : 'ativado';
-    this.snackBar.open(`Cliente ${status} com sucesso!`, 'Fechar', {
-      duration: 3000
+    this.isLoading.set(true);
+    const newStatus = !cliente.ativo;
+    
+    this.clienteService.toggleClienteStatus(cliente.id, newStatus).subscribe({
+      next: (updatedCliente) => {
+        const updatedClientes = this.clientes().map(c =>
+          c.id === updatedCliente.id ? updatedCliente : c
+        );
+        this.clientes.set(updatedClientes);
+        this.applyFilter();
+        
+        const status = newStatus ? 'ativado' : 'desativado';
+        this.snackBar.open(`Cliente ${status} com sucesso!`, 'Fechar', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Erro ao alterar status do cliente:', error);
+        this.snackBar.open('Erro ao alterar status do cliente', 'Fechar', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
+        this.isLoading.set(false);
+      }
     });
   }
 

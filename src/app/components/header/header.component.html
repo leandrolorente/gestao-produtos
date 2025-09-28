@@ -17,14 +17,14 @@
     </button>
 
     <!-- Informações do usuário -->
-    <div class="user-info">
+    <div class="user-info" *ngIf="currentUser()">
       <img
-        [src]="currentUser().avatar || 'https://via.placeholder.com/40'"
-        [alt]="currentUser().name"
+        [src]="currentUser()?.avatar || 'https://via.placeholder.com/40'"
+        [alt]="currentUser()?.name || 'Usuário'"
         class="user-avatar">
       <div class="user-details">
-        <span class="user-name">{{ currentUser().name }}</span>
-        <span class="user-role">{{ currentUser().department }}</span>
+        <span class="user-name">{{ currentUser()?.name || 'Usuário' }}</span>
+        <span class="user-role">{{ currentUser()?.department || 'N/A' }}</span>
       </div>
     </div>
 
