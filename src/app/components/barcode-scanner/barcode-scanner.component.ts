@@ -74,7 +74,7 @@ import { BarcodeFormat } from '@zxing/library';
             <mat-spinner diameter="50"></mat-spinner>
             <p>{{ loadingMessage() }}</p>
           </div>
-          
+
           <ng-template #noCameraTemplate>
             <div class="no-camera-container">
               <mat-icon class="no-camera-icon">videocam_off</mat-icon>
@@ -85,8 +85,8 @@ import { BarcodeFormat } from '@zxing/library';
               <p *ngIf="!cameraPermissionDenied()">
                 Nenhuma câmera foi encontrada. Use a entrada manual abaixo.
               </p>
-              <button 
-                mat-stroked-button 
+              <button
+                mat-stroked-button
                 color="primary"
                 (click)="retryCamera()"
                 *ngIf="cameraPermissionDenied()">
@@ -99,8 +99,8 @@ import { BarcodeFormat } from '@zxing/library';
 
         <!-- Controles da câmera -->
         <div class="camera-controls" *ngIf="availableDevices().length > 1 && hasDevices()">
-          <button 
-            mat-stroked-button 
+          <button
+            mat-stroked-button
             (click)="switchCamera()"
             [disabled]="isLoading()">
             <mat-icon>switch_camera</mat-icon>
@@ -387,41 +387,41 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
   private async initializeScanner(): Promise<void> {
     try {
       this.loadingMessage.set('Verificando permissões de câmera...');
-      
+
       // Verifica se há dispositivos de mídia disponíveis
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('API de mídia não suportada pelo navegador');
       }
 
       // Solicita permissão para câmera
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
           facingMode: 'environment' // Prefer rear camera for barcode scanning
-        } 
+        }
       });
       stream.getTracks().forEach(track => track.stop()); // Para o stream temporário
 
       this.loadingMessage.set('Enumerando câmeras disponíveis...');
-      
+
       // Enumera dispositivos disponíveis
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
-      
+
       this.availableDevices.set(videoDevices);
-      
+
       if (videoDevices.length > 0) {
         // Prefere câmera traseira se disponível
-        const rearCamera = videoDevices.find(device => 
-          device.label.toLowerCase().includes('back') || 
+        const rearCamera = videoDevices.find(device =>
+          device.label.toLowerCase().includes('back') ||
           device.label.toLowerCase().includes('rear') ||
           device.label.toLowerCase().includes('environment')
         );
-        
+
         this.currentDevice.set(rearCamera || videoDevices[0]);
         this.hasDevices.set(true);
-        
+
         this.loadingMessage.set('Inicializando scanner...');
-        
+
         // Aguarda um momento para que o scanner inicialize
         setTimeout(() => {
           this.scannerEnabled.set(true);
@@ -436,7 +436,7 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
     } catch (error: any) {
       console.error('Erro ao inicializar scanner:', error);
       this.isLoading.set(false);
-      
+
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
         this.cameraPermissionDenied.set(true);
         this.loadingMessage.set('Permissão de câmera negada');
@@ -455,7 +455,7 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
   protected switchCamera(): void {
     const devices = this.availableDevices();
     if (devices.length <= 1) return;
-    
+
     const currentIndex = this.getCurrentCameraIndex();
     const nextIndex = (currentIndex + 1) % devices.length;
     this.currentDevice.set(devices[nextIndex]);
