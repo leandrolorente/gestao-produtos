@@ -10,11 +10,11 @@
       font-size: 2rem;
       font-weight: 500;
       margin-bottom: 8px;
-      color: #1976d2;
+      color: var(--primary-color);
     }
 
     p {
-      color: #666;
+      color: var(--text-secondary);
       font-size: 1.1rem;
     }
   }
@@ -34,9 +34,9 @@
       }
 
       &.primary {
-        border-left: 4px solid #1976d2;
+        border-left: 4px solid var(--primary-color);
         .stat-icon {
-          color: #1976d2;
+          color: var(--primary-color);
         }
       }
 
@@ -56,16 +56,16 @@
       }
 
       &.success {
-        border-left: 4px solid #4caf50;
+        border-left: 4px solid var(--primary-light);
         .stat-icon {
-          color: #4caf50;
+          color: var(--primary-light);
         }
       }
 
       &.info {
-        border-left: 4px solid #2196f3;
+        border-left: 4px solid var(--accent-gradient);
         .stat-icon {
-          color: #2196f3;
+          color: var(--primary-color);
         }
       }
 
@@ -81,12 +81,12 @@
             font-size: 2rem;
             font-weight: 600;
             margin: 0 0 4px 0;
-            color: #333;
+            color: var(--text-primary);
           }
 
           p {
             margin: 0;
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9rem;
           }
         }

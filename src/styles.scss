@@ -6,6 +6,36 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+// === VARIÁVEIS PERSONALIZADAS DO SISTEMA ===
+:root {
+  // Cores principais do sistema (baseadas no sidebar/header)
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-color: #667eea;
+  --primary-dark: #764ba2;
+  --primary-light: #8b9bff;
+  
+  // Variações roxas para diferentes elementos
+  --secondary-gradient: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+  --accent-gradient: linear-gradient(135deg, #b794f6 0%, #9f7aea 100%);
+  
+  // Cores de status mantendo a harmonia roxa
+  --success-gradient: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+  --warning-gradient: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+  --danger-gradient: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+  --info-gradient: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+  
+  // Cores neutras
+  --background-gradient: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  --card-background: #ffffff;
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --border-color: #e2e8f0;
+  
+  // Hover e estados
+  --hover-purple: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  --shadow-purple: rgba(102, 126, 234, 0.15);
+}
+
 html {
   @include mat.theme((
     color: (

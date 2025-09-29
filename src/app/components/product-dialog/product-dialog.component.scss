@@ -1,13 +1,13 @@
 /* src/app/components/product-dialog/product-dialog.component.scss */
 
 .dialog-container {
-  background: #f8f9fa;
+  background: var(--background-gradient);
   border-radius: 16px;
   overflow: hidden;
 }
 
 .dialog-header {
-  background: #5a67d8;
+  background: var(--primary-gradient);
   color: white;
   padding: 1.5rem;
   margin: -24px -24px 24px -24px;
@@ -112,7 +112,7 @@ mat-form-field {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border-color);
   margin: 1rem -1rem 0 -1rem;
   background: #f8f9fa;
 
@@ -126,8 +126,8 @@ mat-form-field {
 }
 
 .cancel-btn {
-  color: #6c757d !important;
-  border: 2px solid #dee2e6 !important;
+  color: var(--text-secondary) !important;
+  border: 2px solid var(--border-color) !important;
   border-radius: 8px;
   padding: 0.5rem 1.5rem;
   transition: all 0.3s ease;
@@ -138,13 +138,13 @@ mat-form-field {
 
   &:hover {
     background: #f8f9fa !important;
-    border-color: #6c757d !important;
-    color: #495057 !important;
+    border-color: var(--text-secondary) !important;
+    color: var(--text-primary) !important;
   }
 }
 
 .save-btn {
-  background: linear-gradient(45deg, #28a745, #20c997) !important;
+  background: var(--primary-gradient) !important;
   color: white !important;
   border-radius: 8px;
   padding: 0.5rem 1.5rem;
