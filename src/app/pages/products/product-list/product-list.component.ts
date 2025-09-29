@@ -105,7 +105,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         console.error('Erro ao carregar produtos:', error);
         this.snackBar.open('Erro ao carregar produtos', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
         // Em caso de erro, mantém a tabela vazia ou pode usar dados mockados
@@ -148,7 +150,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         this.dataSource.data = [...this.dataSource.data, newProduct];
         this.snackBar.open('Produto criado com sucesso!', 'Fechar', {
           duration: 3000,
-          panelClass: ['success-snackbar']
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       },
@@ -156,7 +160,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         console.error('Erro ao criar produto:', error);
         this.snackBar.open('Erro ao criar produto', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       }
@@ -178,7 +184,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         }
         this.snackBar.open('Produto atualizado com sucesso!', 'Fechar', {
           duration: 3000,
-          panelClass: ['success-snackbar']
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       },
@@ -186,7 +194,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
         console.error('Erro ao atualizar produto:', error);
         this.snackBar.open('Erro ao atualizar produto', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       }
@@ -202,7 +212,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
           this.dataSource.data = filteredData;
           this.snackBar.open('Produto excluído com sucesso!', 'Fechar', {
             duration: 3000,
-            panelClass: ['success-snackbar']
+            panelClass: ['snackbar-success'],
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom'
           });
           this.isLoading.set(false);
         },
@@ -210,7 +222,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
           console.error('Erro ao excluir produto:', error);
           this.snackBar.open('Erro ao excluir produto', 'Fechar', {
             duration: 3000,
-            panelClass: ['error-snackbar']
+            panelClass: ['snackbar-error'],
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom'
           });
           this.isLoading.set(false);
         }

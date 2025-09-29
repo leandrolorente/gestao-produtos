@@ -356,7 +356,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
       duration: 4000,
       panelClass: [`snackbar-${type}`],
       horizontalPosition: 'end' as const,
-      verticalPosition: 'top' as const,
+      verticalPosition: 'bottom' as const,
     };
 
     this.snackBar.open(message, 'Fechar', config);

@@ -400,7 +400,7 @@ export class AuthService extends BaseApiService {
       duration,
       panelClass: [`snackbar-${type}`],
       horizontalPosition: 'right',
-      verticalPosition: 'top'
+      verticalPosition: 'bottom'
     });
   }
 }

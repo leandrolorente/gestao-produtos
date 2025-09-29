@@ -52,7 +52,9 @@ export class DashboardComponent implements OnInit {
         console.error('Erro ao carregar usuário:', error);
         this.snackBar.open('Erro ao carregar dados do usuário', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
       }
     });
@@ -67,7 +69,9 @@ export class DashboardComponent implements OnInit {
         console.error('Erro ao carregar estatísticas:', error);
         this.snackBar.open('Erro ao carregar estatísticas', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       }

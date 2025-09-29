@@ -159,7 +159,9 @@ export class ClientListComponent implements OnInit {
         console.error('Erro ao carregar clientes:', error);
         this.snackBar.open('Erro ao carregar clientes', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
         // Em caso de erro, mantém a lista vazia ou pode usar dados mockados
@@ -211,7 +213,9 @@ export class ClientListComponent implements OnInit {
         this.applyFilter();
         this.snackBar.open('Cliente adicionado com sucesso!', 'Fechar', {
           duration: 3000,
-          panelClass: ['success-snackbar']
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       },
@@ -219,7 +223,9 @@ export class ClientListComponent implements OnInit {
         console.error('Erro ao criar cliente:', error);
         this.snackBar.open('Erro ao criar cliente', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       }
@@ -253,7 +259,9 @@ export class ClientListComponent implements OnInit {
         this.applyFilter();
         this.snackBar.open('Cliente atualizado com sucesso!', 'Fechar', {
           duration: 3000,
-          panelClass: ['success-snackbar']
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       },
@@ -261,7 +269,9 @@ export class ClientListComponent implements OnInit {
         console.error('Erro ao atualizar cliente:', error);
         this.snackBar.open('Erro ao atualizar cliente', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       }
@@ -278,7 +288,9 @@ export class ClientListComponent implements OnInit {
           this.applyFilter();
           this.snackBar.open('Cliente excluído com sucesso!', 'Fechar', {
             duration: 3000,
-            panelClass: ['success-snackbar']
+            panelClass: ['snackbar-success'],
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom'
           });
           this.isLoading.set(false);
         },
@@ -286,7 +298,9 @@ export class ClientListComponent implements OnInit {
           console.error('Erro ao excluir cliente:', error);
           this.snackBar.open('Erro ao excluir cliente', 'Fechar', {
             duration: 3000,
-            panelClass: ['error-snackbar']
+            panelClass: ['snackbar-error'],
+            horizontalPosition: 'right',
+            verticalPosition: 'bottom'
           });
           this.isLoading.set(false);
         }
@@ -309,7 +323,9 @@ export class ClientListComponent implements OnInit {
         const status = newStatus ? 'ativado' : 'desativado';
         this.snackBar.open(`Cliente ${status} com sucesso!`, 'Fechar', {
           duration: 3000,
-          panelClass: ['success-snackbar']
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       },
@@ -317,7 +333,9 @@ export class ClientListComponent implements OnInit {
         console.error('Erro ao alterar status do cliente:', error);
         this.snackBar.open('Erro ao alterar status do cliente', 'Fechar', {
           duration: 3000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
         this.isLoading.set(false);
       }

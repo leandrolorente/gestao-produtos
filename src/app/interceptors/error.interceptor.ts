@@ -43,7 +43,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (typeof window !== 'undefined') {
         snackBar.open(errorMessage, 'Fechar', {
           duration: 5000,
-          panelClass: ['error-snackbar']
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
         });
       }
 
