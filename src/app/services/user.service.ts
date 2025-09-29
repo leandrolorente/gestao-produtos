@@ -13,7 +13,7 @@ export interface UserCreateDto {
 }
 
 export interface UserUpdateDto extends Partial<Omit<UserCreateDto, 'password'>> {
-  id: number;
+  id: string;
   password?: string; // Opcional para atualização
 }
 
@@ -31,44 +31,44 @@ export class UserService extends BaseApiService {
   // Dados mockados para fallback
   private readonly MOCK_USERS: User[] = [
     {
-      id: 1,
+      id: '67781ba123456789abcdef01',
       name: 'João Silva',
       email: 'joao.silva@empresa.com',
       avatar: 'https://i.pravatar.cc/150?u=joao',
       department: 'Tecnologia',
       lastUpdated: new Date(),
       role: 'admin',
-      isActive: false
+      isActive: true
     },
     {
-      id: 2,
+      id: '67781ba123456789abcdef02',
       name: 'Maria Santos',
       email: 'maria.santos@empresa.com',
       avatar: 'https://i.pravatar.cc/150?u=maria',
       department: 'Marketing',
       lastUpdated: new Date(),
-      role: 'admin',
-      isActive: false
+      role: 'manager',
+      isActive: true
     },
     {
-      id: 3,
+      id: '67781ba123456789abcdef03',
       name: 'Pedro Oliveira',
       email: 'pedro.oliveira@empresa.com',
       avatar: 'https://i.pravatar.cc/150?u=pedro',
       department: 'Vendas',
       lastUpdated: new Date(),
-      role: 'admin',
-      isActive: false
+      role: 'user',
+      isActive: true
     },
     {
-      id: 4,
+      id: '67781ba123456789abcdef04',
       name: 'Ana Costa',
       email: 'ana.costa@empresa.com',
       avatar: 'https://i.pravatar.cc/150?u=ana',
       department: 'Recursos Humanos',
       lastUpdated: new Date(),
-      role: 'admin',
-      isActive: false
+      role: 'manager',
+      isActive: true
     },
   ];
 
@@ -97,7 +97,7 @@ export class UserService extends BaseApiService {
   /**
    * Obtém um usuário por ID
    */
-  getUserById(id: number): Observable<User> {
+  getUserById(id: string): Observable<User> {
     this.setLoading(true);
 
     return this.http.get<UserResponse>(this.buildUrl(`users/${id}`), this.httpOptions).pipe(
@@ -141,7 +141,7 @@ export class UserService extends BaseApiService {
     };
 
     return this.http
-      .post<UserResponse>(this.buildUrl('Auth/register'), userForApi, this.httpOptions)
+      .post<UserResponse>(this.buildUrl('users'), userForApi, this.httpOptions)
       .pipe(
         map((newUser: UserResponse) => {
           const convertedUser = this.convertFromApi(newUser);
@@ -154,7 +154,7 @@ export class UserService extends BaseApiService {
           console.warn('Erro ao criar usuário na API, simulando criação:', error);
           // Simula criação local para desenvolvimento
           const mockUser: User = {
-            id: new Date().getTime(),
+            id: new Date().getTime().toString(),
             name: userData.name,
             email: userData.email,
             avatar: userData.avatar,
@@ -234,7 +234,7 @@ export class UserService extends BaseApiService {
   /**
    * Remove um usuário
    */
-  deleteUser(id: number): Observable<void> {
+  deleteUser(id: string): Observable<void> {
     this.setLoading(true);
 
     return this.http.delete<void>(this.buildUrl(`users/${id}`), this.httpOptions).pipe(
@@ -268,8 +268,8 @@ export class UserService extends BaseApiService {
       avatar: apiUser.avatar,
       department: apiUser.department,
       lastUpdated: apiUser.updatedAt ? new Date(apiUser.updatedAt) : new Date(),
-      role: 'admin',
-      isActive: false,
+      role: apiUser.role || 'user',
+      isActive: apiUser.isActive ?? true,
     };
   }
 

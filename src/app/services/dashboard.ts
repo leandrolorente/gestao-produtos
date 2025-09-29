@@ -72,7 +72,7 @@ export class DashboardService extends BaseApiService {
    */
   private getMockUser(): User {
     return {
-      id: 1,
+      id: '67781ba123456789abcdef01',
       name: 'Leandro Lorente',
       email: 'leandro@empresa.com',
       role: 'admin',

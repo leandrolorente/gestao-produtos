@@ -298,14 +298,14 @@ export class UserListComponent implements OnInit, AfterViewInit {
         const values = lines[i].split(',').map(v => v.trim());
         if (values.length >= headers.length) {
           users.push({
-            id: new Date().getTime() + i,
+            id: (new Date().getTime() + i).toString(),
             name: values[0] || '',
             email: values[1] || '',
             avatar: values[2] || 'https://i.pravatar.cc/150?u=default',
             department: values[3] || '',
             lastUpdated: new Date(),
-            role: 'admin',
-            isActive: false
+            role: 'user',
+            isActive: true
           });
         }
       }

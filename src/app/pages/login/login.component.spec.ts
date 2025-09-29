@@ -27,10 +27,11 @@ describe('LoginComponent', () => {
     // Mock dos retornos dos métodos
     mockAuthService.isAuthenticated.and.returnValue(false);
     mockAuthService.login.and.returnValue(of({
-      id: 1,
+      id: '67781ba123456789abcdef01',
       name: 'Test User',
       email: 'test@test.com',
-      department: 'TI'
+      department: 'TI',
+      role: 'user'
     }));
     mockAuthService.forgotPassword.and.returnValue(of({
       message: 'E-mail enviado'

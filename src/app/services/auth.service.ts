@@ -14,14 +14,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string;
   refreshToken: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    avatar?: string;
-    department: string;
-    role?: string;
-  };
+  user: AuthUser;
   expiresIn: number;
 }
 
@@ -36,12 +29,12 @@ export interface ResetPasswordRequest {
 }
 
 export interface AuthUser {
-  id: number;
+  id: string; // Mudado para string para compatibilidade com MongoDB ObjectId
   name: string;
   email: string;
   avatar?: string;
   department: string;
-  role?: string;
+  role: 'admin' | 'manager' | 'user';
 }
 
 @Injectable({
@@ -112,7 +105,7 @@ export class AuthService extends BaseApiService {
           // Simulação de login para desenvolvimento
           if (credentials.email === 'admin@gestao.com' && credentials.password === 'admin123') {
             const mockUser: AuthUser = {
-              id: 1,
+              id: '67781ba123456789abcdef01',
               name: 'Administrador',
               email: 'admin@gestao.com',
               avatar: 'https://i.pravatar.cc/150?u=admin',

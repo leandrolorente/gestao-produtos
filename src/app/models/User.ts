@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string; // Mudado para string para compatibilidade com MongoDB ObjectId
   name: string;
   email: string;
   password?: string; // Optional para edição (não deve ser exibida)
@@ -22,11 +22,13 @@ export interface UserCreate {
 
 // Interface para resposta da API
 export interface UserResponse {
-  id: number;
+  id: string; // Mudado para string para compatibilidade com MongoDB ObjectId
   name: string;
   email: string;
   avatar: string;
   department: string;
+  role: 'admin' | 'manager' | 'user';
+  isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
