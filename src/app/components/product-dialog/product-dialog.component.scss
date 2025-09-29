@@ -60,6 +60,33 @@
   flex: 1;
 }
 
+.barcode-field {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.barcode-scan-button {
+  color: var(--primary-color);
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  margin-top: 8px;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  mat-icon {
+    font-size: 1.5rem;
+  }
+}
+
 mat-form-field {
   margin-bottom: 0.5rem;
 

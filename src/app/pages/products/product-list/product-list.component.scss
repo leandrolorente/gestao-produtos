@@ -146,6 +146,26 @@
   color: var(--text-secondary);
 }
 
+.barcode-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+
+  .barcode-icon {
+    font-size: 1rem;
+    color: var(--primary-color);
+  }
+}
+
+.no-barcode {
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.7;
+}
+
 .quantity-badge {
   background: var(--success-gradient);
   color: white;

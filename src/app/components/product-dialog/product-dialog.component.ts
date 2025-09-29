@@ -1,17 +1,20 @@
 // src/app/components/product-dialog/product-dialog.component.ts
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
   MatDialogModule,
   MatDialogRef,
-  MAT_DIALOG_DATA
+  MAT_DIALOG_DATA,
+  MatDialog
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
 import { Product } from '../../models/Product';
+import { BarcodeScannerComponent } from '../barcode-scanner/barcode-scanner.component';
 
 @Component({
   selector: 'app-product-dialog',
@@ -24,6 +27,7 @@ import { Product } from '../../models/Product';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   templateUrl: './product-dialog.component.html',
   styleUrls: ['./product-dialog.component.scss']
@@ -31,6 +35,7 @@ import { Product } from '../../models/Product';
 export class ProductDialogComponent {
   form: FormGroup;
   isEditMode: boolean;
+  private dialog = inject(MatDialog);
 
   constructor(
     private fb: FormBuilder,
@@ -42,6 +47,7 @@ export class ProductDialogComponent {
       id: [data?.id],
       name: [data?.name || '', [Validators.required, Validators.minLength(3)]],
       sku: [data?.sku || '', [Validators.required, Validators.minLength(3)]],
+      barcode: [data?.barcode || '', [Validators.pattern(/^[0-9]{8,20}$/)]],
       quantity: [data?.quantity ?? '', [Validators.required, Validators.min(0)]],
       price: [data?.price ?? '', [Validators.required, Validators.min(0.01)]],
     });
@@ -84,6 +90,25 @@ export class ProductDialogComponent {
     this.form.get('quantity')?.setValue(value);
   }
 
+  openBarcodeScanner(): void {
+    const dialogRef = this.dialog.open(BarcodeScannerComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      data: { initialCode: this.form.get('barcode')?.value || '' },
+      disableClose: false,
+      hasBackdrop: true,
+      backdropClass: 'barcode-scanner-backdrop'
+    });
+
+    dialogRef.afterClosed().subscribe((barcode: string) => {
+      if (barcode) {
+        this.form.get('barcode')?.setValue(barcode);
+        this.form.get('barcode')?.markAsTouched();
+      }
+    });
+  }
+
   getFieldErrorMessage(fieldName: string): string {
     const control = this.form.get(fieldName);
     if (control?.hasError('required')) {
@@ -95,6 +120,11 @@ export class ProductDialogComponent {
     if (control?.hasError('min')) {
       return `${this.getFieldLabel(fieldName)} deve ser maior que ${control.errors?.['min'].min}`;
     }
+    if (control?.hasError('pattern')) {
+      if (fieldName === 'barcode') {
+        return 'Código de barras deve conter apenas números (8-20 dígitos)';
+      }
+    }
     return '';
   }
 
@@ -102,6 +132,7 @@ export class ProductDialogComponent {
     const labels: { [key: string]: string } = {
       name: 'Nome',
       sku: 'SKU',
+      barcode: 'Código de Barras',
       quantity: 'Quantidade',
       price: 'Preço'
     };

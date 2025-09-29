@@ -63,7 +63,7 @@ const ELEMENT_DATA: Product[] = [
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'name', 'sku', 'quantity', 'price', 'lastUpdated', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'sku', 'barcode', 'quantity', 'price', 'lastUpdated', 'actions'];
   dataSource = new MatTableDataSource<Product>([]);
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -83,11 +83,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
-    // Configurar filtro customizado para buscar por nome ou SKU
+    // Configurar filtro customizado para buscar por nome, SKU ou código de barras
     this.dataSource.filterPredicate = (data: Product, filter: string) => {
       const searchTerm = filter.toLowerCase();
       return data.name.toLowerCase().includes(searchTerm) ||
-             data.sku.toLowerCase().includes(searchTerm);
+             data.sku.toLowerCase().includes(searchTerm) ||
+             (data.barcode ? data.barcode.toLowerCase().includes(searchTerm) : false);
     };
   }
 

@@ -32,6 +32,26 @@
       </mat-form-field>
     </div>
 
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="barcode-field">
+        <mat-label>Código de Barras</mat-label>
+        <input matInput
+               formControlName="barcode"
+               placeholder="Ex: 7891234567890"
+               maxlength="50">
+        <mat-icon matSuffix>barcode_reader</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('barcode') }}</mat-error>
+      </mat-form-field>
+      <button 
+        mat-icon-button
+        type="button"
+        (click)="openBarcodeScanner()"
+        matTooltip="Ler código de barras com câmera"
+        class="barcode-scan-button">
+        <mat-icon>qr_code_scanner</mat-icon>
+      </button>
+    </div>
+
     <div class="form-row-split">
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>Quantidade em Estoque</mat-label>
