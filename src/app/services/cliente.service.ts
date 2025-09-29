@@ -175,13 +175,13 @@ export class ClienteService extends BaseApiService {
    */
   createCliente(cliente: ClienteCreateDto): Observable<Cliente> {
     this.loadingSubject.next(true);
-    
+
     // Converte os dados para o formato esperado pela API
     const clienteForApi = {
       ...cliente,
       tipo: cliente.tipo === 'Pessoa Física' ? 1 : 2 // Converte string para número
     };
-    
+
     return this.http.post<any>(this.buildUrl('clientes'), clienteForApi, this.httpOptions)
       .pipe(
         tap(newClienteApi => {
@@ -194,7 +194,7 @@ export class ClienteService extends BaseApiService {
         catchError(error => {
           console.error('Erro ao criar cliente na API:', error);
           this.loadingSubject.next(false);
-          
+
           // Fallback: cria cliente localmente quando API falha
           const novoCliente: Cliente = {
             id: new Date().getTime(), // ID temporário
@@ -211,11 +211,11 @@ export class ClienteService extends BaseApiService {
             observacoes: cliente.observacoes || '',
             dataCadastro: new Date()
           };
-          
+
           // Atualiza a lista local com o cliente criado
           const currentClientes = this.clientesSignal();
           this.clientesSignal.set([...currentClientes, novoCliente]);
-          
+
           return of(novoCliente);
         })
       );
