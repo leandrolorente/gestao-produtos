@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { BaseApiService } from './base-api.service';
 import { Cliente } from '../models/Cliente';
@@ -14,6 +14,7 @@ export interface ClienteCreateDto {
   estado?: string;
   cep?: string;
   tipo: 'Pessoa Física' | 'Pessoa Jurídica';
+  ativo?: boolean;
   observacoes?: string;
 }
 
@@ -27,7 +28,7 @@ export interface ClienteUpdateDto extends Partial<ClienteCreateDto> {
 export class ClienteService extends BaseApiService {
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   public readonly loading$ = this.loadingSubject.asObservable();
-  
+
   // Signal para armazenar os clientes localmente
   private readonly clientesSignal = signal<Cliente[]>([]);
   public readonly clientes = this.clientesSignal.asReadonly();
@@ -56,12 +57,24 @@ export class ClienteService extends BaseApiService {
   */
 
   /**
+   * Converte dados da API (tipo numérico) para formato interno (tipo string)
+   */
+  private convertFromApi(cliente: any): Cliente {
+    return {
+      ...cliente,
+      tipo: cliente.tipo === 1 ? 'Pessoa Física' : 'Pessoa Jurídica',
+      dataCadastro: new Date(cliente.dataCadastro),
+      ultimaCompra: cliente.ultimaCompra ? new Date(cliente.ultimaCompra) : undefined
+    };
+  }
+
+  /**
    * Busca todos os clientes
    */
   getAllClientes(): Observable<Cliente[]> {
     this.loadingSubject.next(true);
-    
-    return this.http.get<Cliente[]>(this.buildUrl('clientes'), this.httpOptions)
+
+    return this.http.get<any[]>(this.buildUrl('clientes'), this.httpOptions)
       .pipe(
         tap(clientes => {
           // Se a API retornar lista vazia, usa dados mockados para demonstração
@@ -69,7 +82,9 @@ export class ClienteService extends BaseApiService {
             const mockClientes = this.getMockClientes();
             this.clientesSignal.set(mockClientes);
           } else {
-            this.clientesSignal.set(clientes);
+            // Converte os dados da API para o formato interno
+            const clientesConvertidos = clientes.map(cliente => this.convertFromApi(cliente));
+            this.clientesSignal.set(clientesConvertidos);
           }
           this.loadingSubject.next(false);
         }),
@@ -144,7 +159,7 @@ export class ClienteService extends BaseApiService {
    */
   getClienteById(id: number): Observable<Cliente> {
     this.loadingSubject.next(true);
-    
+
     return this.http.get<Cliente>(this.buildUrl(`clientes/${id}`), this.httpOptions)
       .pipe(
         tap(() => this.loadingSubject.next(false)),
@@ -161,31 +176,66 @@ export class ClienteService extends BaseApiService {
   createCliente(cliente: ClienteCreateDto): Observable<Cliente> {
     this.loadingSubject.next(true);
     
-    return this.http.post<Cliente>(this.buildUrl('clientes'), cliente, this.httpOptions)
+    // Converte os dados para o formato esperado pela API
+    const clienteForApi = {
+      ...cliente,
+      tipo: cliente.tipo === 'Pessoa Física' ? 1 : 2 // Converte string para número
+    };
+    
+    return this.http.post<any>(this.buildUrl('clientes'), clienteForApi, this.httpOptions)
       .pipe(
-        tap(newCliente => {
-          // Atualiza a lista local
+        tap(newClienteApi => {
+          // Converte e atualiza a lista local
+          const newCliente = this.convertFromApi(newClienteApi);
           const currentClientes = this.clientesSignal();
           this.clientesSignal.set([...currentClientes, newCliente]);
           this.loadingSubject.next(false);
         }),
         catchError(error => {
+          console.error('Erro ao criar cliente na API:', error);
           this.loadingSubject.next(false);
-          return this.handleError(error);
+          
+          // Fallback: cria cliente localmente quando API falha
+          const novoCliente: Cliente = {
+            id: new Date().getTime(), // ID temporário
+            nome: cliente.nome,
+            email: cliente.email,
+            telefone: cliente.telefone || '',
+            cpfCnpj: cliente.cpfCnpj,
+            endereco: cliente.endereco || '',
+            cidade: cliente.cidade || '',
+            estado: cliente.estado || '',
+            cep: cliente.cep || '',
+            tipo: cliente.tipo,
+            ativo: true,
+            observacoes: cliente.observacoes || '',
+            dataCadastro: new Date()
+          };
+          
+          // Atualiza a lista local com o cliente criado
+          const currentClientes = this.clientesSignal();
+          this.clientesSignal.set([...currentClientes, novoCliente]);
+          
+          return of(novoCliente);
         })
       );
-  }
-
-  /**
+  }  /**
    * Atualiza um cliente existente
    */
   updateCliente(cliente: ClienteUpdateDto): Observable<Cliente> {
     this.loadingSubject.next(true);
-    
-    return this.http.put<Cliente>(this.buildUrl(`clientes/${cliente.id}`), cliente, this.httpOptions)
+
+    // Converte os dados para o formato esperado pela API se o tipo estiver presente
+    const clienteForApi = {
+      ...cliente,
+      ...(cliente.tipo && { tipo: cliente.tipo === 'Pessoa Física' ? 1 : 2 })
+    };
+
+    return this.http.put<any>(this.buildUrl(`clientes/${cliente.id}`), clienteForApi, this.httpOptions)
       .pipe(
-        tap(updatedCliente => {
-          // Atualiza a lista local
+        tap(updatedClienteApi => {
+          // Converte e atualiza a lista local
+          const updatedCliente = this.convertFromApi(updatedClienteApi);
           const currentClientes = this.clientesSignal();
           const index = currentClientes.findIndex(c => c.id === updatedCliente.id);
           if (index !== -1) {
@@ -207,7 +257,7 @@ export class ClienteService extends BaseApiService {
    */
   deleteCliente(id: number): Observable<void> {
     this.loadingSubject.next(true);
-    
+
     return this.http.delete<void>(this.buildUrl(`clientes/${id}`), this.httpOptions)
       .pipe(
         tap(() => {
@@ -227,19 +277,19 @@ export class ClienteService extends BaseApiService {
   /**
    * Busca clientes com filtros
    */
-  searchClientes(filters?: { 
-    nome?: string; 
-    email?: string; 
+  searchClientes(filters?: {
+    nome?: string;
+    email?: string;
     cpfCnpj?: string;
     tipo?: 'Pessoa Física' | 'Pessoa Jurídica';
     ativo?: boolean;
   }): Observable<Cliente[]> {
     this.loadingSubject.next(true);
     const params = this.buildParams(filters);
-    
-    return this.http.get<Cliente[]>(this.buildUrl('clientes'), { 
-      ...this.httpOptions, 
-      params 
+
+    return this.http.get<Cliente[]>(this.buildUrl('clientes'), {
+      ...this.httpOptions,
+      params
     }).pipe(
       tap(clientes => {
         this.clientesSignal.set(clientes);
@@ -257,10 +307,10 @@ export class ClienteService extends BaseApiService {
    */
   toggleClienteStatus(id: number, ativo: boolean): Observable<Cliente> {
     this.loadingSubject.next(true);
-    
+
     return this.http.patch<Cliente>(
-      this.buildUrl(`clientes/${id}/status`), 
-      { ativo }, 
+      this.buildUrl(`clientes/${id}/status`),
+      { ativo },
       this.httpOptions
     ).pipe(
       tap(updatedCliente => {

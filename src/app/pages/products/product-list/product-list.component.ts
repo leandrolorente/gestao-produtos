@@ -67,10 +67,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<Product>([]);
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  
+
   // Signal para controlar loading local
   isLoading = signal(false);
-  
+
   constructor(
     public dialog: MatDialog,
     private produtoService: ProdutoService,
@@ -86,7 +86,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     // Configurar filtro customizado para buscar por nome ou SKU
     this.dataSource.filterPredicate = (data: Product, filter: string) => {
       const searchTerm = filter.toLowerCase();
-      return data.name.toLowerCase().includes(searchTerm) || 
+      return data.name.toLowerCase().includes(searchTerm) ||
              data.sku.toLowerCase().includes(searchTerm);
     };
   }
@@ -267,7 +267,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       try {
         const csv = e.target?.result as string;
         const products = this.parseCsvToProducts(csv);
-        
+
         if (products.length > 0) {
           this.addImportedProducts(products);
           alert(`${products.length} produto${products.length > 1 ? 's' : ''} importado${products.length > 1 ? 's' : ''} com sucesso!`);
@@ -291,7 +291,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
     // Validar se tem as colunas necessárias
     const requiredColumns = ['name', 'sku', 'quantity', 'price'];
-    const hasRequiredColumns = requiredColumns.every(col => 
+    const hasRequiredColumns = requiredColumns.every(col =>
       headers.some(header => header.toLowerCase().includes(col.toLowerCase()))
     );
 
@@ -310,7 +310,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     // Processar cada linha de dados
     for (let i = 1; i < lines.length; i++) {
       const values = this.parseCsvLine(lines[i]);
-      
+
       if (values.length >= Math.max(...Object.values(columnIndexes)) + 1) {
         try {
           const product: Product = {
@@ -337,7 +337,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   private findColumnIndex(headers: string[], possibleNames: string[]): number {
     for (const name of possibleNames) {
-      const index = headers.findIndex(header => 
+      const index = headers.findIndex(header =>
         header.toLowerCase().includes(name.toLowerCase())
       );
       if (index !== -1) return index;
@@ -369,22 +369,22 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   private parseNumber(value: string): number {
     if (!value) return 0;
-    
+
     // Remove caracteres não numéricos exceto vírgula, ponto e sinal negativo
     const cleanValue = value.replace(/[^\d.,-]/g, '');
-    
+
     // Converte vírgula para ponto (formato brasileiro)
     const normalizedValue = cleanValue.replace(',', '.');
-    
+
     const parsed = parseFloat(normalizedValue);
     return isNaN(parsed) ? 0 : parsed;
   }
 
   private isValidProduct(product: Product): boolean {
     return !!(
-      product.name && 
+      product.name &&
       product.name.length >= 3 &&
-      product.sku && 
+      product.sku &&
       product.sku.length >= 3 &&
       product.quantity >= 0 &&
       product.price > 0
@@ -394,9 +394,9 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   private addImportedProducts(newProducts: Product[]): void {
     const currentData = this.dataSource.data;
     const existingSkus = new Set(currentData.map(p => p.sku.toLowerCase()));
-    
+
     // Filtrar produtos que não existem (baseado no SKU)
-    const productsToAdd = newProducts.filter(product => 
+    const productsToAdd = newProducts.filter(product =>
       !existingSkus.has(product.sku.toLowerCase())
     );
 

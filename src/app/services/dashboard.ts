@@ -49,7 +49,7 @@ export class DashboardService extends BaseApiService {
    */
   getCurrentUser(): Observable<User> {
     this.loadingSubject.next(true);
-    
+
     return this.http.get<User>(this.buildUrl('auth/me'), this.httpOptions)
       .pipe(
         tap(user => {
@@ -88,7 +88,7 @@ export class DashboardService extends BaseApiService {
    */
   getDashboardStats(): Observable<DashboardStats> {
     this.loadingSubject.next(true);
-    
+
     return this.http.get<DashboardStats>(this.buildUrl('dashboard/stats'), this.httpOptions)
       .pipe(
         tap(stats => {
@@ -129,7 +129,7 @@ export class DashboardService extends BaseApiService {
    */
   updateUserInfo(user: Partial<User>): Observable<User> {
     this.loadingSubject.next(true);
-    
+
     return this.http.put<User>(this.buildUrl('auth/profile'), user, this.httpOptions)
       .pipe(
         tap(updatedUser => {

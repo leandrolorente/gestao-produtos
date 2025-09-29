@@ -21,7 +21,7 @@ export interface ProductUpdateDto extends Partial<ProductCreateDto> {
 export class ProdutoService extends BaseApiService {
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   public readonly loading$ = this.loadingSubject.asObservable();
-  
+
   // Signal para armazenar os produtos localmente
   private readonly productsSignal = signal<Product[]>([]);
   public readonly products = this.productsSignal.asReadonly();
@@ -61,7 +61,7 @@ export class ProdutoService extends BaseApiService {
    */
   getAllProducts(): Observable<Product[]> {
     this.loadingSubject.next(true);
-    
+
     return this.http.get<Product[]>(this.buildUrl('produtos'), this.httpOptions)
       .pipe(
         tap(products => {
@@ -122,7 +122,7 @@ export class ProdutoService extends BaseApiService {
    */
   getProductById(id: number): Observable<Product> {
     this.loadingSubject.next(true);
-    
+
     return this.http.get<Product>(this.buildUrl(`produtos/${id}`), this.httpOptions)
       .pipe(
         tap(() => this.loadingSubject.next(false)),
@@ -138,7 +138,7 @@ export class ProdutoService extends BaseApiService {
    */
   createProduct(product: ProductCreateDto): Observable<Product> {
     this.loadingSubject.next(true);
-    
+
     return this.http.post<Product>(this.buildUrl('produtos'), product, this.httpOptions)
       .pipe(
         tap(newProduct => {
@@ -159,7 +159,7 @@ export class ProdutoService extends BaseApiService {
    */
   updateProduct(product: ProductUpdateDto): Observable<Product> {
     this.loadingSubject.next(true);
-    
+
     return this.http.put<Product>(this.buildUrl(`produtos/${product.id}`), product, this.httpOptions)
       .pipe(
         tap(updatedProduct => {
@@ -185,7 +185,7 @@ export class ProdutoService extends BaseApiService {
    */
   deleteProduct(id: number): Observable<void> {
     this.loadingSubject.next(true);
-    
+
     return this.http.delete<void>(this.buildUrl(`produtos/${id}`), this.httpOptions)
       .pipe(
         tap(() => {
@@ -208,10 +208,10 @@ export class ProdutoService extends BaseApiService {
   searchProducts(filters?: { name?: string; sku?: string; lowStock?: boolean }): Observable<Product[]> {
     this.loadingSubject.next(true);
     const params = this.buildParams(filters);
-    
-    return this.http.get<Product[]>(this.buildUrl('produtos'), { 
-      ...this.httpOptions, 
-      params 
+
+    return this.http.get<Product[]>(this.buildUrl('produtos'), {
+      ...this.httpOptions,
+      params
     }).pipe(
       tap(products => {
         this.productsSignal.set(products);

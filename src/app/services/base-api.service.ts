@@ -8,7 +8,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class BaseApiService {
   protected readonly apiUrl = 'http://localhost:5278/api';
-  
+
   protected readonly httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'

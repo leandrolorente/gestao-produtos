@@ -38,7 +38,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       console.error('Erro HTTP:', error);
-      
+
       // Só mostra snackbar se estiver no navegador
       if (typeof window !== 'undefined') {
         snackBar.open(errorMessage, 'Fechar', {

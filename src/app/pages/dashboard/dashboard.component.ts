@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
    */
   protected loadDashboardData(): void {
     this.isLoading.set(true);
-    
+
     // Carrega usuário atual
     this.dashboardService.getCurrentUser().subscribe({
       next: (user) => {

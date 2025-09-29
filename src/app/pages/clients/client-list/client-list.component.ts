@@ -297,7 +297,7 @@ export class ClientListComponent implements OnInit {
   protected toggleClienteStatus(cliente: Cliente): void {
     this.isLoading.set(true);
     const newStatus = !cliente.ativo;
-    
+
     this.clienteService.toggleClienteStatus(cliente.id, newStatus).subscribe({
       next: (updatedCliente) => {
         const updatedClientes = this.clientes().map(c =>
@@ -305,7 +305,7 @@ export class ClientListComponent implements OnInit {
         );
         this.clientes.set(updatedClientes);
         this.applyFilter();
-        
+
         const status = newStatus ? 'ativado' : 'desativado';
         this.snackBar.open(`Cliente ${status} com sucesso!`, 'Fechar', {
           duration: 3000,
