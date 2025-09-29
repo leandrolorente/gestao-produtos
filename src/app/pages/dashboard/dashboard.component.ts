@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DashboardService } from '../../services/dashboard';
 import { DashboardStats, User } from '../../models/User';
@@ -20,7 +21,8 @@ import { DashboardStats, User } from '../../models/User';
     MatButtonModule,
     MatIconModule,
     MatGridListModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -32,6 +34,7 @@ export class DashboardComponent implements OnInit {
   protected readonly stats = signal<DashboardStats | null>(null);
   protected readonly user = signal<User | null>(null);
   protected readonly isLoading = signal(false);
+  protected readonly isRefreshing = signal(false);
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -83,6 +86,35 @@ export class DashboardComponent implements OnInit {
    */
   protected refreshData(): void {
     this.loadDashboardData();
+  }
+
+  /**
+   * Força atualização apenas das estatísticas
+   */
+  protected refreshStats(): void {
+    this.isRefreshing.set(true);
+    this.dashboardService.refreshStats().subscribe({
+      next: (stats) => {
+        this.stats.set(stats);
+        this.isRefreshing.set(false);
+        this.snackBar.open('Estatísticas atualizadas!', 'Fechar', {
+          duration: 3000,
+          panelClass: ['snackbar-success'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
+        });
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar estatísticas:', error);
+        this.isRefreshing.set(false);
+        this.snackBar.open('Erro ao atualizar estatísticas', 'Fechar', {
+          duration: 3000,
+          panelClass: ['snackbar-error'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
+        });
+      }
+    });
   }
 
   protected readonly quickActions = [

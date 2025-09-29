@@ -61,7 +61,7 @@ export class NotificationService {
    * Exibe mensagem personalizada
    */
   show(
-    message: string, 
+    message: string,
     type: 'success' | 'error' | 'warning' | 'info' | 'primary' = 'primary',
     duration = 4000,
     action = 'Fechar'

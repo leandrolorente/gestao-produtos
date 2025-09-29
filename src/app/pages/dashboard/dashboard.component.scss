@@ -6,16 +6,39 @@
   .welcome-section {
     margin-bottom: 32px;
 
-    h1 {
-      font-size: 2rem;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: var(--primary-color);
-    }
+    .welcome-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      
+      .welcome-text {
+        flex: 1;
+        
+        h1 {
+          font-size: 2rem;
+          font-weight: 500;
+          margin-bottom: 8px;
+          color: var(--primary-color);
+        }
 
-    p {
-      color: var(--text-secondary);
-      font-size: 1.1rem;
+        p {
+          color: var(--text-secondary);
+          font-size: 1.1rem;
+        }
+      }
+
+      .refresh-button {
+        margin-top: 8px;
+        color: var(--primary-color);
+        
+        &:hover {
+          background-color: rgba(var(--primary-color-rgb), 0.1);
+        }
+        
+        mat-icon.spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
     }
   }
 
@@ -258,5 +281,15 @@
         }
       }
     }
+  }
+}
+
+// Animação de rotação para o botão refresh
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
