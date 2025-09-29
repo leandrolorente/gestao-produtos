@@ -119,10 +119,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value.trim();
-    
+
     // Busca normal nos dados carregados primeiro
     this.dataSource.filter = filterValue.toLowerCase();
-    
+
     // Se não encontrou nada na busca local E parece ser um código de barras,
     // tenta buscar na API
     if (filterValue && this.dataSource.filteredData.length === 0 && this.isCompleteBarcode(filterValue)) {
