@@ -29,8 +29,16 @@ import { BarcodeFormat } from '@zxing/library';
       <div class="scanner-header">
         <h2 mat-dialog-title>
           <mat-icon>qr_code_scanner</mat-icon>
-          Ler Código de Barras
+          Scanner de Código de Barras
         </h2>
+        <div class="header-info" *ngIf="!isLoading()">
+          <span class="device-info" *ngIf="hasDevices() && !cameraPermissionDenied()">
+            📷 Câmera ativa
+          </span>
+          <span class="device-info" *ngIf="!hasDevices() || cameraPermissionDenied()">
+            ⌨️ Entrada manual
+          </span>
+        </div>
         <button
           mat-icon-button
           (click)="onCancel()"
@@ -40,14 +48,16 @@ import { BarcodeFormat } from '@zxing/library';
       </div>
 
       <div class="scanner-content" mat-dialog-content>
-        <div class="camera-container" *ngIf="!isLoading() && hasDevices(); else loadingTemplate">
+        <div class="camera-container" *ngIf="!isLoading() && hasDevices() && !cameraPermissionDenied(); else fallbackTemplate">
           <zxing-scanner
             #scanner
             [enable]="scannerEnabled()"
+            [device]="currentDevice()"
             [formats]="allowedFormats"
             (scanSuccess)="onCodeResult($event)"
             (scanError)="onScanError($event)"
             (hasDevices)="onHasDevices($event)"
+            (deviceChange)="onDeviceChange($event)"
             class="barcode-scanner">
           </zxing-scanner>
 
@@ -59,16 +69,43 @@ import { BarcodeFormat } from '@zxing/library';
           </div>
         </div>
 
-        <ng-template #loadingTemplate>
-          <div class="loading-container">
+        <ng-template #fallbackTemplate>
+          <div class="loading-container" *ngIf="isLoading(); else noCameraTemplate">
             <mat-spinner diameter="50"></mat-spinner>
             <p>{{ loadingMessage() }}</p>
           </div>
+          
+          <ng-template #noCameraTemplate>
+            <div class="no-camera-container">
+              <mat-icon class="no-camera-icon">videocam_off</mat-icon>
+              <h3>{{ cameraPermissionDenied() ? 'Acesso à câmera negado' : 'Câmera não disponível' }}</h3>
+              <p *ngIf="cameraPermissionDenied()">
+                Para usar o scanner, permita o acesso à câmera nas configurações do navegador.
+              </p>
+              <p *ngIf="!cameraPermissionDenied()">
+                Nenhuma câmera foi encontrada. Use a entrada manual abaixo.
+              </p>
+              <button 
+                mat-stroked-button 
+                color="primary"
+                (click)="retryCamera()"
+                *ngIf="cameraPermissionDenied()">
+                <mat-icon>refresh</mat-icon>
+                Tentar Novamente
+              </button>
+            </div>
+          </ng-template>
         </ng-template>
 
         <!-- Controles da câmera -->
-        <div class="camera-controls" *ngIf="false">
-          <!-- Removido temporariamente -->
+        <div class="camera-controls" *ngIf="availableDevices().length > 1 && hasDevices()">
+          <button 
+            mat-stroked-button 
+            (click)="switchCamera()"
+            [disabled]="isLoading()">
+            <mat-icon>switch_camera</mat-icon>
+            Trocar Câmera ({{ getCurrentCameraIndex() + 1 }}/{{ availableDevices().length }})
+          </button>
         </div>
 
         <!-- Entrada manual -->
@@ -126,6 +163,21 @@ import { BarcodeFormat } from '@zxing/library';
 
         mat-icon {
           font-size: 1.5rem;
+        }
+      }
+
+      .header-info {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+
+        .device-info {
+          background: rgba(102, 126, 234, 0.1);
+          color: var(--primary-color);
+          padding: 4px 12px;
+          border-radius: 12px;
+          font-size: 0.85rem;
+          font-weight: 500;
         }
       }
 
@@ -201,6 +253,60 @@ import { BarcodeFormat } from '@zxing/library';
       }
     }
 
+    .no-camera-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+      height: 300px;
+      border: 2px dashed #e0e0e0;
+      border-radius: 8px;
+      background: #fafafa;
+
+      .no-camera-icon {
+        font-size: 4rem;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+      }
+
+      h3 {
+        margin: 0 0 8px 0;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+      }
+
+      p {
+        margin: 0 0 16px 0;
+        color: var(--text-secondary);
+        max-width: 300px;
+        line-height: 1.5;
+      }
+
+      button {
+        gap: 8px;
+      }
+    }
+
+    .camera-controls {
+      display: flex;
+      justify-content: center;
+      padding: 8px 0;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+
+        &:hover {
+          background: rgba(102, 126, 234, 0.1);
+        }
+      }
+    }
+
     .camera-controls {
       display: flex;
       justify-content: center;
@@ -246,7 +352,10 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
   protected readonly isLoading = signal(true);
   protected readonly scannerEnabled = signal(false);
   protected readonly hasDevices = signal(false);
-  protected readonly loadingMessage = signal('Iniciando câmera...');
+  protected readonly availableDevices = signal<MediaDeviceInfo[]>([]);
+  protected readonly currentDevice = signal<MediaDeviceInfo | undefined>(undefined);
+  protected readonly loadingMessage = signal('Verificando câmeras disponíveis...');
+  protected readonly cameraPermissionDenied = signal(false);
 
   protected manualCode = '';
 
@@ -277,28 +386,90 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
 
   private async initializeScanner(): Promise<void> {
     try {
-      this.loadingMessage.set('Solicitando permissão da câmera...');
+      this.loadingMessage.set('Verificando permissões de câmera...');
+      
+      // Verifica se há dispositivos de mídia disponíveis
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('API de mídia não suportada pelo navegador');
+      }
 
       // Solicita permissão para câmera
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment' // Prefer rear camera for barcode scanning
+        } 
+      });
       stream.getTracks().forEach(track => track.stop()); // Para o stream temporário
 
-      this.loadingMessage.set('Carregando scanner...');
-
-      // Aguarda um momento para que o scanner inicialize
-      setTimeout(() => {
-        this.scannerEnabled.set(true);
+      this.loadingMessage.set('Enumerando câmeras disponíveis...');
+      
+      // Enumera dispositivos disponíveis
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      this.availableDevices.set(videoDevices);
+      
+      if (videoDevices.length > 0) {
+        // Prefere câmera traseira se disponível
+        const rearCamera = videoDevices.find(device => 
+          device.label.toLowerCase().includes('back') || 
+          device.label.toLowerCase().includes('rear') ||
+          device.label.toLowerCase().includes('environment')
+        );
+        
+        this.currentDevice.set(rearCamera || videoDevices[0]);
+        this.hasDevices.set(true);
+        
+        this.loadingMessage.set('Inicializando scanner...');
+        
+        // Aguarda um momento para que o scanner inicialize
+        setTimeout(() => {
+          this.scannerEnabled.set(true);
+          this.isLoading.set(false);
+        }, 1000);
+      } else {
+        this.hasDevices.set(false);
         this.isLoading.set(false);
-      }, 1000);
+        this.loadingMessage.set('Nenhuma câmera encontrada');
+      }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao inicializar scanner:', error);
-      this.loadingMessage.set('Erro ao acessar câmera. Use a entrada manual.');
       this.isLoading.set(false);
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        this.cameraPermissionDenied.set(true);
+        this.loadingMessage.set('Permissão de câmera negada');
+      } else {
+        this.loadingMessage.set('Erro ao acessar câmera. Use a entrada manual.');
+      }
     }
   }
 
-  protected onCodeResult(result: string): void {
+  protected retryCamera(): void {
+    this.cameraPermissionDenied.set(false);
+    this.isLoading.set(true);
+    this.initializeScanner();
+  }
+
+  protected switchCamera(): void {
+    const devices = this.availableDevices();
+    if (devices.length <= 1) return;
+    
+    const currentIndex = this.getCurrentCameraIndex();
+    const nextIndex = (currentIndex + 1) % devices.length;
+    this.currentDevice.set(devices[nextIndex]);
+  }
+
+  protected getCurrentCameraIndex(): number {
+    const devices = this.availableDevices();
+    const current = this.currentDevice();
+    return devices.findIndex(device => device.deviceId === current?.deviceId);
+  }
+
+  protected onDeviceChange(device: MediaDeviceInfo): void {
+    this.currentDevice.set(device);
+  }  protected onCodeResult(result: string): void {
     if (result && result.trim()) {
       this.barcodeDetected.emit(result.trim());
       this.dialogRef.close(result.trim());
