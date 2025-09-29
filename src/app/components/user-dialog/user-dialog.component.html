@@ -120,6 +120,7 @@
            class="avatar-image"
            (error)="onAvatarError($event)">
     </div>
+
   </div>
 
   <div mat-dialog-actions class="dialog-actions">
@@ -132,7 +133,7 @@
     <button mat-raised-button
             color="primary"
             (click)="onSubmit()"
-            [disabled]="form.invalid || isSubmitting"
+            [disabled]="form.invalid || isSubmitting()"
             type="submit"
             class="submit-btn">
       <mat-icon *ngIf="isSubmitting()">hourglass_empty</mat-icon>

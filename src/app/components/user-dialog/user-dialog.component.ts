@@ -53,12 +53,24 @@ export class UserDialogComponent {
       name: [this.data?.name || '', [Validators.required, Validators.minLength(3)]],
       email: [this.data?.email || '', [Validators.required, Validators.email]],
       password: ['', passwordValidators],
-      avatar: [this.data?.avatar || '', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
+      avatar: [this.data?.avatar || 'https://i.pravatar.cc/150?u=default', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
       department: [this.data?.department || '', [Validators.required]],
     });
   }
 
   onSubmit(): void {
+    console.log('Form status:', this.form.status);
+    console.log('Form errors:', this.form.errors);
+    console.log('Form values:', this.form.value);
+    
+    // Debug individual fields
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      if (control?.invalid) {
+        console.log(`Field ${key} is invalid:`, control.errors);
+      }
+    });
+
     if (this.form.valid) {
       this.isSubmitting.set(true);
 
@@ -129,5 +141,26 @@ export class UserDialogComponent {
       department: 'Departamento'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  // Getter para debug - mostra quais campos estão inválidos
+  get invalidFields(): string[] {
+    const invalid: string[] = [];
+    Object.keys(this.form.controls).forEach(key => {
+      if (this.form.get(key)?.invalid) {
+        invalid.push(key);
+      }
+    });
+    return invalid;
+  }
+
+  // Getter para facilitar debug no template
+  get formDebugInfo(): any {
+    return {
+      valid: this.form.valid,
+      invalid: this.form.invalid,
+      invalidFields: this.invalidFields,
+      values: this.form.value
+    };
   }
 }
