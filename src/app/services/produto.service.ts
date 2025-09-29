@@ -134,6 +134,22 @@ export class ProdutoService extends BaseApiService {
   }
 
   /**
+   * Busca um produto por código de barras
+   */
+  getProductByBarcode(barcode: string): Observable<Product> {
+    this.loadingSubject.next(true);
+
+    return this.http.get<Product>(this.buildUrl(`produtos/barcode/${barcode}`), this.httpOptions)
+      .pipe(
+        tap(() => this.loadingSubject.next(false)),
+        catchError(error => {
+          this.loadingSubject.next(false);
+          return this.handleError(error);
+        })
+      );
+  }
+
+  /**
    * Cria um novo produto
    */
   createProduct(product: ProductCreateDto): Observable<Product> {

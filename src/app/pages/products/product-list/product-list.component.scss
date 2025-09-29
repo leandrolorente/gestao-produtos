@@ -16,6 +16,30 @@
 }
 
 /* Campo de busca */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+
+  .search-field {
+    flex: 1;
+    margin-bottom: 0;
+    width: 100%;
+  }
+
+  .clear-search-btn {
+    color: var(--text-secondary);
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+
+    &:hover {
+      background: rgba(102, 126, 234, 0.2);
+      color: var(--primary-color);
+    }
+  }
+}
+
 .search-field {
   width: 100%;
   margin-bottom: 1.5rem;

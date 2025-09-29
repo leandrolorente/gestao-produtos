@@ -63,7 +63,7 @@ const ELEMENT_DATA: Product[] = [
   styleUrls: ['./product-list.component.scss'],
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'name', 'sku', 'barcode', 'quantity', 'price', 'lastUpdated', 'actions'];
+  displayedColumns: string[] = ['name', 'sku', 'barcode', 'quantity', 'price', 'lastUpdated', 'actions'];
   dataSource = new MatTableDataSource<Product>([]);
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -118,8 +118,46 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    const filterValue = (event.target as HTMLInputElement).value.trim();
+    
+    // Busca normal nos dados carregados primeiro
+    this.dataSource.filter = filterValue.toLowerCase();
+    
+    // Se não encontrou nada na busca local E parece ser um código de barras,
+    // tenta buscar na API
+    if (filterValue && this.dataSource.filteredData.length === 0 && this.isCompleteBarcode(filterValue)) {
+      this.searchByBarcode(filterValue);
+    }
+  }
+
+  private isCompleteBarcode(value: string): boolean {
+    // Considera código de barras se for apenas números com pelo menos 10 dígitos
+    // (mais restritivo para evitar falsos positivos)
+    return /^\d{10,20}$/.test(value);
+  }
+
+  private searchByBarcode(barcode: string): void {
+    this.produtoService.getProductByBarcode(barcode).subscribe({
+      next: (product) => {
+        // Se encontrou o produto, mostra apenas ele na lista
+        this.dataSource.data = [product];
+      },
+      error: (error) => {
+        console.error('Produto não encontrado por código de barras:', error);
+        // Se não encontrou, continua com o filtro normal
+        this.snackBar.open('Produto não encontrado com este código de barras', 'Fechar', {
+          duration: 3000,
+          panelClass: ['snackbar-warning'],
+          horizontalPosition: 'right',
+          verticalPosition: 'bottom'
+        });
+      }
+    });
+  }
+
+  clearFilter(searchInput: HTMLInputElement): void {
+    searchInput.value = '';
+    this.dataSource.filter = '';
   }
 
   openProductDialog(product?: Product): void {
