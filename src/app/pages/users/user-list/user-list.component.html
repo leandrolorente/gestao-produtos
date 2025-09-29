@@ -108,9 +108,9 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns" class="header-row"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-              class="table-row"
+              class="data-row"
               [class.highlight]="row === selectedUser"></tr>
         </table>
 
