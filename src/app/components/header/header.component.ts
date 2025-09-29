@@ -6,8 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
-import { DashboardService } from '../../services/dashboard';
-import { User } from '../../models/User';
+import { AuthService, AuthUser } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -25,34 +24,18 @@ import { User } from '../../models/User';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit {
-  private dashboardService = inject(DashboardService);
+  private authService = inject(AuthService);
 
   isSidebarOpen = input<boolean>(false);
   sidebarToggle = output<void>();
 
   // Signal local para o usuário
-  currentUser = signal<User | null>(null);
+  currentUser = signal<AuthUser | null>(null);
 
   ngOnInit(): void {
-    // Carrega dados do usuário ao inicializar
-    this.dashboardService.getCurrentUser().subscribe({
-      next: (user) => {
-        this.currentUser.set(user);
-      },
-      error: (error) => {
-        console.error('Erro ao carregar usuário no header:', error);
-        // Define um usuário padrão em caso de erro
-        this.currentUser.set({
-          id: 0,
-          name: 'Usuário',
-          email: 'usuario@exemplo.com',
-          role: 'user',
-          department: 'N/A',
-          isActive: true,
-          lastLogin: new Date(),
-          avatar: ''
-        });
-      }
+    // Subscreve ao usuário atual do AuthService
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser.set(user);
     });
   }
 
@@ -61,22 +44,22 @@ export class HeaderComponent implements OnInit {
   }
 
   onLogout() {
-    this.dashboardService.logout().subscribe({
+    this.authService.logout().subscribe({
       next: () => {
-        console.log('Logout realizado com sucesso');
-        // Aqui você pode redirecionar para a página de login
+        this.authService.showSnackbar('Logout realizado com sucesso!', 'success');
       },
       error: (error) => {
         console.error('Erro no logout:', error);
+        this.authService.showSnackbar('Erro ao fazer logout', 'error');
       }
     });
   }
 
   onProfile() {
-    console.log('Abrir perfil do usuário');
+    this.authService.showSnackbar('Funcionalidade em desenvolvimento', 'info');
   }
 
   onSettings() {
-    console.log('Abrir configurações');
+    this.authService.showSnackbar('Funcionalidade em desenvolvimento', 'info');
   }
 }
