@@ -104,7 +104,7 @@ export class DashboardService extends BaseApiService {
     const totalProducts = products.length;
     const lowStockProducts = products.filter(p => p.quantity <= 10).length; // Considera estoque baixo <= 10
     const totalValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
-    
+
     // Simula vendas baseadas na quantidade (produtos com menos estoque venderam mais)
     const productsWithSales = products.map(p => ({
       ...p,

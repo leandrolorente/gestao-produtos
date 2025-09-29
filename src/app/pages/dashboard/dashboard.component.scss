@@ -10,10 +10,10 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      
+
       .welcome-text {
         flex: 1;
-        
+
         h1 {
           font-size: 2rem;
           font-weight: 500;
@@ -30,11 +30,11 @@
       .refresh-button {
         margin-top: 8px;
         color: var(--primary-color);
-        
+
         &:hover {
           background-color: rgba(var(--primary-color-rgb), 0.1);
         }
-        
+
         mat-icon.spinning {
           animation: spin 1s linear infinite;
         }

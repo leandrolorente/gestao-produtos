@@ -6,8 +6,8 @@
         <h1>Bem-vindo de volta, {{ user()?.name || 'Usuário' }}!</h1>
         <p>Aqui está um resumo das informações do seu sistema de gestão.</p>
       </div>
-      <button 
-        mat-icon-button 
+      <button
+        mat-icon-button
         (click)="refreshStats()"
         [disabled]="isRefreshing()"
         matTooltip="Atualizar dados"
