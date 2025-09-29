@@ -62,7 +62,7 @@ export class UserDialogComponent {
     console.log('Form status:', this.form.status);
     console.log('Form errors:', this.form.errors);
     console.log('Form values:', this.form.value);
-    
+
     // Debug individual fields
     Object.keys(this.form.controls).forEach(key => {
       const control = this.form.get(key);
