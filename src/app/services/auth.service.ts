@@ -50,10 +50,10 @@ export interface AuthUser {
 export class AuthService extends BaseApiService {
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   public readonly loading$ = this.loadingSubject.asObservable();
-  
+
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   public readonly currentUser$ = this.currentUserSubject.asObservable();
-  
+
   // Signal para o usuário atual
   private readonly currentUserSignal = signal<AuthUser | null>(null);
   public readonly currentUser = this.currentUserSignal.asReadonly();
@@ -67,7 +67,7 @@ export class AuthService extends BaseApiService {
 
   constructor(private router: Router) {
     super(inject(HttpClient));
-    
+
     // Só inicializa autenticação no browser (não no SSR)
     if (this.isLocalStorageAvailable()) {
       this.initializeAuth();
@@ -85,7 +85,7 @@ export class AuthService extends BaseApiService {
 
     const token = this.getStoredToken();
     const user = this.getStoredUser();
-    
+
     if (token && user) {
       this.setCurrentUser(user);
     }
@@ -96,7 +96,7 @@ export class AuthService extends BaseApiService {
    */
   login(credentials: LoginRequest): Observable<AuthUser> {
     this.setLoading(true);
-    
+
     return this.http.post<LoginResponse>(this.buildUrl('auth/login'), credentials, this.httpOptions)
       .pipe(
         tap((response: LoginResponse) => {
@@ -108,7 +108,7 @@ export class AuthService extends BaseApiService {
         catchError(error => {
           console.error('Erro no login:', error);
           this.setLoading(false);
-          
+
           // Simulação de login para desenvolvimento
           if (credentials.email === 'admin@gestao.com' && credentials.password === 'admin123') {
             const mockUser: AuthUser = {
@@ -119,19 +119,19 @@ export class AuthService extends BaseApiService {
               department: 'Tecnologia',
               role: 'admin'
             };
-            
+
             const mockResponse: LoginResponse = {
               token: 'mock_token_' + Date.now(),
               refreshToken: 'mock_refresh_' + Date.now(),
               user: mockUser,
               expiresIn: 3600
             };
-            
+
             this.storeAuthData(mockResponse);
             this.setCurrentUser(mockUser);
             return of(mockUser);
           }
-          
+
           throw error;
         })
       );
@@ -159,14 +159,14 @@ export class AuthService extends BaseApiService {
    */
   forgotPassword(request: ForgotPasswordRequest): Observable<{ message: string }> {
     this.setLoading(true);
-    
+
     return this.http.post<{ message: string }>(this.buildUrl('auth/forgot-password'), request, this.httpOptions)
       .pipe(
         tap(() => this.setLoading(false)),
         catchError(error => {
           console.error('Erro ao solicitar reset de senha:', error);
           this.setLoading(false);
-          
+
           // Simulação para desenvolvimento
           return of({ message: 'E-mail de recuperação enviado com sucesso!' });
         })
@@ -178,7 +178,7 @@ export class AuthService extends BaseApiService {
    */
   resetPassword(request: ResetPasswordRequest): Observable<{ message: string }> {
     this.setLoading(true);
-    
+
     return this.http.post<{ message: string }>(this.buildUrl('auth/reset-password'), request, this.httpOptions)
       .pipe(
         tap(() => this.setLoading(false)),
@@ -235,8 +235,8 @@ export class AuthService extends BaseApiService {
     }
 
     return this.http.post<{ token: string; expiresIn: number }>(
-      this.buildUrl('auth/refresh'), 
-      { refreshToken }, 
+      this.buildUrl('auth/refresh'),
+      { refreshToken },
       this.httpOptions
     ).pipe(
       tap((response) => {
@@ -304,7 +304,7 @@ export class AuthService extends BaseApiService {
     if (!userStr) {
       return null;
     }
-    
+
     try {
       return JSON.parse(userStr);
     } catch (error) {
@@ -398,7 +398,7 @@ export class AuthService extends BaseApiService {
    * Exibe snackbar com estilos personalizados
    */
   public showSnackbar(
-    message: string, 
+    message: string,
     type: 'success' | 'error' | 'info' | 'warning' | 'primary' = 'primary',
     duration: number = 4000,
     action?: string

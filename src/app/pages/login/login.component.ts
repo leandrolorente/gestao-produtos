@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
   hidePassword = true;
   showForgotPassword = false;
   showSuccessMessage = false;
-  
+
   // Signal para controlar loading
   isLoading = signal(false);
 
@@ -96,7 +96,7 @@ export class LoginComponent implements OnInit {
   onLogin(): void {
     if (this.loginForm.valid) {
       this.isLoading.set(true);
-      
+
       const credentials: LoginRequest = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password
@@ -106,7 +106,7 @@ export class LoginComponent implements OnInit {
         next: (user) => {
           this.isLoading.set(false);
           this.showSuccessSnackBar(`Bem-vindo, ${user.name}!`);
-          
+
           // Redireciona para dashboard após um breve delay
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
@@ -128,7 +128,7 @@ export class LoginComponent implements OnInit {
   onForgotPassword(): void {
     if (this.forgotPasswordForm.valid) {
       this.isLoading.set(true);
-      
+
       const request: ForgotPasswordRequest = {
         email: this.forgotPasswordForm.value.email
       };
@@ -156,7 +156,7 @@ export class LoginComponent implements OnInit {
   showForgotPasswordForm(): void {
     this.showForgotPassword = true;
     this.showSuccessMessage = false;
-    
+
     // Copia o email do formulário de login se existir
     const loginEmail = this.loginForm.get('email')?.value;
     if (loginEmail) {
@@ -177,7 +177,7 @@ export class LoginComponent implements OnInit {
    */
   private handleLoginError(error: any): void {
     let message = 'Erro no login. Tente novamente.';
-    
+
     if (error.status === 401) {
       message = 'E-mail ou senha incorretos.';
     } else if (error.status === 403) {
@@ -196,7 +196,7 @@ export class LoginComponent implements OnInit {
    */
   private handleForgotPasswordError(error: any): void {
     let message = 'Erro ao enviar e-mail. Tente novamente.';
-    
+
     if (error.status === 404) {
       message = 'E-mail não encontrado em nosso sistema.';
     } else if (error.status === 429) {
@@ -223,20 +223,20 @@ export class LoginComponent implements OnInit {
    */
   getFieldErrorMessage(fieldName: string): string {
     const control = this.loginForm.get(fieldName);
-    
+
     if (control?.hasError('required')) {
       return `${this.getFieldLabel(fieldName)} é obrigatório`;
     }
-    
+
     if (control?.hasError('email')) {
       return 'Por favor, insira um e-mail válido';
     }
-    
+
     if (control?.hasError('minlength')) {
       const requiredLength = control.errors?.['minlength']?.requiredLength;
       return `Senha deve ter pelo menos ${requiredLength} caracteres`;
     }
-    
+
     return '';
   }
 
@@ -245,15 +245,15 @@ export class LoginComponent implements OnInit {
    */
   getForgotFieldErrorMessage(fieldName: string): string {
     const control = this.forgotPasswordForm.get(fieldName);
-    
+
     if (control?.hasError('required')) {
       return `${this.getFieldLabel(fieldName)} é obrigatório`;
     }
-    
+
     if (control?.hasError('email')) {
       return 'Por favor, insira um e-mail válido';
     }
-    
+
     return '';
   }
 

@@ -1,7 +1,7 @@
 <div class="login-container">
   <!-- Background com gradiente -->
   <div class="background-gradient"></div>
-  
+
   <!-- Conteúdo principal -->
   <div class="login-content">
     <!-- Logo e título -->
@@ -37,8 +37,8 @@
                    formControlName="password"
                    placeholder="••••••••"
                    autocomplete="current-password">
-            <button mat-icon-button 
-                    matSuffix 
+            <button mat-icon-button
+                    matSuffix
                     (click)="hidePassword = !hidePassword"
                     type="button"
                     [attr.aria-label]="'Mostrar senha'"
@@ -53,9 +53,9 @@
             <mat-checkbox formControlName="rememberMe" class="remember-me">
               Lembrar-me
             </mat-checkbox>
-            
-            <button type="button" 
-                    mat-button 
+
+            <button type="button"
+                    mat-button
                     class="forgot-password-link"
                     (click)="showForgotPasswordForm()">
               Esqueceu sua senha?
@@ -93,7 +93,7 @@
 
         <!-- Link para registro -->
         <div class="register-link">
-          <p>Não tem uma conta? 
+          <p>Não tem uma conta?
             <button mat-button class="register-button" disabled>
               Solicitar acesso
             </button>
@@ -124,7 +124,7 @@
           </mat-form-field>
 
           <div class="forgot-actions">
-            <button mat-button 
+            <button mat-button
                     type="button"
                     class="back-button"
                     (click)="showLoginForm()">
@@ -153,7 +153,7 @@
           <mat-icon class="success-icon">check_circle</mat-icon>
           <h3>E-mail enviado!</h3>
           <p>Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.</p>
-          <button mat-button 
+          <button mat-button
                   class="back-to-login"
                   (click)="showLoginForm()">
             <mat-icon>arrow_back</mat-icon>
