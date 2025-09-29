@@ -31,8 +31,8 @@ import { BarcodeFormat } from '@zxing/library';
           <mat-icon>qr_code_scanner</mat-icon>
           Ler Código de Barras
         </h2>
-        <button 
-          mat-icon-button 
+        <button
+          mat-icon-button
           (click)="onCancel()"
           class="close-button">
           <mat-icon>close</mat-icon>
@@ -75,8 +75,8 @@ import { BarcodeFormat } from '@zxing/library';
         <div class="manual-input">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Ou digite o código manualmente</mat-label>
-            <input 
-              matInput 
+            <input
+              matInput
               [(ngModel)]="manualCode"
               placeholder="Digite o código de barras"
               (keyup.enter)="onManualSubmit()">
@@ -86,13 +86,13 @@ import { BarcodeFormat } from '@zxing/library';
       </div>
 
       <div class="scanner-actions" mat-dialog-actions>
-        <button 
-          mat-button 
+        <button
+          mat-button
           (click)="onCancel()">
           Cancelar
         </button>
-        <button 
-          mat-raised-button 
+        <button
+          mat-raised-button
           color="primary"
           (click)="onManualSubmit()"
           [disabled]="!manualCode">
@@ -278,13 +278,13 @@ export class BarcodeScannerComponent implements OnInit, OnDestroy {
   private async initializeScanner(): Promise<void> {
     try {
       this.loadingMessage.set('Solicitando permissão da câmera...');
-      
+
       // Solicita permissão para câmera
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       stream.getTracks().forEach(track => track.stop()); // Para o stream temporário
 
       this.loadingMessage.set('Carregando scanner...');
-      
+
       // Aguarda um momento para que o scanner inicialize
       setTimeout(() => {
         this.scannerEnabled.set(true);
