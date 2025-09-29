@@ -34,7 +34,7 @@ import { UserService } from '../../../services/user.service';
   styleUrls: ['./user-list.component.scss'],
 })
 export class UserListComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'avatar', 'name', 'department', 'lastUpdated', 'actions'];
+  displayedColumns: string[] = ['avatar', 'name', 'department', 'lastUpdated', 'actions'];
   dataSource = new MatTableDataSource<User>([]);
   selectedUser: User | null = null;
 

@@ -128,7 +128,6 @@ export class ClientListComponent implements OnInit {
   protected readonly isLoading = signal(false);
 
   protected readonly displayedColumns: string[] = [
-    'id',
     'nome',
     'email',
     'telefone',
