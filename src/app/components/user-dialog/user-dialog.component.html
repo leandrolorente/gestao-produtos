@@ -1,0 +1,143 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h1 mat-dialog-title>
+      <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+      {{ isEditMode ? 'Editar Usuário' : 'Novo Usuário' }}
+    </h1>
+  </div>
+
+  <div mat-dialog-content class="dialog-content" [formGroup]="form">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nome Completo</mat-label>
+        <input matInput
+               formControlName="name"
+               placeholder="Ex: João Silva"
+               maxlength="100">
+        <mat-icon matSuffix>person</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('name') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>E-mail</mat-label>
+        <input matInput
+               type="email"
+               formControlName="email"
+               placeholder="Ex: joao.silva@empresa.com"
+               maxlength="100">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('email') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row" *ngIf="!isEditMode || showPasswordField">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ isEditMode ? 'Nova Senha (Opcional)' : 'Senha' }}</mat-label>
+        <input matInput
+               [type]="hidePassword ? 'password' : 'text'"
+               formControlName="password"
+               placeholder="••••••••"
+               maxlength="50">
+        <button mat-icon-button matSuffix
+                (click)="hidePassword = !hidePassword"
+                type="button"
+                [attr.aria-label]="'Ocultar senha'"
+                [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error>{{ getFieldErrorMessage('password') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row" *ngIf="isEditMode && !showPasswordField">
+      <button mat-stroked-button
+              type="button"
+              (click)="showPasswordField = true"
+              class="password-change-btn">
+        <mat-icon>lock_reset</mat-icon>
+        Alterar Senha
+      </button>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>URL do Avatar</mat-label>
+        <input matInput
+               formControlName="avatar"
+               placeholder="Ex: https://i.pravatar.cc/150?u=joao"
+               maxlength="255">
+        <mat-icon matSuffix>photo</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('avatar') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Departamento</mat-label>
+        <mat-select formControlName="department">
+          <mat-option value="">Selecione um departamento</mat-option>
+          <mat-option value="Tecnologia">
+            <mat-icon>computer</mat-icon>
+            Tecnologia
+          </mat-option>
+          <mat-option value="Marketing">
+            <mat-icon>campaign</mat-icon>
+            Marketing
+          </mat-option>
+          <mat-option value="Vendas">
+            <mat-icon>trending_up</mat-icon>
+            Vendas
+          </mat-option>
+          <mat-option value="Recursos Humanos">
+            <mat-icon>group</mat-icon>
+            Recursos Humanos
+          </mat-option>
+          <mat-option value="Financeiro">
+            <mat-icon>account_balance</mat-icon>
+            Financeiro
+          </mat-option>
+          <mat-option value="Operacional">
+            <mat-icon>settings</mat-icon>
+            Operacional
+          </mat-option>
+          <mat-option value="Suporte">
+            <mat-icon>support</mat-icon>
+            Suporte
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>business</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('department') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Preview do Avatar -->
+    <div class="avatar-preview" *ngIf="form.get('avatar')?.value">
+      <p class="preview-label">Preview do Avatar:</p>
+      <img [src]="form.get('avatar')?.value"
+           alt="Preview do avatar"
+           class="avatar-image"
+           (error)="onAvatarError($event)">
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button
+            (click)="onCancel()"
+            type="button"
+            class="cancel-btn">
+      Cancelar
+    </button>
+    <button mat-raised-button
+            color="primary"
+            (click)="onSubmit()"
+            [disabled]="form.invalid || isSubmitting"
+            type="submit"
+            class="submit-btn">
+      <mat-icon *ngIf="isSubmitting()">hourglass_empty</mat-icon>
+      <mat-icon *ngIf="!isSubmitting()">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      {{ isSubmitting() ? 'Salvando...' : (isEditMode ? 'Salvar' : 'Criar') }}
+    </button>
+  </div>
+</div>

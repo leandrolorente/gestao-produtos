@@ -73,7 +73,7 @@ export class Sidebar {
     },
     {
       label: 'Usuários',
-      icon: 'people',
+      icon: 'person',
       route: '/usuarios'
     },
     {

@@ -49,7 +49,8 @@ export class HeaderComponent implements OnInit {
           role: 'user',
           department: 'N/A',
           isActive: true,
-          lastLogin: new Date()
+          lastLogin: new Date(),
+          avatar: ''
         });
       }
     });

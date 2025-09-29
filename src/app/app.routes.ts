@@ -3,6 +3,7 @@ import { MainLayout } from './layouts/main-layout/main-layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ProductListComponent } from './pages/products/product-list/product-list.component';
 import { ClientListComponent } from './pages/clients/client-list/client-list.component';
+import { UserListComponent } from './pages/users/user-list/user-list.component';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,10 @@ export const routes: Routes = [
       {
         path: 'clientes',
         component: ClientListComponent
+      },
+      {
+        path: 'usuarios',
+        component: UserListComponent
       },
       {
         path: '',

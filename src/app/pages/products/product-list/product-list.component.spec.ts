@@ -19,7 +19,7 @@ describe('ProductListComponent', () => {
 
   beforeEach(async () => {
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
-    
+
     await TestBed.configureTestingModule({
       imports: [
         ProductListComponent,
@@ -101,7 +101,7 @@ describe('ProductListComponent', () => {
       afterClosed: () => of(newProduct)
     };
     mockDialog.open.and.returnValue(dialogRefMock as any);
-    
+
     const initialCount = component.dataSource.data.length;
     component.openProductDialog();
 
@@ -124,7 +124,7 @@ describe('ProductListComponent', () => {
       afterClosed: () => of(updatedData)
     };
     mockDialog.open.and.returnValue(dialogRefMock as any);
-    
+
     component.openProductDialog(existingProduct);
 
     const updatedProduct = component.dataSource.data.find(p => p.id === existingProduct.id);
@@ -137,7 +137,7 @@ describe('ProductListComponent', () => {
     spyOn(document, 'createElement').and.callThrough();
     spyOn(document.body, 'appendChild').and.callThrough();
     spyOn(document.body, 'removeChild').and.callThrough();
-    
+
     component.exportToCsv();
 
     expect(document.createElement).toHaveBeenCalledWith('a');
@@ -146,7 +146,7 @@ describe('ProductListComponent', () => {
   it('should not export CSV when no data', () => {
     component.dataSource.data = [];
     spyOn(document, 'createElement');
-    
+
     component.exportToCsv();
 
     expect(document.createElement).not.toHaveBeenCalled();
@@ -154,9 +154,9 @@ describe('ProductListComponent', () => {
 
   it('should trigger file input when import button is clicked', () => {
     spyOn(component.fileInput.nativeElement, 'click');
-    
+
     component.triggerFileInput();
-    
+
     expect(component.fileInput.nativeElement.click).toHaveBeenCalled();
   });
 
@@ -167,11 +167,11 @@ describe('ProductListComponent', () => {
         files: [file]
       }
     } as any;
-    
+
     spyOn(component as any, 'importCsv');
-    
+
     component.onFileSelected(event);
-    
+
     expect((component as any).importCsv).toHaveBeenCalledWith(file);
   });
 
@@ -182,12 +182,12 @@ describe('ProductListComponent', () => {
         files: [file]
       }
     } as any;
-    
+
     spyOn(window, 'alert');
     spyOn(component as any, 'importCsv');
-    
+
     component.onFileSelected(event);
-    
+
     expect(window.alert).toHaveBeenCalledWith('Por favor, selecione um arquivo CSV válido.');
     expect((component as any).importCsv).not.toHaveBeenCalled();
   });
@@ -196,9 +196,9 @@ describe('ProductListComponent', () => {
     const csvData = `name,sku,quantity,price
 Produto Teste,TEST-001,10,99.99
 Outro Produto,TEST-002,5,49.99`;
-    
+
     const products = (component as any).parseCsvToProducts(csvData);
-    
+
     expect(products.length).toBe(2);
     expect(products[0].name).toBe('Produto Teste');
     expect(products[0].sku).toBe('TEST-001');
@@ -218,9 +218,9 @@ Outro Produto,TEST-002,5,49.99`;
         lastUpdated: new Date()
       }
     ];
-    
+
     (component as any).addImportedProducts(newProducts);
-    
+
     expect(component.dataSource.data.length).toBe(initialCount + 1);
     expect(component.dataSource.data[component.dataSource.data.length - 1].name).toBe('Produto Importado');
   });
@@ -238,10 +238,10 @@ Outro Produto,TEST-002,5,49.99`;
         lastUpdated: new Date()
       }
     ];
-    
+
     spyOn(window, 'alert');
     (component as any).addImportedProducts(duplicateProducts);
-    
+
     expect(component.dataSource.data.length).toBe(initialCount);
     expect(window.alert).toHaveBeenCalled();
   });
@@ -250,9 +250,9 @@ Outro Produto,TEST-002,5,49.99`;
     const event = {
       target: { value: 'Teclado' }
     } as any;
-    
+
     component.applyFilter(event);
-    
+
     expect(component.dataSource.filter).toBe('teclado');
   });
 
@@ -260,9 +260,9 @@ Outro Produto,TEST-002,5,49.99`;
     const event = {
       target: { value: 'TEC-001' }
     } as any;
-    
+
     component.applyFilter(event);
-    
+
     expect(component.dataSource.filter).toBe('tec-001');
   });
 
