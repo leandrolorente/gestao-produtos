@@ -367,7 +367,7 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   onClienteFocus(): void {
     const clienteNomeControl = this.vendaForm.get('clienteNome');
     const currentValue = clienteNomeControl?.value;
-    
+
     // Se o campo está vazio, mostra todos os clientes ao focar
     if (!currentValue || currentValue.trim() === '') {
       this.clientesFiltrados.set(this.clientes());
