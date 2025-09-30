@@ -67,18 +67,18 @@ export class VendaDialogComponent implements OnInit {
   clientesFiltrados = signal<Cliente[]>([]);
   produtosFiltrados = signal<Product[]>([]);
 
-  // Computed values
-  subtotal = computed(() => {
-    const items = this.vendaForm?.get('items')?.value || [];
-    return items.reduce((sum: number, item: any) => {
-      return sum + (item.quantidade * item.precoUnitario);
-    }, 0);
-  });
+  // Signals para totais (atualizados manualmente)
+  subtotalValue = signal<number>(0);
+  totalValue = signal<number>(0);
 
-  total = computed(() => {
-    const desconto = this.vendaForm?.get('desconto')?.value || 0;
-    return this.subtotal() - desconto;
-  });
+  // Getters para compatibilidade
+  get subtotal() {
+    return this.subtotalValue();
+  }
+
+  get total() {
+    return this.totalValue();
+  }
 
   // Opções de pagamento e status
   formasPagamento = [
@@ -133,6 +133,14 @@ export class VendaDialogComponent implements OnInit {
       // Adiciona um item vazio para começar
       this.addItem();
     }
+
+    // Listener para mudanças no desconto
+    this.vendaForm.get('desconto')?.valueChanges.subscribe(() => {
+      this.updateTotals();
+    });
+
+    // Inicializar totais
+    setTimeout(() => this.updateTotals(), 100);
   }
 
   private populateForm(venda: Venda): void {
@@ -157,6 +165,9 @@ export class VendaDialogComponent implements OnInit {
     venda.items.forEach(item => {
       itemsArray.push(this.createItemFormGroup(item));
     });
+    
+    // Atualizar totais após carregar todos os dados
+    setTimeout(() => this.updateTotals(), 100);
   }
 
   private loadClientes(): void {
@@ -247,11 +258,17 @@ export class VendaDialogComponent implements OnInit {
   addItem(): void {
     const newItem = this.createItemFormGroup();
     this.itemsArray.push(newItem);
+    
+    // Atualizar totais
+    this.updateTotals();
   }
 
   removeItem(index: number): void {
     if (this.itemsArray.length > 1) {
       this.itemsArray.removeAt(index);
+      
+      // Atualizar totais
+      this.updateTotals();
     }
   }
 
@@ -265,11 +282,47 @@ export class VendaDialogComponent implements OnInit {
 
   private updateItemSubtotal(itemIndex: number): void {
     const itemGroup = this.itemsArray.at(itemIndex) as FormGroup;
-    const quantidade = itemGroup.get('quantidade')?.value || 0;
-    const precoUnitario = itemGroup.get('precoUnitario')?.value || 0;
+    const quantidade = Number(itemGroup.get('quantidade')?.value) || 0;
+    const precoUnitario = Number(itemGroup.get('precoUnitario')?.value) || 0;
     const subtotal = quantidade * precoUnitario;
 
     itemGroup.get('subtotal')?.setValue(subtotal);
+    
+    // Atualizar totais gerais
+    this.updateTotals();
+  }
+
+  private updateTotals(): void {
+    try {
+      if (!this.vendaForm?.get('items')) return;
+      
+      // Calcular subtotal
+      const items = this.vendaForm.get('items')?.value || [];
+      const novoSubtotal = items.reduce((sum: number, item: any) => {
+        const quantidade = Number(item?.quantidade) || 0;
+        const precoUnitario = Number(item?.precoUnitario) || 0;
+        return sum + (quantidade * precoUnitario);
+      }, 0);
+      
+      // Calcular total
+      const desconto = Number(this.vendaForm.get('desconto')?.value) || 0;
+      const novoTotal = Math.max(0, novoSubtotal - desconto);
+      
+      // Atualizar signals
+      this.subtotalValue.set(novoSubtotal);
+      this.totalValue.set(novoTotal);
+      
+      console.log('Totais atualizados:', { subtotal: novoSubtotal, total: novoTotal });
+    } catch (error) {
+      console.error('Erro ao atualizar totais:', error);
+    }
+  }
+
+  // Método para recalcular todos os subtotais dos itens
+  private recalcularTodosSubtotais(): void {
+    for (let i = 0; i < this.itemsArray.length; i++) {
+      this.updateItemSubtotal(i);
+    }
   }
 
   formatPrice(value: number): string {
@@ -341,8 +394,8 @@ export class VendaDialogComponent implements OnInit {
       if (this.editMode) {
         const vendaAtualizada: Venda = {
           ...formValue,
-          subtotal: this.subtotal(),
-          total: this.total(),
+          subtotal: this.subtotal,
+          total: this.total,
           ultimaAtualizacao: new Date()
         };
         this.dialogRef.close(vendaAtualizada);
