@@ -3,7 +3,10 @@
   <div class="welcome-section">
     <div class="welcome-header">
       <div class="welcome-text">
-        <h1>Bem-vindo de volta, {{ user()?.name || 'Usuário' }}!</h1>
+        <h1>
+          <span class="welcome-prefix">Bem-vindo de volta,</span>
+          <span class="welcome-name">{{ user()?.name || 'Usuário' }}!</span>
+        </h1>
         <p>Aqui está um resumo das informações do seu sistema de gestão.</p>
       </div>
       <button
