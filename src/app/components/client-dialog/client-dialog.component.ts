@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
 import { Cliente } from '../../models/Cliente';
 
 export interface ClientDialogData {
@@ -25,7 +26,8 @@ export interface ClientDialogData {
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatIconModule
   ],
   templateUrl: './client-dialog.component.html',
   styleUrl: './client-dialog.component.scss'

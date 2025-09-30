@@ -190,7 +190,13 @@ export class ClientListComponent implements OnInit {
   protected addCliente(): void {
     const dialogRef = this.dialog.open(ClientDialogComponent, {
       width: '600px',
-      data: { cliente: null, isEdit: false }
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { cliente: null, isEdit: false },
+      disableClose: true,
+      panelClass: 'custom-dialog',
+      autoFocus: false,
+      restoreFocus: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -234,7 +240,13 @@ export class ClientListComponent implements OnInit {
   protected editCliente(cliente: Cliente): void {
     const dialogRef = this.dialog.open(ClientDialogComponent, {
       width: '600px',
-      data: { cliente, isEdit: true }
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { cliente, isEdit: true },
+      disableClose: true,
+      panelClass: 'custom-dialog',
+      autoFocus: false,
+      restoreFocus: false
     });
 
     dialogRef.afterClosed().subscribe(result => {

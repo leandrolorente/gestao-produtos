@@ -1,7 +1,13 @@
-<h2 mat-dialog-title>{{ isEdit ? 'Editar Cliente' : 'Novo Cliente' }}</h2>
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h1>
+      <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+      {{ isEdit ? 'Editar Cliente' : 'Novo Cliente' }}
+    </h1>
+  </div>
 
-<mat-dialog-content>
-  <form [formGroup]="clienteForm" class="client-form">
+  <div class="dialog-content">
+    <form [formGroup]="clienteForm" class="client-form">
     
     <!-- Nome e Email -->
     <div class="form-row">
@@ -100,13 +106,18 @@
       </mat-form-field>
     </div>
 
-  </form>
-</mat-dialog-content>
+    </form>
+  </div>
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="onSave()" 
-          [disabled]="clienteForm.invalid">
-    {{ isEdit ? 'Atualizar' : 'Salvar' }}
-  </button>
-</mat-dialog-actions>
+  <div class="dialog-actions">
+    <button mat-button (click)="onCancel()" class="cancel-btn">
+      <mat-icon>cancel</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()" 
+            [disabled]="clienteForm.invalid" class="save-btn">
+      <mat-icon>{{ isEdit ? 'update' : 'save' }}</mat-icon>
+      {{ isEdit ? 'Atualizar' : 'Salvar' }}
+    </button>
+  </div>
+</div>

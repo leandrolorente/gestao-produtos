@@ -162,8 +162,14 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   openProductDialog(product?: Product): void {
     const dialogRef = this.dialog.open(ProductDialogComponent, {
-      width: '450px',
+      width: '500px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
       data: product ? { ...product } : null,
+      disableClose: true,
+      panelClass: 'custom-dialog',
+      autoFocus: false,
+      restoreFocus: false
     });
 
     dialogRef.afterClosed().subscribe((result) => {

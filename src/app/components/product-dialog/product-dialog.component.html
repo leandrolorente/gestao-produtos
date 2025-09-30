@@ -1,12 +1,12 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h1 mat-dialog-title>
+    <h1>
       <mat-icon>{{ isEditMode ? 'edit' : 'add_box' }}</mat-icon>
       {{ isEditMode ? 'Editar Produto' : 'Novo Produto' }}
     </h1>
   </div>
 
-  <div mat-dialog-content class="dialog-content" [formGroup]="form">
+  <div class="dialog-content" [formGroup]="form">
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Nome do Produto</mat-label>
@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <div mat-dialog-actions class="dialog-actions">
+  <div class="dialog-actions">
     <button mat-button
             (click)="onCancel()"
             class="cancel-btn">
