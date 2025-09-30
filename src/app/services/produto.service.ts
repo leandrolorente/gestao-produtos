@@ -26,36 +26,6 @@ export class ProdutoService extends BaseApiService {
   private readonly productsSignal = signal<Product[]>([]);
   public readonly products = this.productsSignal.asReadonly();
 
-  // Dados mockados para fallback (comentados para uso posterior se necessário)
-  /*
-  private readonly MOCK_PRODUCTS: Product[] = [
-    {
-      id: 1,
-      name: 'Teclado Mecânico RGB',
-      sku: 'TEC-001',
-      quantity: 50,
-      price: 350.5,
-      lastUpdated: new Date(),
-    },
-    {
-      id: 2,
-      name: 'Mouse Gamer 16000 DPI',
-      sku: 'MOU-007',
-      quantity: 75,
-      price: 199.99,
-      lastUpdated: new Date(),
-    },
-    {
-      id: 3,
-      name: 'Monitor Ultrawide 29"',
-      sku: 'MON-029',
-      quantity: 20,
-      price: 1450.0,
-      lastUpdated: new Date(),
-    }
-  ];
-  */
-
   /**
    * Busca todos os produtos
    */
@@ -65,56 +35,15 @@ export class ProdutoService extends BaseApiService {
     return this.http.get<Product[]>(this.buildUrl('produtos'), this.httpOptions)
       .pipe(
         tap(products => {
-          // Se a API retornar lista vazia, usa dados mockados para demonstração
-          if (products.length === 0) {
-            const mockProducts = this.getMockProducts();
-            this.productsSignal.set(mockProducts);
-          } else {
-            this.productsSignal.set(products);
-          }
+          this.productsSignal.set(products);
           this.loadingSubject.next(false);
         }),
         catchError(error => {
           console.error('Erro ao buscar produtos:', error);
           this.loadingSubject.next(false);
-          // Em caso de erro, usa dados mockados como fallback
-          const mockProducts = this.getMockProducts();
-          this.productsSignal.set(mockProducts);
           return this.handleError(error);
         })
       );
-  }
-
-  /**
-   * Retorna dados mockados para demonstração
-   */
-  private getMockProducts(): Product[] {
-    return [
-      {
-        id: 1,
-        name: 'Teclado Mecânico RGB',
-        sku: 'TEC-001',
-        quantity: 50,
-        price: 350.5,
-        lastUpdated: new Date(),
-      },
-      {
-        id: 2,
-        name: 'Mouse Gamer 16000 DPI',
-        sku: 'MOU-007',
-        quantity: 75,
-        price: 199.99,
-        lastUpdated: new Date(),
-      },
-      {
-        id: 3,
-        name: 'Monitor Ultrawide 29"',
-        sku: 'MON-029',
-        quantity: 20,
-        price: 1450.0,
-        lastUpdated: new Date(),
-      }
-    ];
   }
 
   /**

@@ -28,50 +28,6 @@ export class UserService extends BaseApiService {
   private readonly usersSignal = signal<User[]>([]);
   public readonly users = this.usersSignal.asReadonly();
 
-  // Dados mockados para fallback
-  private readonly MOCK_USERS: User[] = [
-    {
-      id: '67781ba123456789abcdef01',
-      name: 'João Silva',
-      email: 'joao.silva@empresa.com',
-      avatar: 'https://i.pravatar.cc/150?u=joao',
-      department: 'Tecnologia',
-      lastUpdated: new Date(),
-      role: 'admin',
-      isActive: true
-    },
-    {
-      id: '67781ba123456789abcdef02',
-      name: 'Maria Santos',
-      email: 'maria.santos@empresa.com',
-      avatar: 'https://i.pravatar.cc/150?u=maria',
-      department: 'Marketing',
-      lastUpdated: new Date(),
-      role: 'manager',
-      isActive: true
-    },
-    {
-      id: '67781ba123456789abcdef03',
-      name: 'Pedro Oliveira',
-      email: 'pedro.oliveira@empresa.com',
-      avatar: 'https://i.pravatar.cc/150?u=pedro',
-      department: 'Vendas',
-      lastUpdated: new Date(),
-      role: 'user',
-      isActive: true
-    },
-    {
-      id: '67781ba123456789abcdef04',
-      name: 'Ana Costa',
-      email: 'ana.costa@empresa.com',
-      avatar: 'https://i.pravatar.cc/150?u=ana',
-      department: 'Recursos Humanos',
-      lastUpdated: new Date(),
-      role: 'manager',
-      isActive: true
-    },
-  ];
-
   /**
    * Obtém todos os usuários
    */
@@ -86,10 +42,9 @@ export class UserService extends BaseApiService {
         return convertedUsers;
       }),
       catchError((error) => {
-        console.warn('Erro ao buscar usuários da API, usando dados mockados:', error);
-        this.usersSignal.set(this.MOCK_USERS);
+        console.error('Erro ao buscar usuários da API:', error);
         this.setLoading(false);
-        return of(this.MOCK_USERS);
+        throw error;
       })
     );
   }
@@ -115,12 +70,8 @@ export class UserService extends BaseApiService {
         return convertedUser;
       }),
       catchError((error) => {
-        console.warn('Erro ao buscar usuário da API, usando dados mockados:', error);
-        const mockUser = this.MOCK_USERS.find((u) => u.id === id);
+        console.error('Erro ao buscar usuário da API:', error);
         this.setLoading(false);
-        if (mockUser) {
-          return of(mockUser);
-        }
         return this.handleError(error);
       })
     );
@@ -151,24 +102,9 @@ export class UserService extends BaseApiService {
           return convertedUser;
         }),
         catchError((error) => {
-          console.warn('Erro ao criar usuário na API, simulando criação:', error);
-          // Simula criação local para desenvolvimento
-          const mockUser: User = {
-            id: new Date().getTime().toString(),
-            name: userData.name,
-            email: userData.email,
-            avatar: userData.avatar,
-            department: userData.department,
-            lastUpdated: new Date(),
-            role: 'admin',
-            isActive: false
-          };
-
-          const currentUsers = this.usersSignal();
-          this.usersSignal.set([...currentUsers, mockUser]);
+          console.error('Erro ao criar usuário na API:', error);
           this.setLoading(false);
-
-          return of(mockUser);
+          return this.handleError(error);
         })
       );
   }

@@ -40,35 +40,14 @@ export class DashboardService extends BaseApiService {
           catchError(error => {
             console.error('Erro ao buscar usuário:', error);
             this.loadingSubject.next(false);
-            // Em caso de erro, usa dados mockados como fallback
-            const mockUser = this.getMockUser();
-            this.currentUser.set(mockUser);
-            return of(mockUser);
+            throw error;
           })
         );
     } else {
-      // Se não há usuário autenticado, retorna mock
+      // Se não há usuário autenticado, retorna erro
       this.loadingSubject.next(false);
-      const mockUser = this.getMockUser();
-      this.currentUser.set(mockUser);
-      return of(mockUser);
+      return throwError(() => new Error('Usuário não autenticado'));
     }
-  }
-
-  /**
-   * Retorna usuário mockado para demonstração
-   */
-  private getMockUser(): User {
-    return {
-      id: '67781ba123456789abcdef01',
-      name: 'Leandro Lorente',
-      email: 'leandro@empresa.com',
-      role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
-      department: 'TI / Gestão',
-      lastLogin: new Date(),
-      isActive: true
-    };
   }
 
   /**
@@ -89,10 +68,7 @@ export class DashboardService extends BaseApiService {
         catchError(error => {
           console.error('Erro ao buscar estatísticas:', error);
           this.loadingSubject.next(false);
-          // Em caso de erro, usa dados mockados como fallback
-          const mockStats = this.getMockStats();
-          this.dashboardStats.set(mockStats);
-          return of(mockStats);
+          throw error;
         })
       );
   }
@@ -137,24 +113,6 @@ export class DashboardService extends BaseApiService {
    */
   refreshStats(): Observable<DashboardStats> {
     return this.getDashboardStats();
-  }
-
-  /**
-   * Retorna estatísticas mockadas para demonstração
-   */
-  private getMockStats(): DashboardStats {
-    return {
-      totalProducts: 156,
-      lowStockProducts: 12,
-      totalValue: 89750.50,
-      recentTransactions: 47,
-      pendingOrders: 8,
-      topSellingProducts: [
-        { id: 1, name: 'Teclado Mecânico RGB', quantity: 50, sales: 23 },
-        { id: 2, name: 'Mouse Gamer 16000 DPI', quantity: 75, sales: 18 },
-        { id: 3, name: 'Monitor Ultrawide 29"', quantity: 20, sales: 15 }
-      ]
-    };
   }
 
   /**

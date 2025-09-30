@@ -55,9 +55,6 @@ export class LoginComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/dashboard']);
     }
-
-    // Preenche dados de demonstração
-    this.fillDemoCredentials();
   }
 
   /**
@@ -77,16 +74,6 @@ export class LoginComponent implements OnInit {
   private createForgotPasswordForm(): FormGroup {
     return this.fb.group({
       email: ['', [Validators.required, Validators.email]]
-    });
-  }
-
-  /**
-   * Preenche credenciais de demonstração
-   */
-  private fillDemoCredentials(): void {
-    this.loginForm.patchValue({
-      email: 'admin@gestao.com',
-      password: 'admin123'
     });
   }
 

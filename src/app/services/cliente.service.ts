@@ -33,29 +33,6 @@ export class ClienteService extends BaseApiService {
   private readonly clientesSignal = signal<Cliente[]>([]);
   public readonly clientes = this.clientesSignal.asReadonly();
 
-  // Dados mockados para fallback (comentados para uso posterior se necessário)
-  /*
-  private readonly MOCK_CLIENTES: Cliente[] = [
-    {
-      id: 1,
-      nome: 'João Silva Santos',
-      email: 'joao.silva@email.com',
-      telefone: '(11) 99999-1234',
-      cpfCnpj: '123.456.789-00',
-      endereco: 'Rua das Flores, 123',
-      cidade: 'São Paulo',
-      estado: 'SP',
-      cep: '01234-567',
-      tipo: 'Pessoa Física',
-      ativo: true,
-      dataCadastro: new Date('2024-01-15'),
-      ultimaCompra: new Date('2024-09-20'),
-      observacoes: 'Cliente preferencial'
-    },
-    // ... outros clientes mockados
-  ];
-  */
-
   /**
    * Converte dados da API (tipo numérico) para formato interno (tipo string)
    */
@@ -77,81 +54,17 @@ export class ClienteService extends BaseApiService {
     return this.http.get<any[]>(this.buildUrl('clientes'), this.httpOptions)
       .pipe(
         tap(clientes => {
-          // Se a API retornar lista vazia, usa dados mockados para demonstração
-          if (clientes.length === 0) {
-            const mockClientes = this.getMockClientes();
-            this.clientesSignal.set(mockClientes);
-          } else {
-            // Converte os dados da API para o formato interno
-            const clientesConvertidos = clientes.map(cliente => this.convertFromApi(cliente));
-            this.clientesSignal.set(clientesConvertidos);
-          }
+          // Converte os dados da API para o formato interno
+          const clientesConvertidos = clientes.map(cliente => this.convertFromApi(cliente));
+          this.clientesSignal.set(clientesConvertidos);
           this.loadingSubject.next(false);
         }),
         catchError(error => {
           console.error('Erro ao buscar clientes:', error);
           this.loadingSubject.next(false);
-          // Em caso de erro, usa dados mockados como fallback
-          const mockClientes = this.getMockClientes();
-          this.clientesSignal.set(mockClientes);
           return this.handleError(error);
         })
       );
-  }
-
-  /**
-   * Retorna dados mockados para demonstração
-   */
-  private getMockClientes(): Cliente[] {
-    return [
-      {
-        id: 1,
-        nome: 'João Silva Santos',
-        email: 'joao.silva@email.com',
-        telefone: '(11) 99999-1234',
-        cpfCnpj: '123.456.789-00',
-        endereco: 'Rua das Flores, 123',
-        cidade: 'São Paulo',
-        estado: 'SP',
-        cep: '01234-567',
-        tipo: 'Pessoa Física',
-        ativo: true,
-        dataCadastro: new Date('2024-01-15'),
-        ultimaCompra: new Date('2024-09-20'),
-        observacoes: 'Cliente preferencial'
-      },
-      {
-        id: 2,
-        nome: 'Maria Oliveira',
-        email: 'maria.oliveira@empresa.com',
-        telefone: '(11) 88888-5678',
-        cpfCnpj: '987.654.321-11',
-        endereco: 'Av. Paulista, 456',
-        cidade: 'São Paulo',
-        estado: 'SP',
-        cep: '04567-890',
-        tipo: 'Pessoa Física',
-        ativo: true,
-        dataCadastro: new Date('2024-02-10'),
-        ultimaCompra: new Date('2024-09-25')
-      },
-      {
-        id: 3,
-        nome: 'Empresa ABC Ltda',
-        email: 'contato@empresaabc.com.br',
-        telefone: '(11) 3333-4444',
-        cpfCnpj: '12.345.678/0001-90',
-        endereco: 'Rua Comercial, 789',
-        cidade: 'São Paulo',
-        estado: 'SP',
-        cep: '05678-123',
-        tipo: 'Pessoa Jurídica',
-        ativo: true,
-        dataCadastro: new Date('2024-03-05'),
-        ultimaCompra: new Date('2024-09-18'),
-        observacoes: 'Cliente corporativo - desconto especial'
-      }
-    ];
   }
 
   /**

@@ -101,30 +101,6 @@ export class AuthService extends BaseApiService {
         catchError(error => {
           console.error('Erro no login:', error);
           this.setLoading(false);
-
-          // Simulação de login para desenvolvimento
-          if (credentials.email === 'admin@gestao.com' && credentials.password === 'admin123') {
-            const mockUser: AuthUser = {
-              id: '67781ba123456789abcdef01',
-              name: 'Administrador',
-              email: 'admin@gestao.com',
-              avatar: 'https://i.pravatar.cc/150?u=admin',
-              department: 'Tecnologia',
-              role: 'admin'
-            };
-
-            const mockResponse: LoginResponse = {
-              token: 'mock_token_' + Date.now(),
-              refreshToken: 'mock_refresh_' + Date.now(),
-              user: mockUser,
-              expiresIn: 3600
-            };
-
-            this.storeAuthData(mockResponse);
-            this.setCurrentUser(mockUser);
-            return of(mockUser);
-          }
-
           throw error;
         })
       );
