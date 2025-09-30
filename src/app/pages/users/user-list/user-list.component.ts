@@ -91,9 +91,12 @@ export class UserListComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(UserDialogComponent, {
       width: '500px',
       maxWidth: '95vw',
+      maxHeight: '90vh',
       data: user || null,
       disableClose: true,
-      panelClass: 'custom-dialog'
+      panelClass: 'custom-dialog',
+      autoFocus: false,
+      restoreFocus: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
