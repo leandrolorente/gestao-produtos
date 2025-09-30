@@ -8,7 +8,7 @@
 
   <div class="dialog-content">
     <form [formGroup]="clienteForm" class="client-form">
-    
+
     <!-- Nome e Email -->
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
@@ -30,14 +30,14 @@
     <div class="form-row two-columns">
       <mat-form-field appearance="outline">
         <mat-label>Telefone</mat-label>
-        <input matInput formControlName="telefone" placeholder="(00) 00000-0000" 
+        <input matInput formControlName="telefone" placeholder="(00) 00000-0000"
                (input)="formatTelefone($event)">
         <mat-error>{{ getFieldErrorMessage('telefone') }}</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>CPF/CNPJ</mat-label>
-        <input matInput formControlName="cpfCnpj" 
+        <input matInput formControlName="cpfCnpj"
                (input)="formatCpfCnpj($event)">
         <mat-error>{{ getFieldErrorMessage('cpfCnpj') }}</mat-error>
       </mat-form-field>
@@ -101,7 +101,7 @@
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Observações</mat-label>
-        <textarea matInput formControlName="observacoes" rows="3" 
+        <textarea matInput formControlName="observacoes" rows="3"
                   placeholder="Informações adicionais sobre o cliente"></textarea>
       </mat-form-field>
     </div>
@@ -114,7 +114,7 @@
       <mat-icon>cancel</mat-icon>
       Cancelar
     </button>
-    <button mat-raised-button color="primary" (click)="onSave()" 
+    <button mat-raised-button color="primary" (click)="onSave()"
             [disabled]="clienteForm.invalid" class="save-btn">
       <mat-icon>{{ isEdit ? 'update' : 'save' }}</mat-icon>
       {{ isEdit ? 'Atualizar' : 'Salvar' }}

@@ -49,7 +49,7 @@ export class ClientDialogComponent {
   constructor() {
     this.isEdit = this.data.isEdit;
     this.clienteForm = this.createForm();
-    
+
     if (this.data.cliente) {
       this.clienteForm.patchValue(this.data.cliente);
     }
@@ -105,7 +105,7 @@ export class ClientDialogComponent {
 
   protected formatCpfCnpj(event: any): void {
     let value = event.target.value.replace(/\D/g, '');
-    
+
     if (value.length <= 11) {
       // CPF: 000.000.000-00
       value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -120,14 +120,14 @@ export class ClientDialogComponent {
       value = value.replace(/(\d{4})(\d)/, '$1-$2');
       this.clienteForm.patchValue({ tipo: 'Pessoa Jurídica' });
     }
-    
+
     event.target.value = value;
     this.clienteForm.patchValue({ cpfCnpj: value });
   }
 
   protected formatTelefone(event: any): void {
     let value = event.target.value.replace(/\D/g, '');
-    
+
     if (value.length <= 10) {
       // (00) 0000-0000
       value = value.replace(/(\d{2})(\d)/, '($1) $2');
@@ -137,7 +137,7 @@ export class ClientDialogComponent {
       value = value.replace(/(\d{2})(\d)/, '($1) $2');
       value = value.replace(/(\d{5})(\d)/, '$1-$2');
     }
-    
+
     event.target.value = value;
   }
 
