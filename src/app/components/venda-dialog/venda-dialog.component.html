@@ -21,12 +21,17 @@
           matInput
           formControlName="clienteNome"
           [matAutocomplete]="autoCliente"
-          placeholder="Digite o nome do cliente">
+          placeholder="Digite o nome do cliente"
+          (focus)="onClienteFocus()"
+          (input)="onClienteInput($event)">
         <mat-icon matSuffix>person_search</mat-icon>
         <mat-autocomplete
           #autoCliente="matAutocomplete"
           [displayWith]="displayClienteFn"
-          (optionSelected)="onClienteOptionSelected($event)">
+          [autoActiveFirstOption]="false"
+          (optionSelected)="onClienteOptionSelected($event)"
+          (opened)="onClienteAutocompleteOpened()"
+          (closed)="onClienteAutocompleteClosed()">
           <mat-option
             *ngFor="let cliente of clientesFiltrados()"
             [value]="cliente">
@@ -44,15 +49,6 @@
     <div class="section-header">
       <mat-icon>inventory</mat-icon>
       <h3>Itens da Venda</h3>
-      <button
-        type="button"
-        mat-icon-button
-        color="primary"
-        (click)="addItem()"
-        matTooltip="Adicionar Item"
-        class="section-action">
-        <mat-icon>add</mat-icon>
-      </button>
     </div>
 
     <div formArrayName="items" class="items-container">
@@ -88,7 +84,9 @@
               <mat-autocomplete
                 #autoProduto="matAutocomplete"
                 [displayWith]="displayProdutoFn"
-                (optionSelected)="onProdutoOptionSelected($event, i)">
+                (optionSelected)="onProdutoOptionSelected($event, i)"
+                (opened)="onProdutoAutocompleteOpened()"
+                (closed)="onProdutoAutocompleteClosed()">
                 <mat-option
                   *ngFor="let produto of produtosFiltrados()"
                   [value]="produto">
@@ -141,6 +139,19 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Botão flutuante para adicionar item -->
+    <div class="add-item-container">
+      <button
+        type="button"
+        mat-fab
+        color="primary"
+        (click)="addItem()"
+        matTooltip="Adicionar Item"
+        class="add-item-fab">
+        <mat-icon>add</mat-icon>
+      </button>
     </div>
 
     <!-- Resumo e Pagamento -->

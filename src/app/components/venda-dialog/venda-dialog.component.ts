@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed, ElementRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -50,13 +50,15 @@ export interface VendaDialogData {
   templateUrl: './venda-dialog.component.html',
   styleUrls: ['./venda-dialog.component.scss']
 })
-export class VendaDialogComponent implements OnInit {
+export class VendaDialogComponent implements OnInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<VendaDialogComponent>);
   private readonly data = inject<VendaDialogData>(MAT_DIALOG_DATA);
   private readonly fb = inject(FormBuilder);
   private readonly produtoService = inject(ProdutoService);
   private readonly clienteService = inject(ClienteService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly elementRef = inject(ElementRef);
+  private readonly renderer = inject(Renderer2);
 
   vendaForm!: FormGroup;
   editMode = false;
@@ -70,6 +72,10 @@ export class VendaDialogComponent implements OnInit {
   // Signals para totais (atualizados manualmente)
   subtotalValue = signal<number>(0);
   totalValue = signal<number>(0);
+
+  // Controle de estado dos autocompletetes
+  clienteAutoCompleteOpen = signal<boolean>(false);
+  produtoAutoCompleteOpen = signal<boolean>(false);
 
   // Getters para compatibilidade
   get subtotal() {
@@ -176,7 +182,7 @@ export class VendaDialogComponent implements OnInit {
       next: (clientes: any) => {
         console.log('Clientes carregados:', clientes);
         this.clientes.set(clientes);
-        this.clientesFiltrados.set(clientes);
+        // Não definir clientesFiltrados aqui - será definido quando o usuário focar no campo
       },
       error: (error: any) => {
         console.error('Erro ao carregar clientes:', error);
@@ -201,11 +207,8 @@ export class VendaDialogComponent implements OnInit {
   }
 
   private setupAutocompleteFiltros(): void {
-    // Filtro para clientes
-    this.vendaForm.get('clienteNome')?.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? this.filtrarClientes(value) : this.clientes())
-    ).subscribe(clientes => this.clientesFiltrados.set(clientes));
+    // Não configuramos valueChanges para clientes aqui pois controlamos manualmente
+    // via onClienteFocus e onClienteInput
 
     // Configurar filtros para produtos quando itens são adicionados
     this.itemsArray.valueChanges.pipe(
@@ -222,7 +225,10 @@ export class VendaDialogComponent implements OnInit {
   }
 
   private filtrarClientes(value: string): Cliente[] {
-    if (!value) return this.clientes();
+    if (!value || value.trim() === '') {
+      // Quando clica no campo mas não digitou nada, mostra todos
+      return this.clientes();
+    }
     const filterValue = value.toLowerCase();
     return this.clientes().filter(cliente =>
       cliente.nome.toLowerCase().includes(filterValue) ||
@@ -357,6 +363,30 @@ export class VendaDialogComponent implements OnInit {
     }
   }
 
+  // Método para quando o usuário foca no campo de cliente
+  onClienteFocus(): void {
+    const clienteNomeControl = this.vendaForm.get('clienteNome');
+    const currentValue = clienteNomeControl?.value;
+    
+    // Se o campo está vazio, mostra todos os clientes ao focar
+    if (!currentValue || currentValue.trim() === '') {
+      this.clientesFiltrados.set(this.clientes());
+    }
+  }
+
+  // Método para quando o usuário digita no campo de cliente
+  onClienteInput(event: any): void {
+    const value = event.target.value;
+    if (value && value.trim() !== '') {
+      // Filtra conforme digita
+      const clientes = this.filtrarClientes(value);
+      this.clientesFiltrados.set(clientes);
+    } else {
+      // Se limpar o campo, mostra todos novamente
+      this.clientesFiltrados.set(this.clientes());
+    }
+  }
+
   // Método para quando o usuário seleciona uma opção do autocomplete de produto
   onProdutoOptionSelected(event: any, itemIndex: number): void {
     const produto = event.option.value;
@@ -416,7 +446,7 @@ export class VendaDialogComponent implements OnInit {
           observacoes: formValue.observacoes || undefined,
           dataVencimento: formValue.dataVencimento || undefined
         };
-        
+
         console.log('Nova venda a ser criada:', novaVenda);
         this.dialogRef.close(novaVenda);
       }
@@ -452,5 +482,43 @@ export class VendaDialogComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy(): void {
+    // Limpar classes CSS ao destruir o componente
+    this.renderer.removeClass(this.elementRef.nativeElement, 'autocomplete-open');
+  }
+
+  // Métodos para controlar rolagem quando autocomplete está aberto
+  onClienteAutocompleteOpened(): void {
+    this.clienteAutoCompleteOpen.set(true);
+    this.renderer.addClass(this.elementRef.nativeElement, 'autocomplete-open');
+  }
+
+  onClienteAutocompleteClosed(): void {
+    this.clienteAutoCompleteOpen.set(false);
+    if (!this.produtoAutoCompleteOpen()) {
+      this.renderer.removeClass(this.elementRef.nativeElement, 'autocomplete-open');
+    }
+  }
+
+  onProdutoAutocompleteOpened(): void {
+    this.produtoAutoCompleteOpen.set(true);
+    this.renderer.addClass(this.elementRef.nativeElement, 'autocomplete-open');
+  }
+
+  onProdutoAutocompleteClosed(): void {
+    this.produtoAutoCompleteOpen.set(false);
+    if (!this.clienteAutoCompleteOpen()) {
+      this.renderer.removeClass(this.elementRef.nativeElement, 'autocomplete-open');
+    }
+  }
+
+  private disableBodyScroll(): void {
+    document.body.style.overflow = 'hidden';
+  }
+
+  private enableBodyScroll(): void {
+    document.body.style.overflow = '';
   }
 }

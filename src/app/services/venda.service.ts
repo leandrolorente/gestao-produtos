@@ -27,11 +27,11 @@ export class VendaService extends BaseApiService {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-    
+
     if (token) {
       return headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     console.warn('Token JWT não encontrado no localStorage');
     return headers;
   }
