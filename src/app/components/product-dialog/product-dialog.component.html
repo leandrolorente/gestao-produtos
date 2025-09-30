@@ -54,18 +54,18 @@
 
     <div class="form-row-split">
       <mat-form-field appearance="outline" class="half-width">
-        <mat-label>Quantidade em Estoque</mat-label>
+        <mat-label>Quantidade</mat-label>
         <input matInput
                type="text"
                formControlName="quantity"
-               placeholder="0"
+               placeholder="Ex: 100"
                (input)="formatQuantity($event)">
         <mat-icon matSuffix>inventory</mat-icon>
         <mat-error>{{ getFieldErrorMessage('quantity') }}</mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="half-width">
-        <mat-label>Preço</mat-label>
+      <mat-form-field appearance="outline" class="half-width price-field">
+        <mat-label>Preço Unitário</mat-label>
         <input matInput
                type="text"
                formControlName="price"

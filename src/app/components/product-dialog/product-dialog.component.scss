@@ -106,6 +106,16 @@
       width: 100%;
     }
   }
+
+  // Garantir que os labels não quebrem
+  mat-form-field {
+    .mdc-floating-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: calc(100% - 32px);
+    }
+  }
 }
 
 .full-width {
@@ -114,6 +124,12 @@
 
 .half-width {
   flex: 1;
+  min-width: 0; // Permite que o flex shrink funcione corretamente
+
+  @media (max-width: 768px) {
+    width: 100%;
+    flex: none;
+  }
 }
 
 .barcode-field {
@@ -178,7 +194,10 @@ mat-form-field {
   .mat-form-field-prefix {
     color: #28a745;
     font-weight: 600;
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -188,6 +207,30 @@ mat-form-field {
   color: #dc3545;
   display: flex;
   align-items: center;
+}
+
+// Estilo específico para o campo de preço
+.price-field {
+  .mat-mdc-text-field-wrapper {
+    .mdc-text-field__input {
+      padding-left: 2.5rem !important; // Espaço extra para o prefixo R$
+    }
+  }
+
+  .mat-mdc-form-field-text-prefix {
+    padding-left: 0.75rem;
+    padding-right: 0.5rem;
+    color: #28a745;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  // Ajuste específico para o Material 3
+  ::ng-deep .mat-mdc-form-field-text-prefix {
+    margin-left: 0.5rem;
+    margin-right: 0.25rem;
+  }
 }
 
 .dialog-actions {
