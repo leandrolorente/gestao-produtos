@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { catchError, tap, map, delay } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { catchError, tap, map } from 'rxjs/operators';
 import { BaseApiService } from './base-api.service';
 import { Venda, VendaCreate, VendaResponse, VendasStats, VendaItem } from '../models/Venda';
 
@@ -12,110 +12,37 @@ export class VendaService extends BaseApiService {
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   public readonly loading$ = this.loadingSubject.asObservable();
 
-  // Signal para armazenar vendas localmente
+  // Signal para armazenar vendas localmente (cache)
   private readonly vendasSignal = signal<Venda[]>([]);
-
-  // Dados mockados para demonstração
-  private readonly MOCK_VENDAS: Venda[] = [
-    {
-      id: '67781ba123456789abcdef01',
-      numero: 'VND-001',
-      clienteId: '67781ba123456789abcdef01',
-      clienteNome: 'João Silva',
-      clienteEmail: 'joao.silva@email.com',
-      items: [
-        {
-          id: '1',
-          produtoId: '67781ba123456789abcdef01',
-          produtoNome: 'Teclado Mecânico RGB',
-          produtoSku: 'TEC-001',
-          quantidade: 2,
-          precoUnitario: 150.00,
-          subtotal: 300.00
-        },
-        {
-          id: '2',
-          produtoId: '67781ba123456789abcdef02',
-          produtoNome: 'Mouse Gamer',
-          produtoSku: 'MOU-001',
-          quantidade: 1,
-          precoUnitario: 80.00,
-          subtotal: 80.00
-        }
-      ],
-      subtotal: 380.00,
-      desconto: 20.00,
-      total: 360.00,
-      formaPagamento: 'PIX',
-      status: 'Finalizada',
-      observacoes: 'Cliente VIP - desconto aplicado',
-      dataVenda: new Date('2024-12-15'),
-      vendedorId: '67781ba123456789abcdef01',
-      vendedorNome: 'Maria Santos',
-      ultimaAtualizacao: new Date()
-    },
-    {
-      id: '67781ba123456789abcdef02',
-      numero: 'VND-002',
-      clienteId: '67781ba123456789abcdef02',
-      clienteNome: 'Ana Costa',
-      clienteEmail: 'ana.costa@email.com',
-      items: [
-        {
-          id: '3',
-          produtoId: '67781ba123456789abcdef03',
-          produtoNome: 'Monitor 24"',
-          produtoSku: 'MON-001',
-          quantidade: 1,
-          precoUnitario: 450.00,
-          subtotal: 450.00
-        }
-      ],
-      subtotal: 450.00,
-      desconto: 0,
-      total: 450.00,
-      formaPagamento: 'Cartão de Crédito',
-      status: 'Confirmada',
-      dataVenda: new Date('2024-12-14'),
-      dataVencimento: new Date('2024-12-21'),
-      vendedorId: '67781ba123456789abcdef01',
-      vendedorNome: 'Maria Santos',
-      ultimaAtualizacao: new Date()
-    },
-    {
-      id: '67781ba123456789abcdef03',
-      numero: 'VND-003',
-      clienteId: '67781ba123456789abcdef03',
-      clienteNome: 'Pedro Oliveira',
-      clienteEmail: 'pedro.oliveira@email.com',
-      items: [
-        {
-          id: '4',
-          produtoId: '67781ba123456789abcdef04',
-          produtoNome: 'Notebook Gamer',
-          produtoSku: 'NOT-001',
-          quantidade: 1,
-          precoUnitario: 2500.00,
-          subtotal: 2500.00
-        }
-      ],
-      subtotal: 2500.00,
-      desconto: 100.00,
-      total: 2400.00,
-      formaPagamento: 'Boleto',
-      status: 'Pendente',
-      observacoes: 'Aguardando pagamento do boleto',
-      dataVenda: new Date(),
-      dataVencimento: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
-      vendedorId: '67781ba123456789abcdef02',
-      vendedorNome: 'Carlos Mendes',
-      ultimaAtualizacao: new Date()
-    }
-  ];
 
   constructor(protected override http: HttpClient) {
     super(http);
-    this.vendasSignal.set(this.MOCK_VENDAS);
+  }
+
+  /**
+   * Adiciona o token JWT aos headers das requisições
+   */
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    
+    if (token) {
+      return headers.set('Authorization', `Bearer ${token}`);
+    }
+    
+    console.warn('Token JWT não encontrado no localStorage');
+    return headers;
+  }
+
+  /**
+   * Opções HTTP com autenticação
+   */
+  private get authHttpOptions() {
+    return {
+      headers: this.getAuthHeaders()
+    };
   }
 
   /**
@@ -124,7 +51,7 @@ export class VendaService extends BaseApiService {
   getAllVendas(): Observable<Venda[]> {
     this.setLoading(true);
 
-    return this.http.get<VendaResponse[]>(this.buildUrl('vendas'), this.httpOptions)
+    return this.http.get<VendaResponse[]>(this.buildUrl('vendas'), this.authHttpOptions)
       .pipe(
         map(response => response.map(venda => this.convertFromApi(venda))),
         tap(vendas => {
@@ -134,8 +61,7 @@ export class VendaService extends BaseApiService {
         catchError(error => {
           console.error('Erro ao buscar vendas:', error);
           this.setLoading(false);
-          // Retorna dados mockados como fallback
-          return of(this.MOCK_VENDAS);
+          return throwError(() => error);
         })
       );
   }
@@ -146,20 +72,147 @@ export class VendaService extends BaseApiService {
   getVendaById(id: string): Observable<Venda> {
     this.setLoading(true);
 
-    return this.http.get<VendaResponse>(this.buildUrl(`vendas/${id}`), this.httpOptions)
+    return this.http.get<VendaResponse>(this.buildUrl(`vendas/${id}`), this.authHttpOptions)
       .pipe(
         map(response => this.convertFromApi(response)),
         tap(() => this.setLoading(false)),
         catchError(error => {
           console.error('Erro ao buscar venda:', error);
           this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
 
-          // Busca nos dados mockados
-          const venda = this.MOCK_VENDAS.find(v => v.id === id);
-          if (venda) {
-            return of(venda);
-          }
+  /**
+   * Obtém uma venda por número
+   */
+  getVendaByNumero(numero: string): Observable<Venda> {
+    this.setLoading(true);
 
+    return this.http.get<VendaResponse>(this.buildUrl(`vendas/numero/${numero}`), this.authHttpOptions)
+      .pipe(
+        map(response => this.convertFromApi(response)),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar venda por número:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtém vendas por cliente
+   */
+  getVendasByCliente(clienteId: string): Observable<Venda[]> {
+    this.setLoading(true);
+
+    return this.http.get<VendaResponse[]>(this.buildUrl(`vendas/cliente/${clienteId}`), this.authHttpOptions)
+      .pipe(
+        map(response => response.map(venda => this.convertFromApi(venda))),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar vendas por cliente:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtém vendas por vendedor
+   */
+  getVendasByVendedor(vendedorId: string): Observable<Venda[]> {
+    this.setLoading(true);
+
+    return this.http.get<VendaResponse[]>(this.buildUrl(`vendas/vendedor/${vendedorId}`), this.authHttpOptions)
+      .pipe(
+        map(response => response.map(venda => this.convertFromApi(venda))),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar vendas por vendedor:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtém vendas por status
+   */
+  getVendasByStatus(status: string): Observable<Venda[]> {
+    this.setLoading(true);
+
+    return this.http.get<VendaResponse[]>(this.buildUrl(`vendas/status/${status}`), this.authHttpOptions)
+      .pipe(
+        map(response => response.map(venda => this.convertFromApi(venda))),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar vendas por status:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtém vendas por período
+   */
+  getVendasByPeriodo(dataInicio: Date, dataFim: Date): Observable<Venda[]> {
+    this.setLoading(true);
+
+    const params = this.buildParams({
+      dataInicio: dataInicio.toISOString(),
+      dataFim: dataFim.toISOString()
+    });
+
+    return this.http.get<VendaResponse[]>(this.buildUrl('vendas/periodo'), {
+      ...this.authHttpOptions,
+      params
+    })
+      .pipe(
+        map(response => response.map(venda => this.convertFromApi(venda))),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar vendas por período:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtém vendas vencidas
+   */
+  getVendasVencidas(): Observable<Venda[]> {
+    this.setLoading(true);
+
+    return this.http.get<VendaResponse[]>(this.buildUrl('vendas/vencidas'), this.authHttpOptions)
+      .pipe(
+        map(response => response.map(venda => this.convertFromApi(venda))),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar vendas vencidas:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtém vendas de hoje
+   */
+  getVendasHoje(): Observable<Venda[]> {
+    this.setLoading(true);
+
+    return this.http.get<VendaResponse[]>(this.buildUrl('vendas/hoje'), this.authHttpOptions)
+      .pipe(
+        map(response => response.map(venda => this.convertFromApi(venda))),
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar vendas de hoje:', error);
+          this.setLoading(false);
           return throwError(() => error);
         })
       );
@@ -172,8 +225,9 @@ export class VendaService extends BaseApiService {
     this.setLoading(true);
 
     const body = this.convertCreateToApi(vendaData);
+    console.log('Dados enviados para API:', body);
 
-    return this.http.post<VendaResponse>(this.buildUrl('vendas'), body, this.httpOptions)
+    return this.http.post<VendaResponse>(this.buildUrl('vendas'), body, this.authHttpOptions)
       .pipe(
         map(response => this.convertFromApi(response)),
         tap(novaVenda => {
@@ -183,34 +237,10 @@ export class VendaService extends BaseApiService {
         }),
         catchError(error => {
           console.error('Erro ao criar venda:', error);
+          console.error('Resposta da API:', error.error);
+          console.error('Status:', error.status);
           this.setLoading(false);
-
-          // Simula criação local para desenvolvimento
-          const novaVenda: Venda = {
-            id: new Date().getTime().toString(),
-            numero: `VND-${String(this.vendasSignal().length + 1).padStart(3, '0')}`,
-            clienteId: vendaData.clienteId,
-            clienteNome: 'Cliente Mock', // Seria obtido do serviço de clientes
-            clienteEmail: 'cliente@mock.com',
-            items: vendaData.items.map((item, index) => ({
-              ...item,
-              id: `${new Date().getTime()}_${index}`
-            })),
-            subtotal: vendaData.items.reduce((sum, item) => sum + (item.precoUnitario * item.quantidade), 0),
-            desconto: vendaData.desconto || 0,
-            total: vendaData.items.reduce((sum, item) => sum + (item.precoUnitario * item.quantidade), 0) - (vendaData.desconto || 0),
-            formaPagamento: vendaData.formaPagamento as any,
-            status: 'Pendente',
-            observacoes: vendaData.observacoes,
-            dataVenda: new Date(),
-            dataVencimento: vendaData.dataVencimento,
-            ultimaAtualizacao: new Date()
-          };
-
-          const vendasAtuais = this.vendasSignal();
-          this.vendasSignal.set([...vendasAtuais, novaVenda]);
-
-          return of(novaVenda);
+          return throwError(() => error);
         })
       );
   }
@@ -223,7 +253,7 @@ export class VendaService extends BaseApiService {
 
     const body = this.convertToApi(venda);
 
-    return this.http.put<VendaResponse>(this.buildUrl(`vendas/${venda.id}`), body, this.httpOptions)
+    return this.http.put<VendaResponse>(this.buildUrl(`vendas/${venda.id}`), body, this.authHttpOptions)
       .pipe(
         map(response => this.convertFromApi(response)),
         tap(vendaAtualizada => {
@@ -239,17 +269,6 @@ export class VendaService extends BaseApiService {
         catchError(error => {
           console.error('Erro ao atualizar venda:', error);
           this.setLoading(false);
-
-          // Simula atualização local
-          const vendas = this.vendasSignal();
-          const index = vendas.findIndex(v => v.id === venda.id);
-          if (index !== -1) {
-            const novasVendas = [...vendas];
-            novasVendas[index] = { ...venda, ultimaAtualizacao: new Date() };
-            this.vendasSignal.set(novasVendas);
-            return of(novasVendas[index]);
-          }
-
           return throwError(() => error);
         })
       );
@@ -261,7 +280,7 @@ export class VendaService extends BaseApiService {
   deleteVenda(id: string): Observable<void> {
     this.setLoading(true);
 
-    return this.http.delete<void>(this.buildUrl(`vendas/${id}`), this.httpOptions)
+    return this.http.delete<void>(this.buildUrl(`vendas/${id}`), this.authHttpOptions)
       .pipe(
         tap(() => {
           const vendas = this.vendasSignal();
@@ -271,12 +290,88 @@ export class VendaService extends BaseApiService {
         catchError(error => {
           console.error('Erro ao excluir venda:', error);
           this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
 
-          // Simula exclusão local
+  /**
+   * Confirma uma venda pendente
+   */
+  confirmarVenda(id: string): Observable<Venda> {
+    this.setLoading(true);
+
+    return this.http.patch<VendaResponse>(this.buildUrl(`vendas/${id}/confirmar`), {}, this.authHttpOptions)
+      .pipe(
+        map(response => this.convertFromApi(response)),
+        tap(vendaAtualizada => {
           const vendas = this.vendasSignal();
-          this.vendasSignal.set(vendas.filter(v => v.id !== id));
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendasSignal.set(novasVendas);
+          }
+          this.setLoading(false);
+        }),
+        catchError(error => {
+          console.error('Erro ao confirmar venda:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
 
-          return of(void 0);
+  /**
+   * Finaliza uma venda confirmada
+   */
+  finalizarVenda(id: string): Observable<Venda> {
+    this.setLoading(true);
+
+    return this.http.patch<VendaResponse>(this.buildUrl(`vendas/${id}/finalizar`), {}, this.authHttpOptions)
+      .pipe(
+        map(response => this.convertFromApi(response)),
+        tap(vendaAtualizada => {
+          const vendas = this.vendasSignal();
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendasSignal.set(novasVendas);
+          }
+          this.setLoading(false);
+        }),
+        catchError(error => {
+          console.error('Erro ao finalizar venda:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Cancela uma venda
+   */
+  cancelarVenda(id: string): Observable<Venda> {
+    this.setLoading(true);
+
+    return this.http.patch<VendaResponse>(this.buildUrl(`vendas/${id}/cancelar`), {}, this.authHttpOptions)
+      .pipe(
+        map(response => this.convertFromApi(response)),
+        tap(vendaAtualizada => {
+          const vendas = this.vendasSignal();
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendasSignal.set(novasVendas);
+          }
+          this.setLoading(false);
+        }),
+        catchError(error => {
+          console.error('Erro ao cancelar venda:', error);
+          this.setLoading(false);
+          return throwError(() => error);
         })
       );
   }
@@ -287,49 +382,32 @@ export class VendaService extends BaseApiService {
   getVendasStats(): Observable<VendasStats> {
     this.setLoading(true);
 
-    return this.http.get<VendasStats>(this.buildUrl('vendas/stats'), this.httpOptions)
+    return this.http.get<VendasStats>(this.buildUrl('vendas/stats'), this.authHttpOptions)
       .pipe(
         tap(() => this.setLoading(false)),
         catchError(error => {
           console.error('Erro ao buscar estatísticas:', error);
           this.setLoading(false);
-
-          // Retorna estatísticas mockadas
-          const vendas = this.vendasSignal();
-          const mockStats: VendasStats = {
-            totalVendas: vendas.length,
-            vendasHoje: vendas.filter(v =>
-              new Date(v.dataVenda).toDateString() === new Date().toDateString()
-            ).length,
-            faturamentoMes: vendas
-              .filter(v => v.status === 'Finalizada')
-              .reduce((sum, v) => sum + v.total, 0),
-            ticketMedio: vendas.length > 0 ?
-              vendas.reduce((sum, v) => sum + v.total, 0) / vendas.length : 0,
-            vendasPendentes: vendas.filter(v => v.status === 'Pendente').length,
-            topClientes: [
-              { clienteNome: 'João Silva', totalCompras: 5, valorTotal: 1500.00 },
-              { clienteNome: 'Ana Costa', totalCompras: 3, valorTotal: 890.00 },
-              { clienteNome: 'Pedro Oliveira', totalCompras: 2, valorTotal: 2400.00 }
-            ],
-            vendasPorMes: [
-              { mes: 'Nov', vendas: 45, faturamento: 12500.00 },
-              { mes: 'Dez', vendas: 52, faturamento: 15800.00 }
-            ]
-          };
-
-          return of(mockStats);
+          return throwError(() => error);
         })
       );
   }
 
   /**
-   * Gera próximo número de venda
+   * Obtém próximo número de venda disponível
    */
-  getProximoNumero(): Observable<string> {
-    const vendas = this.vendasSignal();
-    const proximoNumero = `VND-${String(vendas.length + 1).padStart(3, '0')}`;
-    return of(proximoNumero);
+  getProximoNumero(): Observable<{ numero: string }> {
+    this.setLoading(true);
+
+    return this.http.get<{ numero: string }>(this.buildUrl('vendas/proximo-numero'), this.authHttpOptions)
+      .pipe(
+        tap(() => this.setLoading(false)),
+        catchError(error => {
+          console.error('Erro ao buscar próximo número:', error);
+          this.setLoading(false);
+          return throwError(() => error);
+        })
+      );
   }
 
   /**
@@ -384,11 +462,18 @@ export class VendaService extends BaseApiService {
   private convertCreateToApi(vendaData: VendaCreate): any {
     return {
       clienteId: vendaData.clienteId,
-      items: vendaData.items,
-      desconto: vendaData.desconto,
+      items: vendaData.items.map(item => ({
+        produtoId: item.produtoId,
+        produtoNome: item.produtoNome,
+        produtoSku: item.produtoSku,
+        quantidade: Number(item.quantidade),
+        precoUnitario: Number(item.precoUnitario),
+        subtotal: Number(item.subtotal)
+      })),
+      desconto: Number(vendaData.desconto) || 0,
       formaPagamento: vendaData.formaPagamento,
-      observacoes: vendaData.observacoes,
-      dataVencimento: vendaData.dataVencimento?.toISOString()
+      observacoes: vendaData.observacoes || undefined,
+      dataVencimento: vendaData.dataVencimento?.toISOString() || undefined
     };
   }
 

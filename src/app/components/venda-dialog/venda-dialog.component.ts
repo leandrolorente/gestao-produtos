@@ -390,6 +390,7 @@ export class VendaDialogComponent implements OnInit {
   onSubmit(): void {
     if (this.vendaForm.valid) {
       const formValue = this.vendaForm.value;
+      console.log('Form value:', formValue);
 
       if (this.editMode) {
         const vendaAtualizada: Venda = {
@@ -406,17 +407,28 @@ export class VendaDialogComponent implements OnInit {
             produtoId: item.produtoId,
             produtoNome: item.produtoNome,
             produtoSku: item.produtoSku,
-            quantidade: item.quantidade,
-            precoUnitario: item.precoUnitario
+            quantidade: Number(item.quantidade),
+            precoUnitario: Number(item.precoUnitario),
+            subtotal: Number(item.quantidade) * Number(item.precoUnitario)
           })),
-          desconto: formValue.desconto,
+          desconto: Number(formValue.desconto) || 0,
           formaPagamento: formValue.formaPagamento,
-          observacoes: formValue.observacoes,
-          dataVencimento: formValue.dataVencimento
+          observacoes: formValue.observacoes || undefined,
+          dataVencimento: formValue.dataVencimento || undefined
         };
+        
+        console.log('Nova venda a ser criada:', novaVenda);
         this.dialogRef.close(novaVenda);
       }
     } else {
+      console.log('Form inválido:', this.vendaForm.errors);
+      console.log('Controles inválidos:');
+      Object.keys(this.vendaForm.controls).forEach(key => {
+        const control = this.vendaForm.get(key);
+        if (control?.invalid) {
+          console.log(`${key}:`, control.errors);
+        }
+      });
       this.markFormGroupTouched();
     }
   }
