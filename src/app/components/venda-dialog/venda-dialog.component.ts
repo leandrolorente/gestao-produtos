@@ -165,7 +165,7 @@ export class VendaDialogComponent implements OnInit {
     venda.items.forEach(item => {
       itemsArray.push(this.createItemFormGroup(item));
     });
-    
+
     // Atualizar totais após carregar todos os dados
     setTimeout(() => this.updateTotals(), 100);
   }
@@ -258,7 +258,7 @@ export class VendaDialogComponent implements OnInit {
   addItem(): void {
     const newItem = this.createItemFormGroup();
     this.itemsArray.push(newItem);
-    
+
     // Atualizar totais
     this.updateTotals();
   }
@@ -266,7 +266,7 @@ export class VendaDialogComponent implements OnInit {
   removeItem(index: number): void {
     if (this.itemsArray.length > 1) {
       this.itemsArray.removeAt(index);
-      
+
       // Atualizar totais
       this.updateTotals();
     }
@@ -287,7 +287,7 @@ export class VendaDialogComponent implements OnInit {
     const subtotal = quantidade * precoUnitario;
 
     itemGroup.get('subtotal')?.setValue(subtotal);
-    
+
     // Atualizar totais gerais
     this.updateTotals();
   }
@@ -295,7 +295,7 @@ export class VendaDialogComponent implements OnInit {
   private updateTotals(): void {
     try {
       if (!this.vendaForm?.get('items')) return;
-      
+
       // Calcular subtotal
       const items = this.vendaForm.get('items')?.value || [];
       const novoSubtotal = items.reduce((sum: number, item: any) => {
@@ -303,15 +303,15 @@ export class VendaDialogComponent implements OnInit {
         const precoUnitario = Number(item?.precoUnitario) || 0;
         return sum + (quantidade * precoUnitario);
       }, 0);
-      
+
       // Calcular total
       const desconto = Number(this.vendaForm.get('desconto')?.value) || 0;
       const novoTotal = Math.max(0, novoSubtotal - desconto);
-      
+
       // Atualizar signals
       this.subtotalValue.set(novoSubtotal);
       this.totalValue.set(novoTotal);
-      
+
       console.log('Totais atualizados:', { subtotal: novoSubtotal, total: novoTotal });
     } catch (error) {
       console.error('Erro ao atualizar totais:', error);
