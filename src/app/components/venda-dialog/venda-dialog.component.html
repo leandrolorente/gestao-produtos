@@ -1,0 +1,251 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h1>
+      <mat-icon>{{ editMode ? 'edit' : 'add_shopping_cart' }}</mat-icon>
+      {{ editMode ? 'Editar Venda' : 'Nova Venda' }}
+    </h1>
+  </div>
+
+  <div class="dialog-content" [formGroup]="vendaForm">
+
+    <!-- Informações do Cliente -->
+    <div class="section-header">
+      <mat-icon>person</mat-icon>
+      <h3>Informações do Cliente</h3>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Cliente</mat-label>
+        <input
+          matInput
+          formControlName="clienteNome"
+          [matAutocomplete]="autoCliente"
+          placeholder="Digite o nome do cliente">
+        <mat-icon matSuffix>person_search</mat-icon>
+        <mat-autocomplete
+          #autoCliente="matAutocomplete"
+          [displayWith]="displayClienteFn"
+          (optionSelected)="onClienteOptionSelected($event)">
+          <mat-option
+            *ngFor="let cliente of clientesFiltrados()"
+            [value]="cliente">
+            <div class="autocomplete-option">
+              <div class="primary-text">{{ cliente.nome }}</div>
+              <div class="secondary-text">{{ cliente.email }}</div>
+            </div>
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error>{{ getFieldErrorMessage('clienteId', 'Cliente') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Itens da Venda -->
+    <div class="section-header">
+      <mat-icon>inventory</mat-icon>
+      <h3>Itens da Venda</h3>
+      <button
+        type="button"
+        mat-icon-button
+        color="primary"
+        (click)="addItem()"
+        matTooltip="Adicionar Item"
+        class="section-action">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+
+    <div formArrayName="items" class="items-container">
+      <div
+        *ngFor="let item of itemsArray.controls; let i = index"
+        [formGroupName]="i"
+        class="item-card">
+
+        <div class="item-header">
+          <span class="item-label">Item {{ i + 1 }}</span>
+          <button
+            type="button"
+            mat-icon-button
+            color="warn"
+            (click)="removeItem(i)"
+            [disabled]="itemsArray.length === 1"
+            matTooltip="Remover Item"
+            class="remove-item-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <div class="item-fields">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="produto-field">
+              <mat-label>Produto</mat-label>
+              <input
+                matInput
+                formControlName="produtoNome"
+                [matAutocomplete]="autoProduto"
+                placeholder="Digite o nome do produto">
+              <mat-icon matSuffix>search</mat-icon>
+              <mat-autocomplete
+                #autoProduto="matAutocomplete"
+                [displayWith]="displayProdutoFn"
+                (optionSelected)="onProdutoOptionSelected($event, i)">
+                <mat-option
+                  *ngFor="let produto of produtosFiltrados()"
+                  [value]="produto">
+                  <div class="autocomplete-option">
+                    <div class="primary-text">{{ produto.name }}</div>
+                    <div class="secondary-text">
+                      <span class="sku">{{ produto.sku }}</span>
+                      <span class="price">{{ formatPrice(produto.price) }}</span>
+                    </div>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row quantity-price-row">
+            <mat-form-field appearance="outline" class="quantity-field">
+              <mat-label>Quantidade</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="quantidade"
+                min="1"
+                (input)="onQuantidadeChange(i)">
+              <mat-icon matSuffix>format_list_numbered</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="price-field">
+              <mat-label>Preço Unitário</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="precoUnitario"
+                step="0.01"
+                min="0"
+                (input)="onPrecoChange(i)">
+              <span matTextPrefix>R$ </span>
+              <mat-icon matSuffix>attach_money</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="subtotal-field">
+              <mat-label>Subtotal</mat-label>
+              <input
+                matInput
+                formControlName="subtotal"
+                readonly>
+              <span matTextPrefix>R$ </span>
+              <mat-icon matSuffix>calculate</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumo e Pagamento -->
+    <div class="section-header">
+      <mat-icon>payment</mat-icon>
+      <h3>Pagamento e Totais</h3>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Forma de Pagamento</mat-label>
+        <mat-select formControlName="formaPagamento">
+          <mat-option *ngFor="let forma of formasPagamento" [value]="forma">
+            {{ forma }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>credit_card</mat-icon>
+        <mat-error>{{ getFieldErrorMessage('formaPagamento', 'Forma de Pagamento') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width" *ngIf="editMode">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let status of statusOptions" [value]="status">
+            {{ status }}
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>flag</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Desconto</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="desconto"
+          step="0.01"
+          min="0">
+        <span matTextPrefix>R$ </span>
+        <mat-icon matSuffix>local_offer</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Data de Vencimento</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="dataVencimento">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observações</mat-label>
+        <textarea
+          matInput
+          formControlName="observacoes"
+          rows="3"
+          placeholder="Informações adicionais sobre a venda"
+          maxlength="500"></textarea>
+        <mat-icon matSuffix>note</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- Totais -->
+    <div class="totals-container">
+      <div class="totals-card">
+        <div class="total-line">
+          <span class="label">Subtotal:</span>
+          <span class="value">{{ formatPrice(subtotal()) }}</span>
+        </div>
+        <div class="total-line">
+          <span class="label">Desconto:</span>
+          <span class="value discount">- {{ formatPrice(vendaForm.get('desconto')?.value || 0) }}</span>
+        </div>
+        <div class="total-line final">
+          <span class="label">Total:</span>
+          <span class="value">{{ formatPrice(total()) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button
+      type="button"
+      mat-button
+      (click)="onCancel()"
+      class="cancel-btn">
+      <mat-icon>cancel</mat-icon>
+      Cancelar
+    </button>
+    <button
+      type="submit"
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="vendaForm.invalid"
+      class="save-btn">
+      <mat-icon>{{ editMode ? 'save' : 'add_shopping_cart' }}</mat-icon>
+      {{ editMode ? 'Atualizar' : 'Salvar' }}
+    </button>
+  </div>
+</div>
