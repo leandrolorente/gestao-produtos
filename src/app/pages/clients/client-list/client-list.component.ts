@@ -170,6 +170,34 @@ export class ClientListComponent implements OnInit {
     });
   }
 
+  /**
+   * Formata uma data de forma segura
+   */
+  protected formatDate(date: any): string {
+    if (!date) return 'Nunca';
+    
+    try {
+      // Se já é um objeto Date
+      if (date instanceof Date) {
+        return date.toLocaleDateString('pt-BR');
+      }
+      
+      // Se é uma string, tenta converter para Date
+      if (typeof date === 'string') {
+        const parsedDate = new Date(date);
+        // Verifica se a data é válida
+        if (!isNaN(parsedDate.getTime())) {
+          return parsedDate.toLocaleDateString('pt-BR');
+        }
+      }
+      
+      return 'Data inválida';
+    } catch (error) {
+      console.warn('Erro ao formatar data:', error);
+      return 'Data inválida';
+    }
+  }
+
   protected applyFilter(): void {
     const term = this.searchTerm().toLowerCase();
     const filtered = this.clientes().filter(cliente =>
