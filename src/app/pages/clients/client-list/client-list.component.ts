@@ -175,13 +175,13 @@ export class ClientListComponent implements OnInit {
    */
   protected formatDate(date: any): string {
     if (!date) return 'Nunca';
-    
+
     try {
       // Se já é um objeto Date
       if (date instanceof Date) {
         return date.toLocaleDateString('pt-BR');
       }
-      
+
       // Se é uma string, tenta converter para Date
       if (typeof date === 'string') {
         const parsedDate = new Date(date);
@@ -190,7 +190,7 @@ export class ClientListComponent implements OnInit {
           return parsedDate.toLocaleDateString('pt-BR');
         }
       }
-      
+
       return 'Data inválida';
     } catch (error) {
       console.warn('Erro ao formatar data:', error);
