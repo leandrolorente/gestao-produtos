@@ -479,6 +479,80 @@
       }
     }
   }
+
+  // Estilos para vendas recentes
+  .recent-sales-card {
+    .sales-list {
+      .sale-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-light);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .sale-info {
+          flex: 1;
+
+          h4 {
+            margin: 0 0 4px 0;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+          }
+
+          p {
+            margin: 0 0 2px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+          }
+
+          small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+          }
+        }
+
+        .sale-amount {
+          text-align: right;
+
+          .amount {
+            display: block;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+          }
+
+          .status {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+
+            &.finalizada {
+              background: #e8f5e8;
+              color: #2e7d32;
+            }
+
+            &.pendente {
+              background: #fff3e0;
+              color: #ed6c02;
+            }
+
+            &.cancelada {
+              background: #ffebee;
+              color: #d32f2f;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 // Animação de rotação para o botão refresh

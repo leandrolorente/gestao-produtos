@@ -7,9 +7,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { DashboardService } from '../../services/dashboard';
-import { DashboardStats, User } from '../../models/User';
+import { DashboardService } from '../../services/dashboard.service';
+import { AuthService } from '../../services/auth.service';
+import { DashboardStats, User, WidgetsData, ProductSummary, SaleSummary } from '../../models/User';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,9 +29,12 @@ import { DashboardStats, User } from '../../models/User';
 })
 export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
-  private snackBar = inject(MatSnackBar);
+  private authService = inject(AuthService);
 
   protected readonly stats = signal<DashboardStats | null>(null);
+  protected readonly widgets = signal<WidgetsData | null>(null);
+  protected readonly topProducts = signal<ProductSummary[]>([]);
+  protected readonly recentSales = signal<SaleSummary[]>([]);
   protected readonly user = signal<User | null>(null);
   protected readonly isLoading = signal(false);
   protected readonly isRefreshing = signal(false);
@@ -53,29 +56,22 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar usuário:', error);
-        this.snackBar.open('Erro ao carregar dados do usuário', 'Fechar', {
-          duration: 3000,
-          panelClass: ['snackbar-error'],
-          horizontalPosition: 'right',
-          verticalPosition: 'bottom'
-        });
+        this.authService.showSnackbar('Erro ao carregar dados do usuário', 'error');
       }
     });
 
-    // Carrega estatísticas
-    this.dashboardService.getDashboardStats().subscribe({
-      next: (stats) => {
-        this.stats.set(stats);
+    // Carrega todos os dados do dashboard de uma vez
+    this.dashboardService.loadAllDashboardData().subscribe({
+      next: (data) => {
+        this.stats.set(data.stats);
+        this.widgets.set(data.widgets);
+        this.topProducts.set(data.topProducts);
+        this.recentSales.set(data.recentSales);
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Erro ao carregar estatísticas:', error);
-        this.snackBar.open('Erro ao carregar estatísticas', 'Fechar', {
-          duration: 3000,
-          panelClass: ['snackbar-error'],
-          horizontalPosition: 'right',
-          verticalPosition: 'bottom'
-        });
+        console.error('Erro ao carregar dados do dashboard:', error);
+        this.authService.showSnackbar('Erro ao carregar dados do dashboard', 'error');
         this.isLoading.set(false);
       }
     });
@@ -89,30 +85,23 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Força atualização apenas das estatísticas
+   * Força atualização de todos os dados do dashboard
    */
   protected refreshStats(): void {
     this.isRefreshing.set(true);
-    this.dashboardService.refreshStats().subscribe({
-      next: (stats) => {
-        this.stats.set(stats);
+    this.dashboardService.refreshAllData().subscribe({
+      next: (data) => {
+        this.stats.set(data.stats);
+        this.widgets.set(data.widgets);
+        this.topProducts.set(data.topProducts);
+        this.recentSales.set(data.recentSales);
         this.isRefreshing.set(false);
-        this.snackBar.open('Estatísticas atualizadas!', 'Fechar', {
-          duration: 3000,
-          panelClass: ['snackbar-success'],
-          horizontalPosition: 'right',
-          verticalPosition: 'bottom'
-        });
+        this.authService.showSnackbar('Dashboard atualizado com sucesso!', 'success');
       },
       error: (error) => {
-        console.error('Erro ao atualizar estatísticas:', error);
+        console.error('Erro ao atualizar dashboard:', error);
         this.isRefreshing.set(false);
-        this.snackBar.open('Erro ao atualizar estatísticas', 'Fechar', {
-          duration: 3000,
-          panelClass: ['snackbar-error'],
-          horizontalPosition: 'right',
-          verticalPosition: 'bottom'
-        });
+        this.authService.showSnackbar('Erro ao atualizar dashboard', 'error');
       }
     });
   }
