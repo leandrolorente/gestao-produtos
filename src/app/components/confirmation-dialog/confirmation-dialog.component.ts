@@ -53,4 +53,9 @@ export class ConfirmationDialogComponent {
   onCancel(): void {
     this.dialogRef.close(false);
   }
+
+  formatMessage(message: string): string {
+    // Converte quebras de linha (\n) em tags HTML <br>
+    return message.replace(/\n/g, '<br>');
+  }
 }

@@ -12,7 +12,7 @@
   </div>
 
   <div class="dialog-content">
-    <p class="dialog-message">{{ data.message }}</p>
+    <p class="dialog-message" [innerHTML]="formatMessage(data.message)"></p>
   </div>
 
   <div class="dialog-actions">

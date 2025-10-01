@@ -400,24 +400,37 @@ export class VendaListComponent implements OnInit {
       return;
     }
 
-    this.vendaService.confirmarVenda(venda.id).subscribe({
-      next: (vendaAtualizada) => {
-        const vendas = this.vendas();
-        const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
-        if (index !== -1) {
-          const novasVendas = [...vendas];
-          novasVendas[index] = vendaAtualizada;
-          this.vendas.set(novasVendas);
-          this.dataSource.data = this.vendas();
-        }
-        this.authService.showSnackbar(`Venda ${venda.numero} confirmada com sucesso!`, 'success');
-        this.loadStats();
-      },
-      error: (error) => {
-        console.error('Erro ao confirmar venda:', error);
-        const mensagem = error.message || 'Erro ao confirmar venda';
-        this.authService.showSnackbar(mensagem, 'error');
+    this.confirmationService.confirmAction(
+      'Confirmar Venda',
+      `Deseja confirmar a venda ${venda.numero}?\n\nApós confirmada, a venda poderá ser processada para finalização.`,
+      'Confirmar',
+      {
+        icon: 'check_circle',
+        iconColor: 'primary',
+        actionColor: 'primary'
       }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.vendaService.confirmarVenda(venda.id).subscribe({
+        next: (vendaAtualizada) => {
+          const vendas = this.vendas();
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendas.set(novasVendas);
+            this.dataSource.data = this.vendas();
+          }
+          this.authService.showSnackbar(`Venda ${venda.numero} confirmada com sucesso!`, 'success');
+          this.loadStats();
+        },
+        error: (error) => {
+          console.error('Erro ao confirmar venda:', error);
+          const mensagem = error.message || 'Erro ao confirmar venda';
+          this.authService.showSnackbar(mensagem, 'error');
+        }
+      });
     });
   }
 
@@ -430,24 +443,37 @@ export class VendaListComponent implements OnInit {
       return;
     }
 
-    this.vendaService.finalizarVenda(venda.id).subscribe({
-      next: (vendaAtualizada) => {
-        const vendas = this.vendas();
-        const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
-        if (index !== -1) {
-          const novasVendas = [...vendas];
-          novasVendas[index] = vendaAtualizada;
-          this.vendas.set(novasVendas);
-          this.dataSource.data = this.vendas();
-        }
-        this.authService.showSnackbar(`Venda ${venda.numero} finalizada com sucesso!`, 'success');
-        this.loadStats();
-      },
-      error: (error) => {
-        console.error('Erro ao finalizar venda:', error);
-        const mensagem = error.message || 'Erro ao finalizar venda';
-        this.authService.showSnackbar(mensagem, 'error');
+    this.confirmationService.confirmAction(
+      'Finalizar Venda',
+      `Deseja finalizar a venda ${venda.numero}?\n\nApós finalizada, a venda será marcada como concluída e não poderá mais ser alterada.`,
+      'Finalizar',
+      {
+        icon: 'task_alt',
+        iconColor: 'primary',
+        actionColor: 'primary'
       }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.vendaService.finalizarVenda(venda.id).subscribe({
+        next: (vendaAtualizada) => {
+          const vendas = this.vendas();
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendas.set(novasVendas);
+            this.dataSource.data = this.vendas();
+          }
+          this.authService.showSnackbar(`Venda ${venda.numero} finalizada com sucesso!`, 'success');
+          this.loadStats();
+        },
+        error: (error) => {
+          console.error('Erro ao finalizar venda:', error);
+          const mensagem = error.message || 'Erro ao finalizar venda';
+          this.authService.showSnackbar(mensagem, 'error');
+        }
+      });
     });
   }
 
