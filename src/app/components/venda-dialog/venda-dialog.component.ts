@@ -139,7 +139,7 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
     // Se em modo de edição, preenche o formulário
     if (this.editMode && this.data?.venda) {
       this.populateForm(this.data.venda);
-      
+
       // Desabilita campos do cliente se readOnlyClient for true
       if (this.data.readOnlyClient) {
         this.vendaForm.get('clienteId')?.disable();

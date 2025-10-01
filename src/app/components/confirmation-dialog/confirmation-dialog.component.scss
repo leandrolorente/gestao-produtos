@@ -2,24 +2,24 @@
   padding: 0;
   border-radius: 8px;
   overflow: hidden;
-  
+
   .dialog-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 20px 24px 16px 24px;
-    
+
     .header-content {
       display: flex;
       align-items: center;
       gap: 12px;
-      
+
       .dialog-icon {
         font-size: 24px;
         width: 24px;
         height: 24px;
         color: white !important;
       }
-      
+
       .dialog-title {
         margin: 0;
         font-size: 20px;
@@ -28,11 +28,11 @@
       }
     }
   }
-  
+
   .dialog-content {
     padding: 24px;
     min-height: 60px;
-    
+
     .dialog-message {
       margin: 0;
       font-size: 16px;
@@ -40,7 +40,7 @@
       color: rgba(0, 0, 0, 0.87);
     }
   }
-  
+
   .dialog-actions {
     padding: 8px 16px 16px 16px;
     display: flex;
@@ -48,26 +48,26 @@
     gap: 8px;
     border-top: 1px solid rgba(0, 0, 0, 0.12);
     background-color: #fafafa;
-    
+
     .action-button {
       min-width: 80px;
       height: 36px;
       font-weight: 500;
       text-transform: uppercase;
       border-radius: 4px;
-      
+
       &.mat-raised {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        
+
         &:hover {
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
       }
-      
+
       &.mat-stroked {
         border: 1px solid currentColor;
       }
-      
+
       // Cores personalizadas baseadas no tema
       &[color="primary"] {
         &.mat-raised {
@@ -75,14 +75,14 @@
           color: white;
         }
       }
-      
+
       &[color="warn"] {
         &.mat-raised {
           background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
           color: white;
         }
       }
-      
+
       &[color="accent"] {
         &.mat-raised {
           background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);

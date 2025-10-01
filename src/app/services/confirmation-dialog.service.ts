@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { 
-  ConfirmationDialogComponent, 
-  ConfirmationDialogData, 
-  ConfirmationButton 
+import {
+  ConfirmationDialogComponent,
+  ConfirmationDialogData,
+  ConfirmationButton
 } from '../components/confirmation-dialog/confirmation-dialog.component';
 
 @Injectable({
@@ -34,8 +34,8 @@ export class ConfirmationDialogService {
    * Método de conveniência para confirmação simples Sim/Não
    */
   confirm(
-    title: string, 
-    message: string, 
+    title: string,
+    message: string,
     options?: {
       icon?: string;
       iconColor?: 'primary' | 'accent' | 'warn';
@@ -73,8 +73,8 @@ export class ConfirmationDialogService {
    * Método de conveniência para alerta com apenas botão OK
    */
   alert(
-    title: string, 
-    message: string, 
+    title: string,
+    message: string,
     options?: {
       icon?: string;
       iconColor?: 'primary' | 'accent' | 'warn';
@@ -113,7 +113,7 @@ export class ConfirmationDialogService {
       maxWidth?: string;
     }
   ): Observable<boolean> {
-    const message = options?.customMessage || 
+    const message = options?.customMessage ||
       `Tem certeza que deseja excluir "${itemName}"? Esta ação não pode ser desfeita.`;
 
     const buttons: ConfirmationButton[] = [

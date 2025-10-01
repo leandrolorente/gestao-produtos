@@ -638,7 +638,7 @@ mat-chip {
 /* --- Estilos para botões de ação de vendas --- */
 .confirm-action {
   color: #2e7d32 !important;
-  
+
   .mat-icon {
     color: #2e7d32 !important;
   }
@@ -646,7 +646,7 @@ mat-chip {
 
 .finalize-action {
   color: #1976d2 !important;
-  
+
   .mat-icon {
     color: #1976d2 !important;
   }
@@ -654,7 +654,7 @@ mat-chip {
 
 .process-action {
   color: #ff6f00 !important;
-  
+
   .mat-icon {
     color: #ff6f00 !important;
   }
@@ -662,7 +662,7 @@ mat-chip {
 
 .cancel-action {
   color: #d32f2f !important;
-  
+
   .mat-icon {
     color: #d32f2f !important;
   }
@@ -670,7 +670,7 @@ mat-chip {
 
 .delete-action {
   color: #f44336 !important;
-  
+
   .mat-icon {
     color: #f44336 !important;
   }
@@ -723,7 +723,7 @@ mat-chip {
 /* --- Classe para células que não devem ter double-click --- */
 .non-clickable {
   cursor: default !important;
-  
+
   &:hover {
     transform: none !important;
     background-color: transparent !important;
@@ -737,7 +737,7 @@ mat-chip {
   position: relative;
   z-index: 10;
   cursor: default !important;
-  
+
   .action-buttons {
     display: flex;
     gap: 8px;
@@ -746,7 +746,7 @@ mat-chip {
     position: relative;
     z-index: 20;
     height: 100%;
-    
+
     .action-btn {
       position: relative;
       z-index: 30;
@@ -759,7 +759,7 @@ mat-chip {
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      
+
       mat-icon {
         font-size: 18px;
         width: 18px;
@@ -769,34 +769,34 @@ mat-chip {
         align-items: center;
         justify-content: center;
       }
-      
+
       &:hover {
         background: rgba(255, 255, 255, 1);
         transform: scale(1.05);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       }
-      
+
       &:active {
         transform: scale(0.95);
       }
-      
+
       &.edit-btn {
         color: #1976d2;
-        
+
         &:hover {
           background: rgba(25, 118, 210, 0.1);
         }
-        
+
         &:disabled {
           color: rgba(0, 0, 0, 0.26);
           background: rgba(0, 0, 0, 0.05);
           cursor: not-allowed !important;
         }
       }
-      
+
       &.menu-btn {
         color: #424242;
-        
+
         &:hover {
           background: rgba(66, 66, 66, 0.1);
         }

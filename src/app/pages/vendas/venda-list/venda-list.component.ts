@@ -216,8 +216,8 @@ export class VendaListComponent implements OnInit {
     const dialogRef = this.dialog.open(VendaDialogComponent, {
       width: '900px',
       maxHeight: '90vh',
-      data: { 
-        venda, 
+      data: {
+        venda,
         editMode: true,
         readOnlyClient: true // Cliente não pode ser editado na edição
       },
@@ -256,10 +256,10 @@ export class VendaListComponent implements OnInit {
   onRowDoubleClick(event: Event, venda: Venda): void {
     // Verifica se o clique foi na coluna de ações ou em um botão
     const target = event.target as HTMLElement;
-    
+
     // Se foi na coluna de ações, não faz nada
-    if (target.closest('.actions-column') || 
-        target.closest('.action-buttons') || 
+    if (target.closest('.actions-column') ||
+        target.closest('.action-buttons') ||
         target.closest('button') ||
         target.closest('.non-clickable')) {
       return;
@@ -282,7 +282,7 @@ export class VendaListComponent implements OnInit {
     // Implementação da impressão da venda
     const printContent = this.generatePrintContent(venda);
     const printWindow = window.open('', '_blank');
-    
+
     if (printWindow) {
       printWindow.document.write(printContent);
       printWindow.document.close();
@@ -314,7 +314,7 @@ export class VendaListComponent implements OnInit {
         <div class="header">
           <h1>Sistema de Gestão - Venda ${venda.numero}</h1>
         </div>
-        
+
         <div class="info">
           <p><strong>Cliente:</strong> ${venda.clienteNome}</p>
           <p><strong>Email:</strong> ${venda.clienteEmail}</p>
