@@ -378,8 +378,8 @@
           display: flex;
           flex-direction: column;
           gap: 12px;
-          overflow-y: auto;
-          max-height: 250px;
+          height: 100; // Usa toda a altura disponível
+          // Removido overflow-y e max-height para usar todo o espaço
 
           .product-item {
             display: flex;
@@ -477,7 +477,7 @@
           flex-direction: column;
           gap: 12px;
           overflow-y: auto;
-          max-height: 250px;
+          max-height: 320px;
 
           .sale-item {
             display: flex;
