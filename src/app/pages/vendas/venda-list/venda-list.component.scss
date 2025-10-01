@@ -158,23 +158,32 @@
   }
 }
 
-/* --- Desktop View seguindo padrão --- */
-.desktop-view {
-  @media (max-width: 768px) {
-    display: none;
-  }
-}
-
 .table-container {
   overflow: auto;
   border-radius: 16px;
   background: var(--card-background);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  // Responsividade para mobile
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    border-radius: 12px;
+    -webkit-overflow-scrolling: touch; // Para scroll suave no iOS
+  }
 }
 
 .modern-table {
   width: 100%;
   background: var(--card-background);
+  min-width: 600px; // Garante largura mínima para scroll horizontal
+
+  @media (max-width: 768px) {
+    min-width: 500px; // Reduz a largura mínima no mobile
+  }
+
+  @media (max-width: 480px) {
+    min-width: 400px; // Reduz ainda mais em telas pequenas
+  }
 }
 
 .header-row {
@@ -497,6 +506,51 @@ mat-chip {
       min-width: unset;
     }
   }
+
+  // Responsividade específica para tabela
+  .table-container {
+    margin: 0 -0.5rem; // Compensa as margens do card
+  }
+
+  .modern-table {
+    font-size: 0.8rem;
+
+    .mat-mdc-header-cell {
+      padding: 12px 8px !important;
+      font-size: 0.75rem !important;
+    }
+
+    .mat-mdc-cell {
+      padding: 12px 8px !important;
+      font-size: 0.8rem !important;
+    }
+
+    // Oculta algumas colunas menos importantes no mobile
+    .mat-column-formaPagamento {
+      display: none;
+    }
+  }
+
+  // Ajusta colunas específicas para mobile
+  .mat-column-numero {
+    min-width: 70px !important;
+  }
+
+  .mat-column-cliente {
+    min-width: 120px !important;
+  }
+
+  .mat-column-status {
+    min-width: 80px !important;
+  }
+
+  .mat-column-total {
+    min-width: 90px !important;
+  }
+
+  .mat-column-acoes {
+    min-width: 60px !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -512,6 +566,46 @@ mat-chip {
       width: 100%;
       justify-content: center;
     }
+  }
+
+  // Responsividade extrema para tabela em telas muito pequenas
+  .modern-table {
+    font-size: 0.75rem;
+
+    .mat-mdc-header-cell {
+      padding: 8px 4px !important;
+      font-size: 0.7rem !important;
+    }
+
+    .mat-mdc-cell {
+      padding: 8px 4px !important;
+      font-size: 0.75rem !important;
+    }
+
+    // Oculta mais colunas em telas muito pequenas
+    .mat-column-dataVenda {
+      display: none;
+    }
+  }
+
+  .mat-column-numero {
+    min-width: 60px !important;
+  }
+
+  .mat-column-cliente {
+    min-width: 100px !important;
+  }
+
+  .mat-column-status {
+    min-width: 70px !important;
+  }
+
+  .mat-column-total {
+    min-width: 80px !important;
+  }
+
+  .mat-column-acoes {
+    min-width: 50px !important;
   }
 }
 
