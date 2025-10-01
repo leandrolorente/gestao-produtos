@@ -15,16 +15,22 @@
     </div>
 
     <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
+      <mat-form-field 
+        appearance="outline" 
+        class="full-width"
+        [class.field-disabled]="clienteReadOnly()">
         <mat-label>Cliente</mat-label>
         <input
           matInput
           formControlName="clienteNome"
           [matAutocomplete]="autoCliente"
           placeholder="Digite o nome do cliente"
+          [readonly]="clienteReadOnly()"
           (focus)="onClienteFocus()"
           (input)="onClienteInput($event)">
-        <mat-icon matSuffix>person_search</mat-icon>
+        <mat-icon matSuffix [class.icon-disabled]="clienteReadOnly()">
+          {{ clienteReadOnly() ? 'lock' : 'person_search' }}
+        </mat-icon>
         <mat-autocomplete
           #autoCliente="matAutocomplete"
           [displayWith]="displayClienteFn"
@@ -42,6 +48,10 @@
           </mat-option>
         </mat-autocomplete>
         <mat-error>{{ getFieldErrorMessage('clienteId', 'Cliente') }}</mat-error>
+        <mat-hint *ngIf="clienteReadOnly()" class="readonly-hint">
+          <mat-icon>info</mat-icon>
+          Cliente não pode ser alterado durante a edição
+        </mat-hint>
       </mat-form-field>
     </div>
 
@@ -79,6 +89,7 @@
                 matInput
                 formControlName="produtoNome"
                 [matAutocomplete]="autoProduto"
+                (input)="onProdutoInput($event)"
                 placeholder="Digite o nome do produto">
               <mat-icon matSuffix>search</mat-icon>
               <mat-autocomplete

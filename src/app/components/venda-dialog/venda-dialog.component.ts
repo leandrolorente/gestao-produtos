@@ -27,6 +27,7 @@ import { AuthService } from '../../services/auth.service';
 export interface VendaDialogData {
   venda?: Venda;
   editMode: boolean;
+  readOnlyClient?: boolean;
 }
 
 @Component({
@@ -76,6 +77,9 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   // Controle de estado dos autocompletetes
   clienteAutoCompleteOpen = signal<boolean>(false);
   produtoAutoCompleteOpen = signal<boolean>(false);
+
+  // Computed para verificar se o cliente está em modo somente leitura
+  clienteReadOnly = computed(() => this.data?.readOnlyClient === true);
 
   // Getters para compatibilidade
   get subtotal() {
@@ -135,6 +139,13 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
     // Se em modo de edição, preenche o formulário
     if (this.editMode && this.data?.venda) {
       this.populateForm(this.data.venda);
+      
+      // Desabilita campos do cliente se readOnlyClient for true
+      if (this.data.readOnlyClient) {
+        this.vendaForm.get('clienteId')?.disable();
+        this.vendaForm.get('clienteNome')?.disable();
+        this.vendaForm.get('clienteEmail')?.disable();
+      }
     } else {
       // Adiciona um item vazio para começar
       this.addItem();
@@ -177,10 +188,8 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   }
 
   private loadClientes(): void {
-    console.log('Carregando clientes...');
     this.clienteService.getAllClientes().subscribe({
       next: (clientes: any) => {
-        console.log('Clientes carregados:', clientes);
         this.clientes.set(clientes);
         // Não definir clientesFiltrados aqui - será definido quando o usuário focar no campo
       },
@@ -192,12 +201,13 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   }
 
   private loadProdutos(): void {
-    console.log('Carregando produtos...');
     this.produtoService.getAllProducts().subscribe({
       next: (produtos: any) => {
-        console.log('Produtos carregados:', produtos);
         this.produtos.set(produtos);
-        this.produtosFiltrados.set(produtos);
+        // Em modo de edição, não preencher automaticamente para evitar autocomplete aberto
+        if (!this.editMode) {
+          this.produtosFiltrados.set(produtos);
+        }
       },
       error: (error: any) => {
         console.error('Erro ao carregar produtos:', error);
@@ -221,7 +231,10 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   private updateProdutosFiltros(): void {
     // Para simplicidade, usar apenas um filtro global de produtos por enquanto
     // Pode ser melhorado para filtros individuais por item no futuro
-    this.produtosFiltrados.set(this.produtos());
+    // Em modo de edição, não preencher automaticamente para evitar autocomplete aberto
+    if (!this.editMode) {
+      this.produtosFiltrados.set(this.produtos());
+    }
   }
 
   private filtrarClientes(value: string): Cliente[] {
@@ -387,6 +400,19 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Método para quando o usuário digita no campo de produto
+  onProdutoInput(event: any): void {
+    const value = event.target.value;
+    if (value && value.trim() !== '') {
+      // Filtra conforme digita
+      const produtos = this.filtrarProdutos(value);
+      this.produtosFiltrados.set(produtos);
+    } else {
+      // Se limpar o campo, mostra todos novamente
+      this.produtosFiltrados.set(this.produtos());
+    }
+  }
+
   // Método para quando o usuário seleciona uma opção do autocomplete de produto
   onProdutoOptionSelected(event: any, itemIndex: number): void {
     const produto = event.option.value;
@@ -505,6 +531,10 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   onProdutoAutocompleteOpened(): void {
     this.produtoAutoCompleteOpen.set(true);
     this.renderer.addClass(this.elementRef.nativeElement, 'autocomplete-open');
+    // Carregar produtos quando o autocomplete for aberto manualmente
+    if (this.produtosFiltrados().length === 0) {
+      this.produtosFiltrados.set(this.produtos());
+    }
   }
 
   onProdutoAutocompleteClosed(): void {

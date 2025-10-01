@@ -557,3 +557,37 @@
     transform: translateY(0);
   }
 }
+
+/* --- Estilos para campos desabilitados --- */
+.field-disabled {
+  opacity: 0.6;
+  
+  .mat-mdc-form-field-input-control input {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+  
+  .mat-mdc-form-field-label-wrapper {
+    color: #666 !important;
+  }
+}
+
+.icon-disabled {
+  color: #666 !important;
+  opacity: 0.7;
+}
+
+.readonly-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}

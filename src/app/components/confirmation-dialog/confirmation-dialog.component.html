@@ -1,0 +1,29 @@
+<div class="confirmation-dialog" [style.max-width]="data.maxWidth">
+  <div class="dialog-header">
+    <div class="header-content">
+      <mat-icon 
+        *ngIf="data.icon" 
+        [color]="data.iconColor"
+        class="dialog-icon">
+        {{ data.icon }}
+      </mat-icon>
+      <h2 class="dialog-title">{{ data.title }}</h2>
+    </div>
+  </div>
+
+  <div class="dialog-content">
+    <p class="dialog-message">{{ data.message }}</p>
+  </div>
+
+  <div class="dialog-actions">
+    <button
+      *ngFor="let button of data.buttons"
+      mat-button
+      [color]="button.color || 'primary'"
+      [class]="'mat-' + (button.variant || 'raised')"
+      (click)="onButtonClick(button.value)"
+      class="action-button">
+      {{ button.text }}
+    </button>
+  </div>
+</div>

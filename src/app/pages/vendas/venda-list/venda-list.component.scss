@@ -702,3 +702,122 @@ mat-chip {
     min-height: 2.5rem;
   }
 }
+
+/* --- Estilos para interação com as linhas da tabela --- */
+.data-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  position: relative;
+
+  &:hover {
+    background-color: rgba(102, 126, 234, 0.04) !important;
+    transform: translateX(2px);
+  }
+
+  &:active {
+    transform: translateX(1px);
+    background-color: rgba(102, 126, 234, 0.08) !important;
+  }
+}
+
+/* --- Classe para células que não devem ter double-click --- */
+.non-clickable {
+  cursor: default !important;
+  
+  &:hover {
+    transform: none !important;
+    background-color: transparent !important;
+  }
+}
+
+/* --- Estilos para a coluna de ações --- */
+.actions-column {
+  width: 100px;
+  min-width: 100px;
+  position: relative;
+  z-index: 10;
+  cursor: default !important;
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 20;
+    height: 100%;
+    
+    .action-btn {
+      position: relative;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      cursor: pointer !important;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      &:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+      
+      &.edit-btn {
+        color: #1976d2;
+        
+        &:hover {
+          background: rgba(25, 118, 210, 0.1);
+        }
+        
+        &:disabled {
+          color: rgba(0, 0, 0, 0.26);
+          background: rgba(0, 0, 0, 0.05);
+          cursor: not-allowed !important;
+        }
+      }
+      
+      &.menu-btn {
+        color: #424242;
+        
+        &:hover {
+          background: rgba(66, 66, 66, 0.1);
+        }
+      }
+    }
+  }
+}
+
+/* Sobrescrever comportamento da linha para a coluna de ações */
+.data-row:hover .actions-column {
+  transform: none !important;
+  background-color: transparent !important;
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}

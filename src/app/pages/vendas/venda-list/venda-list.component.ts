@@ -21,6 +21,7 @@ import { Venda, VendaCreate, VendasStats } from '../../../models/Venda';
 import { VendaService } from '../../../services/venda.service';
 import { AuthService } from '../../../services/auth.service';
 import { VendaDialogComponent } from '../../../components/venda-dialog/venda-dialog.component';
+import { ConfirmationDialogService } from '../../../services/confirmation-dialog.service';
 
 @Component({
   selector: 'app-venda-list',
@@ -76,6 +77,9 @@ export class VendaListComponent implements OnInit {
   statusOptions = ['Todos', 'Pendente', 'Confirmada', 'Finalizada', 'Cancelada'];
   formasPagamento = ['Todas', 'Dinheiro', 'PIX', 'Cartão de Débito', 'Cartão de Crédito', 'Boleto', 'Transferência'];
 
+  // Timer para controlar double-click
+  private clickTimer: any = null;
+
   // Computed para estatísticas resumidas
   vendasHoje = computed(() => {
     const hoje = new Date().toDateString();
@@ -103,7 +107,8 @@ export class VendaListComponent implements OnInit {
   constructor(
     private vendaService: VendaService,
     private dialog: MatDialog,
-    private authService: AuthService
+    private authService: AuthService,
+    private confirmationService: ConfirmationDialogService
   ) {}
 
   ngOnInit(): void {
@@ -211,7 +216,11 @@ export class VendaListComponent implements OnInit {
     const dialogRef = this.dialog.open(VendaDialogComponent, {
       width: '900px',
       maxHeight: '90vh',
-      data: { venda, editMode: true },
+      data: { 
+        venda, 
+        editMode: true,
+        readOnlyClient: true // Cliente não pode ser editado na edição
+      },
       panelClass: 'custom-dialog'
     });
 
@@ -220,6 +229,44 @@ export class VendaListComponent implements OnInit {
         this.updateVenda(result);
       }
     });
+  }
+
+  /**
+   * Método para lidar com double-click na linha da tabela
+   */
+  onDoubleClick(venda: Venda): void {
+    // Limpa qualquer timer de click simples pendente
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+      this.clickTimer = null;
+    }
+
+    // Só permite ação se a venda pode ser editada
+    if (this.podeEditar(venda)) {
+      this.openEditDialog(venda);
+    } else {
+      // Para vendas não editáveis, não faz nada (não abre nem visualização)
+      return;
+    }
+  }
+
+  /**
+   * Método para lidar com double-click na linha, mas ignorando a coluna de ações
+   */
+  onRowDoubleClick(event: Event, venda: Venda): void {
+    // Verifica se o clique foi na coluna de ações ou em um botão
+    const target = event.target as HTMLElement;
+    
+    // Se foi na coluna de ações, não faz nada
+    if (target.closest('.actions-column') || 
+        target.closest('.action-buttons') || 
+        target.closest('button') ||
+        target.closest('.non-clickable')) {
+      return;
+    }
+
+    // Caso contrário, executa a ação de double-click
+    this.onDoubleClick(venda);
   }
 
   openViewDialog(venda: Venda): void {
@@ -413,14 +460,17 @@ export class VendaListComponent implements OnInit {
       return;
     }
 
-    const confirmar = confirm(
-      `Deseja processar completamente a venda ${venda.numero}?\n\n` +
-      'Isso irá:\n' +
-      '1. Confirmar a venda\n' +
-      '2. Finalizar a venda automaticamente'
-    );
-
-    if (!confirmar) return;
+    this.confirmationService.confirmAction(
+      'Processar Venda Completa',
+      `Deseja processar completamente a venda ${venda.numero}?\n\nIsso irá:\n1. Confirmar a venda\n2. Finalizar a venda automaticamente`,
+      'Processar',
+      {
+        icon: 'flash_on',
+        iconColor: 'primary',
+        actionColor: 'primary'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
 
     this.vendaService.processarVendaCompleta(venda.id).subscribe({
       next: (vendaFinalizada) => {
@@ -441,6 +491,7 @@ export class VendaListComponent implements OnInit {
         this.authService.showSnackbar(mensagem, 'error');
       }
     });
+    });
   }
 
   /**
@@ -452,8 +503,17 @@ export class VendaListComponent implements OnInit {
       return;
     }
 
-    const confirmar = confirm(`Tem certeza que deseja cancelar a venda ${venda.numero}?`);
-    if (!confirmar) return;
+    this.confirmationService.confirmAction(
+      'Cancelar Venda',
+      `Tem certeza que deseja cancelar a venda ${venda.numero}?\n\nEsta ação não pode ser desfeita.`,
+      'Cancelar',
+      {
+        icon: 'cancel',
+        iconColor: 'warn',
+        actionColor: 'warn'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
 
     this.vendaService.cancelarVenda(venda.id).subscribe({
       next: (vendaAtualizada) => {
@@ -473,6 +533,7 @@ export class VendaListComponent implements OnInit {
         const mensagem = error.message || 'Erro ao cancelar venda';
         this.authService.showSnackbar(mensagem, 'error');
       }
+    });
     });
   }
 
@@ -505,7 +566,14 @@ export class VendaListComponent implements OnInit {
   }
 
   deleteVenda(venda: Venda): void {
-    if (confirm(`Tem certeza que deseja excluir a venda ${venda.numero}?`)) {
+    this.confirmationService.confirmDelete(
+      `venda ${venda.numero}`,
+      {
+        customMessage: `Tem certeza que deseja excluir a venda ${venda.numero}?\n\nEsta ação é irreversível e todos os dados da venda serão perdidos.`
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
       this.vendaService.deleteVenda(venda.id).subscribe({
         next: () => {
           const vendas = this.vendas();
@@ -519,7 +587,7 @@ export class VendaListComponent implements OnInit {
           this.authService.showSnackbar('Erro ao excluir venda', 'error');
         }
       });
-    }
+    });
   }
 
   exportToCsv(): void {
