@@ -12,7 +12,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, startWith, map } from 'rxjs';
 
 // Models
@@ -23,6 +22,7 @@ import { Cliente } from '../../models/Cliente';
 // Services
 import { ProdutoService } from '../../services/produto.service';
 import { ClienteService } from '../../services/cliente.service';
+import { AuthService } from '../../services/auth.service';
 
 export interface VendaDialogData {
   venda?: Venda;
@@ -56,7 +56,7 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly produtoService = inject(ProdutoService);
   private readonly clienteService = inject(ClienteService);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly authService = inject(AuthService);
   private readonly elementRef = inject(ElementRef);
   private readonly renderer = inject(Renderer2);
 
@@ -186,7 +186,7 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         console.error('Erro ao carregar clientes:', error);
-        this.snackBar.open('Erro ao carregar clientes', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao carregar clientes', 'error');
       }
     });
   }
@@ -201,7 +201,7 @@ export class VendaDialogComponent implements OnInit, OnDestroy {
       },
       error: (error: any) => {
         console.error('Erro ao carregar produtos:', error);
-        this.snackBar.open('Erro ao carregar produtos', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao carregar produtos', 'error');
       }
     });
   }

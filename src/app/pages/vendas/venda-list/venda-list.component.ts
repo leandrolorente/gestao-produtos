@@ -5,7 +5,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +19,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { Venda, VendaCreate, VendasStats } from '../../../models/Venda';
 import { VendaService } from '../../../services/venda.service';
+import { AuthService } from '../../../services/auth.service';
 import { VendaDialogComponent } from '../../../components/venda-dialog/venda-dialog.component';
 
 @Component({
@@ -103,7 +103,7 @@ export class VendaListComponent implements OnInit {
   constructor(
     private vendaService: VendaService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -127,7 +127,7 @@ export class VendaListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar vendas:', error);
-        this.snackBar.open('Erro ao carregar vendas', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao carregar vendas', 'error');
         this.loading.set(false);
       }
     });
@@ -222,12 +222,12 @@ export class VendaListComponent implements OnInit {
         const vendasAtuais = this.vendas();
         this.vendas.set([...vendasAtuais, novaVenda]);
         this.dataSource.data = this.vendas();
-        this.snackBar.open('Venda criada com sucesso!', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Venda criada com sucesso!', 'success');
         this.loadStats(); // Recarrega estatísticas
       },
       error: (error) => {
         console.error('Erro ao criar venda:', error);
-        this.snackBar.open('Erro ao criar venda', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao criar venda', 'error');
       }
     });
   }
@@ -242,13 +242,13 @@ export class VendaListComponent implements OnInit {
           novasVendas[index] = venda;
           this.vendas.set(novasVendas);
           this.dataSource.data = novasVendas;
-          this.snackBar.open('Venda atualizada com sucesso!', 'Fechar', { duration: 3000 });
+          this.authService.showSnackbar('Venda atualizada com sucesso!', 'success');
           this.loadStats(); // Recarrega estatísticas
         }
       },
       error: (error) => {
         console.error('Erro ao atualizar venda:', error);
-        this.snackBar.open('Erro ao atualizar venda', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao atualizar venda', 'error');
       }
     });
   }
@@ -260,12 +260,12 @@ export class VendaListComponent implements OnInit {
           const vendas = this.vendas();
           this.vendas.set(vendas.filter(v => v.id !== venda.id));
           this.dataSource.data = this.vendas();
-          this.snackBar.open('Venda excluída com sucesso!', 'Fechar', { duration: 3000 });
+          this.authService.showSnackbar('Venda excluída com sucesso!', 'success');
           this.loadStats(); // Recarrega estatísticas
         },
         error: (error) => {
           console.error('Erro ao excluir venda:', error);
-          this.snackBar.open('Erro ao excluir venda', 'Fechar', { duration: 3000 });
+          this.authService.showSnackbar('Erro ao excluir venda', 'error');
         }
       });
     }

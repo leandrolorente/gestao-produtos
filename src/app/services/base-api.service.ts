@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class BaseApiService {
-  protected readonly apiUrl = 'https://gestao-produtos-api.onrender.com/api';
+  protected readonly apiUrl = 'http://localhost:5278/api';
 
   protected readonly httpOptions = {
     headers: new HttpHeaders({
