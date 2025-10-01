@@ -112,6 +112,12 @@ export class VendaListComponent implements OnInit {
     this.setupFilters();
   }
 
+  // Verifica se o usuário é admin
+  isAdmin(): boolean {
+    const currentUser = this.authService.currentUser();
+    return currentUser?.role === 'admin';
+  }
+
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
   }
@@ -214,6 +220,91 @@ export class VendaListComponent implements OnInit {
         this.updateVenda(result);
       }
     });
+  }
+
+  openViewDialog(venda: Venda): void {
+    this.dialog.open(VendaDialogComponent, {
+      width: '900px',
+      maxHeight: '90vh',
+      data: { venda, editMode: false },
+      panelClass: 'custom-dialog'
+    });
+  }
+
+  printVenda(venda: Venda): void {
+    // Implementação da impressão da venda
+    const printContent = this.generatePrintContent(venda);
+    const printWindow = window.open('', '_blank');
+    
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    } else {
+      this.authService.showSnackbar('Não foi possível abrir a janela de impressão', 'error');
+    }
+  }
+
+  private generatePrintContent(venda: Venda): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Venda ${venda.numero}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .info { margin-bottom: 20px; }
+          .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          .table th { background-color: #f2f2f2; }
+          .total { text-align: right; font-weight: bold; font-size: 18px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Sistema de Gestão - Venda ${venda.numero}</h1>
+        </div>
+        
+        <div class="info">
+          <p><strong>Cliente:</strong> ${venda.clienteNome}</p>
+          <p><strong>Email:</strong> ${venda.clienteEmail}</p>
+          <p><strong>Data:</strong> ${this.formatDate(venda.dataVenda)}</p>
+          <p><strong>Status:</strong> ${venda.status}</p>
+          <p><strong>Forma de Pagamento:</strong> ${venda.formaPagamento}</p>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Preço Unitário</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${venda.items.map((item: any) => `
+              <tr>
+                <td>${item.produtoNome}</td>
+                <td>${item.quantidade}</td>
+                <td>R$ ${item.precoUnitario.toFixed(2)}</td>
+                <td>R$ ${item.subtotal.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="total">
+          <p>Subtotal: R$ ${venda.subtotal.toFixed(2)}</p>
+          <p>Desconto: R$ ${venda.desconto.toFixed(2)}</p>
+          <p><strong>Total: R$ ${venda.total.toFixed(2)}</strong></p>
+        </div>
+      </body>
+      </html>
+    `;
   }
 
   private createVenda(vendaData: VendaCreate): void {

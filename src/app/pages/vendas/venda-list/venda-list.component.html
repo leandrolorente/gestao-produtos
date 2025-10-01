@@ -217,7 +217,7 @@
                 <button
                   mat-icon-button
                   color="primary"
-                  (click)="openEditDialog(venda)"
+                  (click)="$event.stopPropagation(); openEditDialog(venda)"
                   matTooltip="Editar Venda"
                   class="action-btn edit-btn">
                   <mat-icon>edit</mat-icon>
@@ -226,25 +226,27 @@
                 <button
                   mat-icon-button
                   [matMenuTriggerFor]="menuVenda"
+                  (click)="$event.stopPropagation()"
                   matTooltip="Mais Opções"
                   class="action-btn menu-btn">
                   <mat-icon>more_vert</mat-icon>
                 </button>
 
                 <mat-menu #menuVenda="matMenu">
-                  <button mat-menu-item (click)="openEditDialog(venda)">
+                  <button mat-menu-item (click)="openViewDialog(venda)">
                     <mat-icon>visibility</mat-icon>
                     Ver Detalhes
                   </button>
-                  <button mat-menu-item>
+                  <button mat-menu-item (click)="printVenda(venda)">
                     <mat-icon>print</mat-icon>
                     Imprimir
                   </button>
-                  <mat-divider></mat-divider>
+                  <mat-divider *ngIf="isAdmin()"></mat-divider>
                   <button
                     mat-menu-item
                     class="delete-action"
-                    (click)="deleteVenda(venda)">
+                    (click)="deleteVenda(venda)"
+                    *ngIf="isAdmin()">
                     <mat-icon>delete</mat-icon>
                     Excluir
                   </button>
@@ -258,7 +260,7 @@
             mat-row
             *matRowDef="let row; columns: displayedColumns;"
             class="data-row"
-            (click)="openEditDialog(row)"></tr>
+            (click)="openViewDialog(row)"></tr>
         </table>
 
         <!-- Mensagem quando não há dados -->
