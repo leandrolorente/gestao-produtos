@@ -119,7 +119,7 @@ export class DashboardService extends BaseApiService {
    */
   getTopProducts(count: number = 5): Observable<ProductSummary[]> {
     return this.http.get<ProductSummary[]>(
-      this.buildUrl(`dashboard/top-products?count=${count}`), 
+      this.buildUrl(`dashboard/top-products?count=${count}`),
       this.authHttpOptions
     ).pipe(
       tap(products => {
@@ -137,7 +137,7 @@ export class DashboardService extends BaseApiService {
    */
   getRecentSales(count: number = 5): Observable<SaleSummary[]> {
     return this.http.get<SaleSummary[]>(
-      this.buildUrl(`dashboard/recent-sales?count=${count}`), 
+      this.buildUrl(`dashboard/recent-sales?count=${count}`),
       this.authHttpOptions
     ).pipe(
       tap(sales => {
@@ -155,7 +155,7 @@ export class DashboardService extends BaseApiService {
    */
   getRevenue(inicio: string, fim: string): Observable<RevenueData> {
     return this.http.get<RevenueData>(
-      this.buildUrl(`dashboard/revenue?inicio=${inicio}&fim=${fim}`), 
+      this.buildUrl(`dashboard/revenue?inicio=${inicio}&fim=${fim}`),
       this.authHttpOptions
     ).pipe(
       catchError(error => {

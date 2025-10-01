@@ -344,6 +344,166 @@ export class VendaListComponent implements OnInit {
     });
   }
 
+  /**
+   * Confirma uma venda pendente
+   */
+  confirmarVenda(venda: Venda): void {
+    if (venda.status !== 'Pendente') {
+      this.authService.showSnackbar('Apenas vendas pendentes podem ser confirmadas', 'error');
+      return;
+    }
+
+    this.vendaService.confirmarVenda(venda.id).subscribe({
+      next: (vendaAtualizada) => {
+        const vendas = this.vendas();
+        const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+        if (index !== -1) {
+          const novasVendas = [...vendas];
+          novasVendas[index] = vendaAtualizada;
+          this.vendas.set(novasVendas);
+          this.dataSource.data = this.vendas();
+        }
+        this.authService.showSnackbar(`Venda ${venda.numero} confirmada com sucesso!`, 'success');
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Erro ao confirmar venda:', error);
+        const mensagem = error.message || 'Erro ao confirmar venda';
+        this.authService.showSnackbar(mensagem, 'error');
+      }
+    });
+  }
+
+  /**
+   * Finaliza uma venda confirmada
+   */
+  finalizarVenda(venda: Venda): void {
+    if (venda.status !== 'Confirmada') {
+      this.authService.showSnackbar('Apenas vendas confirmadas podem ser finalizadas', 'error');
+      return;
+    }
+
+    this.vendaService.finalizarVenda(venda.id).subscribe({
+      next: (vendaAtualizada) => {
+        const vendas = this.vendas();
+        const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+        if (index !== -1) {
+          const novasVendas = [...vendas];
+          novasVendas[index] = vendaAtualizada;
+          this.vendas.set(novasVendas);
+          this.dataSource.data = this.vendas();
+        }
+        this.authService.showSnackbar(`Venda ${venda.numero} finalizada com sucesso!`, 'success');
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Erro ao finalizar venda:', error);
+        const mensagem = error.message || 'Erro ao finalizar venda';
+        this.authService.showSnackbar(mensagem, 'error');
+      }
+    });
+  }
+
+  /**
+   * Processa uma venda completamente (Confirma → Finaliza)
+   */
+  processarVendaCompleta(venda: Venda): void {
+    if (venda.status !== 'Pendente') {
+      this.authService.showSnackbar('Apenas vendas pendentes podem ser processadas', 'error');
+      return;
+    }
+
+    const confirmar = confirm(
+      `Deseja processar completamente a venda ${venda.numero}?\n\n` +
+      'Isso irá:\n' +
+      '1. Confirmar a venda\n' +
+      '2. Finalizar a venda automaticamente'
+    );
+
+    if (!confirmar) return;
+
+    this.vendaService.processarVendaCompleta(venda.id).subscribe({
+      next: (vendaFinalizada) => {
+        const vendas = this.vendas();
+        const index = vendas.findIndex(v => v.id === vendaFinalizada.id);
+        if (index !== -1) {
+          const novasVendas = [...vendas];
+          novasVendas[index] = vendaFinalizada;
+          this.vendas.set(novasVendas);
+          this.dataSource.data = this.vendas();
+        }
+        this.authService.showSnackbar(`Venda ${venda.numero} processada e finalizada com sucesso!`, 'success');
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Erro ao processar venda:', error);
+        const mensagem = error.message || 'Erro ao processar venda';
+        this.authService.showSnackbar(mensagem, 'error');
+      }
+    });
+  }
+
+  /**
+   * Cancela uma venda
+   */
+  cancelarVenda(venda: Venda): void {
+    if (venda.status !== 'Pendente' && venda.status !== 'Confirmada') {
+      this.authService.showSnackbar('Apenas vendas pendentes ou confirmadas podem ser canceladas', 'error');
+      return;
+    }
+
+    const confirmar = confirm(`Tem certeza que deseja cancelar a venda ${venda.numero}?`);
+    if (!confirmar) return;
+
+    this.vendaService.cancelarVenda(venda.id).subscribe({
+      next: (vendaAtualizada) => {
+        const vendas = this.vendas();
+        const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+        if (index !== -1) {
+          const novasVendas = [...vendas];
+          novasVendas[index] = vendaAtualizada;
+          this.vendas.set(novasVendas);
+          this.dataSource.data = this.vendas();
+        }
+        this.authService.showSnackbar(`Venda ${venda.numero} cancelada com sucesso!`, 'success');
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Erro ao cancelar venda:', error);
+        const mensagem = error.message || 'Erro ao cancelar venda';
+        this.authService.showSnackbar(mensagem, 'error');
+      }
+    });
+  }
+
+  /**
+   * Verifica se uma venda pode ser confirmada
+   */
+  podeConfirmar(venda: Venda): boolean {
+    return this.vendaService.podeConfirmar(venda);
+  }
+
+  /**
+   * Verifica se uma venda pode ser finalizada
+   */
+  podeFinalizar(venda: Venda): boolean {
+    return this.vendaService.podeFinalizar(venda);
+  }
+
+  /**
+   * Verifica se uma venda pode ser cancelada
+   */
+  podeCancelar(venda: Venda): boolean {
+    return this.vendaService.podeCancelar(venda);
+  }
+
+  /**
+   * Verifica se uma venda pode ser editada
+   */
+  podeEditar(venda: Venda): boolean {
+    return this.vendaService.podeEditar(venda);
+  }
+
   deleteVenda(venda: Venda): void {
     if (confirm(`Tem certeza que deseja excluir a venda ${venda.numero}?`)) {
       this.vendaService.deleteVenda(venda.id).subscribe({

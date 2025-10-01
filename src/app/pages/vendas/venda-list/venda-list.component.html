@@ -217,8 +217,9 @@
                 <button
                   mat-icon-button
                   color="primary"
+                  [disabled]="!podeEditar(venda)"
                   (click)="$event.stopPropagation(); openEditDialog(venda)"
-                  matTooltip="Editar Venda"
+                  [matTooltip]="podeEditar(venda) ? 'Editar Venda' : 'Venda não pode ser editada'"
                   class="action-btn edit-btn">
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -237,10 +238,53 @@
                     <mat-icon>visibility</mat-icon>
                     Ver Detalhes
                   </button>
+                  
+                  <!-- Ações de fluxo de venda -->
+                  <mat-divider *ngIf="podeConfirmar(venda) || podeFinalizar(venda) || podeCancelar(venda)"></mat-divider>
+                  
+                  <button 
+                    mat-menu-item 
+                    (click)="confirmarVenda(venda)"
+                    *ngIf="podeConfirmar(venda)"
+                    class="confirm-action">
+                    <mat-icon>check_circle</mat-icon>
+                    Confirmar Venda
+                  </button>
+                  
+                  <button 
+                    mat-menu-item 
+                    (click)="finalizarVenda(venda)"
+                    *ngIf="podeFinalizar(venda)"
+                    class="finalize-action">
+                    <mat-icon>done_all</mat-icon>
+                    Finalizar Venda
+                  </button>
+                  
+                  <button 
+                    mat-menu-item 
+                    (click)="processarVendaCompleta(venda)"
+                    *ngIf="podeConfirmar(venda)"
+                    class="process-action">
+                    <mat-icon>flash_on</mat-icon>
+                    Processar Completo
+                  </button>
+                  
+                  <button 
+                    mat-menu-item 
+                    (click)="cancelarVenda(venda)"
+                    *ngIf="podeCancelar(venda)"
+                    class="cancel-action">
+                    <mat-icon>cancel</mat-icon>
+                    Cancelar Venda
+                  </button>
+                  
+                  <mat-divider></mat-divider>
+                  
                   <button mat-menu-item (click)="printVenda(venda)">
                     <mat-icon>print</mat-icon>
                     Imprimir
                   </button>
+                  
                   <mat-divider *ngIf="isAdmin()"></mat-divider>
                   <button
                     mat-menu-item

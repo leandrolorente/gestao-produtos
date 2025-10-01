@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, tap, map, switchMap } from 'rxjs/operators';
 import { BaseApiService } from './base-api.service';
 import { Venda, VendaCreate, VendaResponse, VendasStats, VendaItem } from '../models/Venda';
 
@@ -23,7 +23,7 @@ export class VendaService extends BaseApiService {
    * Adiciona o token JWT aos headers das requisições
    */
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -296,6 +296,31 @@ export class VendaService extends BaseApiService {
   }
 
   /**
+   * Processa uma venda seguindo o fluxo completo: Confirmar → Finalizar
+   * Apenas para vendas com status 'Pendente'
+   */
+  processarVendaCompleta(id: string): Observable<Venda> {
+    this.setLoading(true);
+
+    // Primeiro, confirma a venda
+    return this.confirmarVenda(id).pipe(
+      // Depois de confirmar, finaliza automaticamente
+      switchMap((vendaConfirmada: Venda) => {
+        if (vendaConfirmada.status === 'Confirmada') {
+          return this.finalizarVenda(id);
+        } else {
+          throw new Error(`Venda não pode ser processada. Status atual: ${vendaConfirmada.status}`);
+        }
+      }),
+      catchError(error => {
+        console.error('Erro ao processar venda completa:', error);
+        this.setLoading(false);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Confirma uma venda pendente
    */
   confirmarVenda(id: string): Observable<Venda> {
@@ -305,18 +330,20 @@ export class VendaService extends BaseApiService {
       .pipe(
         map(response => this.convertFromApi(response)),
         tap(vendaAtualizada => {
-          const vendas = this.vendasSignal();
-          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
-          if (index !== -1) {
-            const novasVendas = [...vendas];
-            novasVendas[index] = vendaAtualizada;
-            this.vendasSignal.set(novasVendas);
-          }
+          console.log(`Venda ${id} confirmada. Status: ${vendaAtualizada.status}`);
+          this.atualizarVendaNoCache(vendaAtualizada);
           this.setLoading(false);
         }),
         catchError(error => {
           console.error('Erro ao confirmar venda:', error);
+          console.error('Detalhes do erro:', error.error);
           this.setLoading(false);
+          
+          // Tratamento específico para erro de fluxo
+          if (error.status === 400 && error.error?.message) {
+            throw new Error(error.error.message);
+          }
+          
           return throwError(() => error);
         })
       );
@@ -332,25 +359,27 @@ export class VendaService extends BaseApiService {
       .pipe(
         map(response => this.convertFromApi(response)),
         tap(vendaAtualizada => {
-          const vendas = this.vendasSignal();
-          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
-          if (index !== -1) {
-            const novasVendas = [...vendas];
-            novasVendas[index] = vendaAtualizada;
-            this.vendasSignal.set(novasVendas);
-          }
+          console.log(`Venda ${id} finalizada. Status: ${vendaAtualizada.status}`);
+          this.atualizarVendaNoCache(vendaAtualizada);
           this.setLoading(false);
         }),
         catchError(error => {
           console.error('Erro ao finalizar venda:', error);
+          console.error('Detalhes do erro:', error.error);
           this.setLoading(false);
+          
+          // Tratamento específico para erro de fluxo
+          if (error.status === 400 && error.error?.message) {
+            throw new Error(error.error.message);
+          }
+          
           return throwError(() => error);
         })
       );
   }
 
   /**
-   * Cancela uma venda
+   * Cancela uma venda (Pendente ou Confirmada)
    */
   cancelarVenda(id: string): Observable<Venda> {
     this.setLoading(true);
@@ -359,21 +388,64 @@ export class VendaService extends BaseApiService {
       .pipe(
         map(response => this.convertFromApi(response)),
         tap(vendaAtualizada => {
-          const vendas = this.vendasSignal();
-          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
-          if (index !== -1) {
-            const novasVendas = [...vendas];
-            novasVendas[index] = vendaAtualizada;
-            this.vendasSignal.set(novasVendas);
-          }
+          console.log(`Venda ${id} cancelada. Status: ${vendaAtualizada.status}`);
+          this.atualizarVendaNoCache(vendaAtualizada);
           this.setLoading(false);
         }),
         catchError(error => {
           console.error('Erro ao cancelar venda:', error);
+          console.error('Detalhes do erro:', error.error);
           this.setLoading(false);
+          
+          // Tratamento específico para erro de fluxo
+          if (error.status === 400 && error.error?.message) {
+            throw new Error(error.error.message);
+          }
+          
           return throwError(() => error);
         })
       );
+  }
+
+  /**
+   * Verifica se uma venda pode ser confirmada
+   */
+  podeConfirmar(venda: Venda): boolean {
+    return venda.status === 'Pendente';
+  }
+
+  /**
+   * Verifica se uma venda pode ser finalizada
+   */
+  podeFinalizar(venda: Venda): boolean {
+    return venda.status === 'Confirmada';
+  }
+
+  /**
+   * Verifica se uma venda pode ser cancelada
+   */
+  podeCancelar(venda: Venda): boolean {
+    return venda.status === 'Pendente' || venda.status === 'Confirmada';
+  }
+
+  /**
+   * Verifica se uma venda pode ser editada
+   */
+  podeEditar(venda: Venda): boolean {
+    return venda.status === 'Pendente';
+  }
+
+  /**
+   * Atualiza uma venda no cache local
+   */
+  private atualizarVendaNoCache(vendaAtualizada: Venda): void {
+    const vendas = this.vendasSignal();
+    const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+    if (index !== -1) {
+      const novasVendas = [...vendas];
+      novasVendas[index] = vendaAtualizada;
+      this.vendasSignal.set(novasVendas);
+    }
   }
 
   /**

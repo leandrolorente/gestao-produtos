@@ -635,6 +635,47 @@ mat-chip {
   }
 }
 
+/* --- Estilos para botões de ação de vendas --- */
+.confirm-action {
+  color: #2e7d32 !important;
+  
+  .mat-icon {
+    color: #2e7d32 !important;
+  }
+}
+
+.finalize-action {
+  color: #1976d2 !important;
+  
+  .mat-icon {
+    color: #1976d2 !important;
+  }
+}
+
+.process-action {
+  color: #ff6f00 !important;
+  
+  .mat-icon {
+    color: #ff6f00 !important;
+  }
+}
+
+.cancel-action {
+  color: #d32f2f !important;
+  
+  .mat-icon {
+    color: #d32f2f !important;
+  }
+}
+
+.delete-action {
+  color: #f44336 !important;
+  
+  .mat-icon {
+    color: #f44336 !important;
+  }
+}
+
 /* --- Animações e transições seguindo padrão --- */
 .stat-card,
 .table-row,
