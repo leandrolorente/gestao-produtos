@@ -684,9 +684,26 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       border-bottom-color: var(--border-color) !important;
     }
 
-    .mat-sort-header {
-      color: var(--text-primary) !important;
+    // COMENTADO: REGRAS QUE INTERFEREM NOS COMPONENTES LOCAIS
+    /*
+    // FORÇAR COR ROXA NOS CABEÇALHOS DAS GRIDS
+    .mat-mdc-header-cell {
+      color: var(--primary-color) !important;
+      font-weight: 600 !important;
     }
+
+    .mat-sort-header {
+      color: var(--primary-color) !important;
+
+      .mat-sort-header-content {
+        color: var(--primary-color) !important;
+      }
+
+      .mat-sort-header-arrow {
+        color: var(--primary-color) !important;
+      }
+    }
+    */
   }
 
   // Toolbar/Header
@@ -981,6 +998,26 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       .modern-table,
       .mat-mdc-table {
         background-color: var(--card-bg) !important;
+
+        /*
+        // FORÇAR COR ROXA NOS CABEÇALHOS DAS GRIDS
+        .mat-mdc-header-cell {
+          color: var(--primary-color) !important;
+          font-weight: 600 !important;
+        }
+
+        .mat-sort-header {
+          color: var(--primary-color) !important;
+
+          .mat-sort-header-content {
+            color: var(--primary-color) !important;
+          }
+
+          .mat-sort-header-arrow {
+            color: var(--primary-color) !important;
+          }
+        }
+        */
       }
     }
 
@@ -1519,6 +1556,35 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: var(--primary-color) !important;
   }
 
+  // === COMENTADO: FORÇA COR ROXA EM TODOS OS CABEÇALHOS DE TABELA ===
+  /*
+  .mat-mdc-table {
+    .mat-mdc-header-cell,
+    .mat-column-header,
+    .mat-sort-header {
+      color: var(--primary-color) !important;
+      font-weight: 600 !important;
+    }
+
+    .mat-sort-header-content,
+    .mat-sort-header-arrow,
+    .mat-sort-header-indicator {
+      color: var(--primary-color) !important;
+    }
+
+    // Headers específicos por nome de coluna
+    .mat-column-name,
+    .mat-column-sku,
+    .mat-column-barcode,
+    .mat-column-quantity,
+    .mat-column-price,
+    .mat-column-updated,
+    .mat-column-actions {
+      color: var(--primary-color) !important;
+    }
+  }
+  */
+
   // === FORÇA SIDEBAR COMPLETAMENTE ===
   .sidebar {
     background-color: var(--bg-secondary) !important;
@@ -1625,6 +1691,207 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: var(--text-primary) !important;
   }
 }
+
+// === REGRA GLOBAL PARA CABEÇALHOS DE TABELA ===
+// Garante que os cabeçalhos das grids sempre tenham cor roxa em qualquer tema
+// === REGRAS GLOBAIS COMENTADAS PARA NÃO INTERFERIR ===
+// Estas regras estavam sobrescrevendo as regras locais dos componentes
+/*
+.mat-mdc-table .mat-mdc-header-cell,
+.mat-mdc-table .mat-sort-header,
+.mat-mdc-header-row .mat-mdc-header-cell,
+th[mat-header-cell],
+th.mat-mdc-header-cell {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+}
+
+.mat-sort-header-content,
+.mat-sort-header-arrow {
+  color: var(--primary-color) !important;
+}
+
+// Força especificamente nos elementos TH com atributo mat-sort-header
+th[mat-sort-header] {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+}
+*/
+
+// Regra adicional para tabelas Material
+table.mat-mdc-table th,
+table[mat-table] th {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+}
+
+// Força qualquer header cell dentro de tabela
+.modern-table th,
+.data-table th,
+.mat-table th {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+}
+
+// === REGRAS ESPECÍFICAS BASEADAS NO INSPECTOR ===
+// Força as classes exatas encontradas no DOM
+.mat-mdc-header-row.header-row th.mat-sort-header,
+.mat-mdc-header-row.header-row th.mat-mdc-header-cell,
+.mat-mdc-header-row th.mdc-data-table__header-cell,
+.cdk-header-row th.cdk-header-cell {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+}
+
+// Força o conteúdo específico do sort header
+.mat-sort-header-container .mat-sort-header-content {
+  color: var(--primary-color) !important;
+}
+
+// Força as colunas específicas por nome
+.mat-column-name,
+.mat-column-sku,
+.mat-column-barcode,
+.mat-column-quantity,
+.mat-column-price,
+.mat-column-lastUpdated,
+.mat-column-actions {
+  color: var(--primary-color) !important;
+}
+
+// === REGRA ULTRA ESPECÍFICA BASEADA NO INSPECTOR ===
+// Combinação exata das classes encontradas
+th.mat-sort-header.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell,
+th.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+
+  .mat-sort-header-content {
+    color: var(--primary-color) !important;
+  }
+}
+
+// === FORÇA APENAS O SELETOR QUE FUNCIONA ===
+// Removendo os seletores que não funcionam
+.mat-mdc-header-row th,
+.mat-mdc-header-row .mat-mdc-header-cell {
+  color: #667eea !important;
+  font-weight: 600 !important;
+}
+
+// Força também o conteúdo interno dos headers
+.mat-mdc-header-row th .mat-sort-header-content,
+.mat-mdc-header-row th div,
+.mat-mdc-header-row .mat-mdc-header-cell .mat-sort-header-content {
+  color: #667eea !important;
+}
+
+// Tema escuro
+.dark-theme .mat-mdc-header-row th,
+.dark-theme .mat-mdc-header-row .mat-mdc-header-cell {
+  color: #bb86fc !important;
+  font-weight: 600 !important;
+}
+
+.dark-theme .mat-mdc-header-row th .mat-sort-header-content,
+.dark-theme .mat-mdc-header-row th div,
+.dark-theme .mat-mdc-header-row .mat-mdc-header-cell .mat-sort-header-content {
+  color: #bb86fc !important;
+}
+
+// === REGRA DE ÚLTIMO RECURSO ===
+// Seletor extremamente específico para forçar a cor
+tr.mat-mdc-header-row.header-row th[role="columnheader"],
+tr[mat-header-row] th[mat-header-cell],
+.mat-mdc-table tr.mat-mdc-header-row th {
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+}
+
+// Força o conteúdo dos headers
+tr.mat-mdc-header-row th .mat-sort-header-content,
+tr.mat-mdc-header-row th div.mat-sort-header-content {
+  color: var(--primary-color) !important;
+}
+
+// === REGRA FINAL DEFINITIVA ===
+// Aplicar estilo inline via CSS se necessário
+* {
+  &[class*="mat-mdc-header-cell"],
+  &[class*="mat-sort-header"] {
+    color: var(--primary-color) !important;
+  }
+}
+
+// Força tudo que contenha header ou sort
+*[class*="header"] *[class*="content"],
+*[class*="sort"] *[class*="content"] {
+  color: #667eea !important;
+}
+
+// === REGRA FINAL PARA FORÇAR TEXTO BRANCO ===
+.mat-mdc-header-row {
+  th {
+    background: #667eea !important; /* Cor roxa padrão do sistema */
+    color: white !important; /* TEXTO BRANCO FORÇADO */
+    font-weight: 600 !important;
+    font-size: 16px !important;
+  }
+}
+
+// Também força nos elementos internos
+.mat-mdc-header-row th *,
+.mat-mdc-header-row th .mat-sort-header-content,
+.mat-mdc-header-row th div {
+  color: white !important;
+}
+
+// === REGRA ULTRA ESPECÍFICA BASEADA NA TAG REAL ===
+th.mat-sort-header.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell {
+  color: white !important;
+  background: #667eea !important;
+  
+  .mat-sort-header-container {
+    color: white !important;
+    
+    .mat-sort-header-content {
+      color: white !important;
+    }
+    
+    .mat-sort-header-arrow {
+      color: white !important;
+      
+      svg {
+        fill: white !important;
+      }
+    }
+  }
+}
+
+// Para headers sem sort (como Ações)
+th.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell {
+  color: white !important;
+  background: #667eea !important;
+}
+
+// COMENTADO: REGRAS DE TEMA QUE INTERFEREM
+/*
+// Tema escuro - cor roxa específica
+.dark-theme .mat-mdc-header-row {
+  th {
+    color: #bb86fc !important; // Tema escuro
+    font-weight: 600 !important;
+  }
+}
+
+// Tema claro - cor roxa específica
+.light-theme .mat-mdc-header-row {
+  th {
+    color: #667eea !important; // Tema claro
+    font-weight: 600 !important;
+  }
+}
+*/
 
 // Transições suaves para mudança de tema (SEM !important para não interferir nas animações do Material)
 * {

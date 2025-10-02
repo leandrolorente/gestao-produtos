@@ -118,6 +118,48 @@
     font-size: 0.875rem;
     border-bottom: none;
   }
+
+  // Força especificamente os headers com sort
+  .mat-sort-header,
+  th[mat-sort-header] {
+    color: white !important;
+    font-weight: 600;
+  }
+
+  // Força o conteúdo dos sort headers
+  .mat-sort-header-content {
+    color: white !important;
+  }
+}
+
+// FORÇA GLOBAL COM ::ng-deep PARA SOBRESCREVER QUALQUER REGRA
+::ng-deep .header-row {
+  .mat-mdc-header-cell,
+  .mat-sort-header,
+  th[mat-sort-header],
+  th {
+    color: white !important;
+    font-weight: 600 !important;
+  }
+
+  .mat-sort-header-content,
+  .mat-sort-header-arrow {
+    color: white !important;
+  }
+}
+
+// FORÇA USANDO A ESTRUTURA EXATA DO INSPECTOR
+::ng-deep tr.mat-mdc-header-row.header-row {
+  th.mat-sort-header.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell,
+  th.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell {
+    color: white !important;
+    font-weight: 600 !important;
+  }
+
+  .mat-sort-header-content,
+  .mat-sort-header-container .mat-sort-header-content {
+    color: white !important;
+  }
 }
 
 .data-row {
