@@ -1,9 +1,10 @@
 [build]
-  command = "npm run build"
+  command = "API_URL=${API_URL:-https://gestao-produtos-api.onrender.com/api} npm run build"
   publish = "dist/gestao-produtos/browser"
 
 [build.environment]
   NODE_VERSION = "20"
+  API_URL = "https://gestao-produtos-api.onrender.com/api"
 
 [context.production]
   environment = { API_URL = "https://gestao-produtos-api.onrender.com/api" }
