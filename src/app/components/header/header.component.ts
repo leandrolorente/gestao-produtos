@@ -7,6 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService, AuthUser } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -25,12 +26,17 @@ import { AuthService, AuthUser } from '../../services/auth.service';
 })
 export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
+  private themeService = inject(ThemeService);
 
   isSidebarOpen = input<boolean>(false);
   sidebarToggle = output<void>();
 
   // Signal local para o usuário
   currentUser = signal<AuthUser | null>(null);
+
+  // Signals para o tema
+  readonly isDarkMode = this.themeService.isDarkMode;
+  readonly currentTheme = this.themeService.currentTheme;
 
   ngOnInit(): void {
     // Subscreve ao usuário atual do AuthService
@@ -61,5 +67,14 @@ export class HeaderComponent implements OnInit {
 
   onSettings() {
     this.authService.showSnackbar('Funcionalidade em desenvolvimento', 'info');
+  }
+
+  /**
+   * Alterna entre modo claro e escuro
+   */
+  onToggleTheme() {
+    this.themeService.toggleTheme();
+    const newMode = this.isDarkMode() ? 'escuro' : 'claro';
+    this.authService.showSnackbar(`Modo ${newMode} ativado`, 'success');
   }
 }

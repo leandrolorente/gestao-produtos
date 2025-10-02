@@ -237,3 +237,60 @@
     }
   }
 }
+
+// === ESTILOS PARA MODO ESCURO ===
+:host-context(.dark-theme) {
+  .app-header {
+    // Gradiente ajustado para modo escuro
+    background: linear-gradient(135deg, #bb86fc 0%, #985eff 100%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .user-menu {
+    .mat-mdc-menu-panel {
+      background-color: var(--card-bg) !important;
+      border: 1px solid var(--border-color);
+    }
+
+    .user-menu-header {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+
+      .menu-user-name {
+        color: var(--text-primary) !important;
+      }
+
+      .menu-user-email {
+        color: var(--text-secondary) !important;
+      }
+    }
+
+    .mat-mdc-menu-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+
+      &.logout-item {
+        &:hover {
+          background-color: rgba(244, 67, 54, 0.1) !important;
+          color: #f44336 !important;
+        }
+      }
+
+      mat-icon {
+        color: var(--text-secondary) !important;
+      }
+    }
+  }
+
+  // Ícones específicos para modo escuro
+  .notification-btn,
+  .user-menu-btn,
+  .menu-button {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  }
+}

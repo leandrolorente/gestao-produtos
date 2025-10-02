@@ -189,3 +189,1391 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
   }
 }
+
+// === SISTEMA DE TEMAS (MODO CLARO/ESCURO) ===
+
+// Tema claro (padrão)
+.light-theme {
+  color-scheme: light;
+
+  // Variáveis CSS para tema claro
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --text-muted: #a0aec0;
+  --border-color: #e2e8f0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --hover-bg: #f7fafc;
+  --card-bg: #ffffff;
+  --surface-bg: #ffffff;
+}
+
+// Tema escuro
+.dark-theme {
+  color-scheme: dark;
+
+  // Variáveis CSS para tema escuro
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #737373;
+  --border-color: #404040;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --hover-bg: #2a2a2a;
+  --card-bg: #1e1e1e;
+  --surface-bg: #121212;
+
+  // Ajuste das cores principais para tema escuro
+  --primary-color: #bb86fc;
+  --primary-dark: #985eff;
+  --primary-light: #d7aeff;
+
+  // Gradientes ajustados para tema escuro
+  --primary-gradient: linear-gradient(135deg, #bb86fc 0%, #985eff 100%);
+  --secondary-gradient: linear-gradient(135deg, #cf6679 0%, #b00020 100%);
+  --background-gradient: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+  --hover-purple: linear-gradient(135deg, #2a2a2a 0%, #363636 100%);
+  --shadow-purple: rgba(187, 134, 252, 0.2);
+
+  // Aplicar cores ao body
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+
+  // === FORÇA FUNDO ESCURO TOTAL ===
+  
+  // Força o fundo de toda a aplicação
+  html, body {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Força todos os containers principais
+  app-root,
+  .app,
+  .application,
+  .main-wrapper,
+  .content-wrapper,
+  .layout-wrapper {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Força o layout principal específico do Angular
+  .mat-drawer-container,
+  .mat-sidenav-container {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Força o conteúdo principal
+  .mat-drawer-content,
+  .mat-sidenav-content {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Força fundo escuro em elementos principais
+  .main-layout,
+  .app-container,
+  router-outlet {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Sobrescrever variáveis do Angular Material para tema escuro
+  --mat-sys-surface: var(--bg-primary);
+  --mat-sys-on-surface: var(--text-primary);
+  --mat-sys-surface-variant: var(--bg-secondary);
+  --mat-sys-on-surface-variant: var(--text-secondary);
+  --mat-sys-outline: var(--border-color);
+  --mat-sys-outline-variant: var(--border-color);
+
+  // === PRESERVAR CORES DO SISTEMA ===
+  // Elementos com cores específicas do sistema não devem ser alterados
+  *[style*="color: var(--primary-color)"],
+  *[style*="color: #bb86fc"],
+  *[style*="color: purple"],
+  .primary-color,
+  .text-primary-color,
+  .mat-primary,
+  .primary-text {
+    // Força a manutenção das cores originais
+    color: inherit !important;
+  }
+
+  // === FORÇAR APENAS ELEMENTOS SEM COR ESPECÍFICA ===
+  // === FORÇAR BACKGROUNDS ESCUROS ONDE NECESSÁRIO ===
+
+  // Fundo principal da aplicação
+  body,
+  .main-layout,
+  .app-container,
+  router-outlet {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // === LAYOUT ESPECÍFICO ===
+  
+  // Main layout e seus containers
+  .main-layout {
+    background-color: var(--bg-primary) !important;
+    
+    .layout-container {
+      background-color: var(--bg-primary) !important;
+      
+      .main-content {
+        background-color: var(--bg-primary) !important;
+        
+        .content-wrapper {
+          background-color: var(--bg-primary) !important;
+        }
+      }
+    }
+  }
+
+  // Layout principal e seus containers
+  .page-container,
+  .main-content,
+  .content-container,
+  .dashboard-container,
+  .client-list-container,
+  .product-list-container,
+  .venda-list-container,
+  .user-list-container,
+  .estoque-container {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Cards e superfícies brancas para escuras
+  .mat-mdc-card,
+  .card,
+  .info-card,
+  .data-card {
+    &:not([style*="background: linear-gradient"]):not([style*="background-color: linear-gradient"]) {
+      background-color: var(--card-bg) !important;
+      border: 1px solid var(--border-color) !important;
+    }
+  }
+
+  // Apenas textos sem cor específica viram brancos
+  .mat-mdc-card *,
+  .dashboard-container *,
+  .page-container * {
+    &:not([style*="color:"]):not([class*="primary"]):not([class*="accent"]):not([class*="warn"]) {
+      &:not(.primary-color):not(.text-primary-color):not(.mat-primary) {
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // Títulos mantendo cores do sistema quando aplicável
+  h1, h2, h3, h4, h5, h6 {
+    &:not([style*="color"]):not([class*="primary"]):not([class*="accent"]) {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Textos comuns
+  p, span, div, label {
+    &:not([style*="color"]):not([class*="primary"]):not([class*="accent"]) {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Força cor de texto para elementos de card (mas preserva cores especiais)
+  .mat-mdc-card {
+    background-color: var(--card-bg) !important;
+
+    * {
+      &:not([style*="color"]):not([class*="primary"]):not([class*="accent"]) {
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // Elementos principais da aplicação
+  .main-content,
+  .router-outlet,
+  .page-content {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // === FORÇAR TODOS OS ELEMENTOS DE ENTRADA ===
+  
+  // Todos os mat-form-field
+  .mat-mdc-form-field {
+    * {
+      background-color: var(--bg-secondary) !important;
+    }
+
+    .mdc-text-field,
+    .mdc-text-field--filled,
+    .mdc-text-field--outlined,
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--bg-secondary) !important;
+    }
+
+    input,
+    textarea {
+      background-color: transparent !important;
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // === FORÇAR ELEMENTOS ESPECÍFICOS COM FUNDO BRANCO ===
+  
+  // SKU fields e código de barras (elementos que aparecem brancos na grid)
+  .sku-field,
+  .barcode-field,
+  .code-field,
+  input[placeholder*="SKU"],
+  input[placeholder*="sku"],
+  .mat-mdc-input-element[placeholder*="SKU"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  // Força elementos de tabela específicos
+  .mat-mdc-table {
+    .mat-mdc-cell {
+      // Qualquer input dentro de células da tabela
+      input, 
+      .mat-mdc-form-field,
+      .mdc-text-field {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // Qualquer elemento que ainda esteja branco
+  *[style*="background-color: white"],
+  *[style*="background-color: #fff"],
+  *[style*="background-color: #ffffff"],
+  *[style*="background: white"],
+  *[style*="background: #fff"],
+  *[style*="background: #ffffff"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Força inputs independente de onde estejam
+  input[type="text"],
+  input[type="email"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+
+    &::placeholder {
+      color: var(--text-muted) !important;
+    }
+
+    &:focus {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--primary-color) !important;
+    }
+
+    &:disabled {
+      background-color: var(--bg-tertiary) !important;
+      color: var(--text-muted) !important;
+    }
+  }
+
+  // Força input dentro de mat-form-field
+  .mat-mdc-form-field input {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Input search específico
+  input[type="search"],
+  input[placeholder*="Buscar"],
+  input[placeholder*="buscar"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+
+    &::placeholder {
+      color: var(--text-muted) !important;
+    }
+  }
+
+  // === TÍTULOS DAS GRIDS COM COR ROXA ===
+  
+  // Forçar títulos das grids a usar cor primária
+  .page-title,
+  .grid-title,
+  .section-title,
+  h1:contains("Gerenciamento"),
+  h2:contains("Gerenciamento"), 
+  h1[innerText*="Gerenciamento"],
+  h2[innerText*="Gerenciamento"] {
+    color: var(--primary-color) !important;
+  }
+
+  // Títulos específicos das páginas
+  .client-list-container h1,
+  .product-list-container h1,
+  .venda-list-container h1,
+  .user-list-container h1,
+  .estoque-container h1 {
+    color: var(--primary-color) !important;
+  }
+
+  // Headers de páginas principais
+  .page-header h1,
+  .page-header h2,
+  .component-header h1,
+  .component-header h2 {
+    color: var(--primary-color) !important;
+  }  // Cards e superfícies
+  .mat-mdc-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+
+    .mat-mdc-card-title {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-card-subtitle {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-mdc-card-content {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Botões
+  .mat-mdc-button {
+    color: var(--text-primary) !important;
+
+    &.mat-primary {
+      background: var(--primary-gradient) !important;
+      color: white !important;
+    }
+
+    &.mat-warn {
+      color: #ff5722 !important;
+    }
+  }
+
+  .mat-mdc-raised-button {
+    &.mat-primary {
+      background: var(--primary-gradient) !important;
+      color: white !important;
+    }
+
+    &.mat-accent {
+      background: var(--secondary-gradient) !important;
+      color: white !important;
+    }
+  }
+
+  .mat-mdc-fab {
+    &.mat-primary {
+      background: var(--primary-gradient) !important;
+      color: white !important;
+    }
+  }
+
+  // Campos de entrada
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--bg-secondary) !important;
+    }
+
+    .mdc-text-field {
+      background-color: var(--bg-secondary) !important;
+    }
+
+    .mdc-text-field--filled {
+      background-color: var(--bg-secondary) !important;
+
+      .mdc-text-field__input {
+        background-color: transparent !important;
+        color: var(--text-primary) !important;
+      }
+    }
+
+    .mat-mdc-form-field-label {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-mdc-input-element {
+      color: var(--text-primary) !important;
+      background-color: transparent !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-floating-label {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-mdc-form-field-hint {
+      color: var(--text-muted) !important;
+    }
+
+    // Underline colors
+    .mdc-line-ripple {
+      &::before {
+        border-bottom-color: var(--border-color) !important;
+      }
+
+      &::after {
+        border-bottom-color: var(--primary-color) !important;
+      }
+    }
+
+    // Estados dos campos
+    &.mat-focused {
+      .mat-mdc-floating-label {
+        color: var(--primary-color) !important;
+      }
+
+      .mdc-text-field {
+        background-color: var(--bg-secondary) !important;
+      }
+    }
+
+    &.mat-form-field-disabled {
+      .mdc-text-field {
+        background-color: var(--bg-tertiary) !important;
+      }
+
+      .mat-mdc-input-element {
+        color: var(--text-muted) !important;
+      }
+    }
+  }
+
+  // Tabelas
+  .mat-mdc-table {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+
+    .mat-mdc-header-row {
+      background-color: var(--bg-secondary) !important;
+    }
+
+    .mat-mdc-row {
+      border-bottom-color: var(--border-color) !important;
+      background-color: var(--card-bg) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+    }
+
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border-color) !important;
+    }
+
+    .mat-sort-header {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Toolbar/Header
+  .mat-toolbar {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+
+    .mat-toolbar-row {
+      color: white !important;
+    }
+
+    * {
+      color: white !important;
+    }
+  }
+
+  // Menus
+  .mat-mdc-menu-panel {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+
+    .mat-mdc-menu-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+
+      .mat-mdc-menu-item-text {
+        color: var(--text-primary) !important;
+      }
+
+      mat-icon {
+        color: var(--text-secondary) !important;
+      }
+    }
+  }
+
+  // Chips
+  .mat-mdc-chip {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+
+    &.mat-primary {
+      background: var(--primary-gradient) !important;
+      color: white !important;
+    }
+
+    &.mat-accent {
+      background: var(--secondary-gradient) !important;
+      color: white !important;
+    }
+
+    &.mat-warn {
+      background: #ff5722 !important;
+      color: white !important;
+    }
+
+    // Chips específicos da tabela
+    &.status-chip {
+      &.ativo {
+        background-color: #4caf50 !important;
+        color: white !important;
+      }
+
+      &.inativo {
+        background-color: #f44336 !important;
+        color: white !important;
+      }
+    }
+
+    // Chips de tipo de pessoa
+    &.tipo-chip {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+    }
+  }
+
+  // Diálogos
+  .mat-mdc-dialog-container {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+
+    .mat-mdc-dialog-title {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-dialog-content {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Select
+  .mat-mdc-select {
+    color: var(--text-primary) !important;
+
+    .mat-mdc-select-value {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-select-arrow {
+      color: var(--text-secondary) !important;
+    }
+  }
+
+  .mat-mdc-select-panel {
+    background-color: var(--card-bg) !important;
+
+    .mat-mdc-option {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+
+      &.mat-mdc-option-active {
+        background-color: var(--hover-bg) !important;
+      }
+    }
+  }
+
+  // Checkbox e Radio
+  .mat-mdc-checkbox,
+  .mat-mdc-radio-button {
+    .mdc-form-field {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Dividers
+  .mat-divider {
+    border-top-color: var(--border-color) !important;
+  }
+
+  // Progress spinners
+  .mat-mdc-progress-spinner circle {
+    stroke: var(--primary-color) !important;
+  }
+
+  // Progress bars
+  .mat-mdc-progress-bar {
+    .mdc-linear-progress__buffer {
+      background-color: var(--bg-tertiary) !important;
+    }
+
+    .mdc-linear-progress__bar-inner {
+      border-color: var(--primary-color) !important;
+    }
+  }
+
+  // Snackbars (manter cores próprias mas ajustar texto)
+  .mat-mdc-snack-bar-container {
+    .mat-mdc-snack-bar-label {
+      color: white !important;
+    }
+  }
+
+  // === CORREÇÕES GLOBAIS PARA TODOS OS COMPONENTES ===
+
+  // === DASHBOARD ===
+  .dashboard-container {
+    background-color: var(--bg-primary) !important;
+
+    // Preservar cores do sistema nos títulos e elementos com cor especial
+    .section-header h3,
+    .mat-mdc-card-title {
+      &:not([style*="color"]):not([class*="primary"]) {
+        color: var(--text-primary) !important;
+      }
+    }
+
+    .stat-card {
+      // Apenas mudar backgrounds brancos para escuros
+      &[style*="background: white"],
+      &[style*="background-color: white"],
+      &[style*="background: #fff"] {
+        background-color: var(--card-bg) !important;
+      }
+
+      // Preservar gradientes coloridos, apenas ajustar os brancos
+      &.primary {
+        background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%) !important;
+        border-left-color: var(--primary-color) !important;
+      }
+
+      &.warning {
+        background: linear-gradient(135deg, #3d3021 0%, #2d2418 100%) !important;
+        // Manter cores dos ícones e textos coloridos
+      }
+
+      &.success {
+        background: linear-gradient(135deg, #1f3d2a 0%, #1a2d1f 100%) !important;
+      }
+
+      &.info {
+        background: linear-gradient(135deg, #2d2d3d 0%, #1e1e2d 100%) !important;
+      }
+
+      // Textos dos valores
+      .stat-info {
+        h3 {
+          color: var(--text-primary) !important;
+        }
+
+        p {
+          color: var(--text-secondary) !important;
+        }
+      }
+    }
+
+    .dashboard-card {
+      background-color: var(--card-bg) !important;
+      border: 1px solid var(--border-color) !important;
+    }
+
+    // Seção de boas-vindas mantém gradiente roxo
+    .welcome-section {
+      // Manter gradiente roxo original
+      * {
+        color: white !important;
+      }
+    }
+
+    // Cards de ações rápidas - apenas fundo branco vira escuro
+    .quick-actions-card {
+      background: var(--card-bg) !important;
+      border: 1px solid var(--border-color) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    }
+  }
+
+  // === LISTAS/TABELAS (CLIENTES, PRODUTOS, VENDAS, ESTOQUE) ===
+  .client-list-container,
+  .product-list-container,
+  .venda-list-container,
+  .estoque-container,
+  .page-container {
+    background-color: var(--bg-primary) !important;
+
+    // Preservar títulos com cores do sistema
+    h1, h2, h3 {
+      &:not([style*="color"]):not([class*="primary"]) {
+        color: var(--text-primary) !important;
+      }
+    }
+
+    .actions-header {
+      background-color: transparent !important;
+
+      * {
+        &:not([style*="color"]):not([class*="primary"]) {
+          color: var(--text-primary) !important;
+        }
+      }
+    }
+
+    // Todos os campos de busca e filtros
+    .search-field,
+    .filter-field,
+    .mat-mdc-form-field {
+      .mdc-text-field,
+      .mdc-text-field--filled,
+      .mdc-text-field--outlined {
+        background-color: var(--bg-secondary) !important;
+      }
+
+      .mat-mdc-input-element {
+        color: var(--text-primary) !important;
+        background-color: transparent !important;
+      }
+
+      .mdc-floating-label,
+      .mat-mdc-floating-label {
+        color: var(--text-secondary) !important;
+      }
+
+      input, textarea {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+      }
+    }
+
+    // Todas as tabelas
+    .table-container,
+    .data-table-container {
+      background-color: var(--card-bg) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+
+      .modern-table,
+      .mat-mdc-table {
+        background-color: var(--card-bg) !important;
+      }
+    }
+
+    // Chips e badges específicos (manter cores especiais)
+    .client-type,
+    .product-type,
+    .status-chip,
+    .type-chip {
+      &:not([class*="primary"]):not([class*="accent"]):not([class*="warn"]) {
+        background-color: var(--bg-tertiary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+      }
+    }
+  }
+
+  // === DIALOGS E MODAIS ===
+  .mat-mdc-dialog-container {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+
+    .mat-mdc-dialog-title {
+      color: var(--text-primary) !important;
+    }
+
+    .mat-mdc-dialog-content {
+      color: var(--text-primary) !important;
+
+      * {
+        color: var(--text-primary) !important;
+      }
+    }
+
+    // Todos os form fields dentro de dialogs
+    .mat-mdc-form-field {
+      .mdc-text-field,
+      .mdc-text-field--filled,
+      .mdc-text-field--outlined {
+        background-color: var(--bg-secondary) !important;
+      }
+      
+      .mat-mdc-input-element {
+        color: var(--text-primary) !important;
+        background-color: transparent !important;
+      }
+
+      .mdc-floating-label {
+        color: var(--text-secondary) !important;
+      }
+    }
+
+    input,
+    textarea,
+    select {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+    }
+
+    // Força todos os elementos do dialog
+    * {
+      &:not([style*="background: linear-gradient"]):not([class*="mat-primary"]):not([class*="mat-accent"]):not([class*="mat-warn"]) {
+        background-color: transparent !important;
+        
+        &.mat-mdc-form-field,
+        &.mdc-text-field {
+          background-color: var(--bg-secondary) !important;
+        }
+      }
+    }
+  }
+
+  // === BOTÕES DOS DIALOGS ===
+  .mat-mdc-dialog-actions {
+    .mat-mdc-button {
+      &:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
+        background-color: var(--bg-tertiary) !important;
+        color: var(--text-primary) !important;
+        border: 1px solid var(--border-color) !important;
+      }
+    }
+  }
+
+  // === CORREÇÃO ESPECÍFICA PARA SIDEBAR ===
+  .sidebar,
+  .mat-drawer,
+  .mat-sidenav {
+    background-color: var(--bg-secondary) !important;
+
+    * {
+      color: var(--text-primary) !important;
+    }
+
+    .sidebar-item,
+    .nav-item {
+      &:not(.active) {
+        color: var(--text-primary) !important;
+      }
+    }
+  }  // === SIDEBAR E NAVEGAÇÃO ===
+  .sidebar,
+  .sidenav,
+  .mat-sidenav,
+  .nav-container {
+    background-color: var(--bg-secondary) !important;
+    border-right: 1px solid var(--border-color) !important;
+
+    // Título do menu hamburger com cor roxa
+    .sidebar-title,
+    .nav-title,
+    .menu-title,
+    h1, h2, h3 {
+      color: var(--primary-color) !important;
+    }
+
+    .sidebar-item,
+    .nav-item,
+    .mat-list-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+
+      &.active {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+      }
+    }
+  }
+
+  // === FORÇA MENU HAMBURGER ESPECÍFICO ===
+  
+  // Menu drawer/sidebar
+  .mat-drawer,
+  .mat-sidenav,
+  .sidebar {
+    background-color: var(--bg-secondary) !important;
+
+    // Força títulos do menu com cor primária - ESPECÍFICO PARA "Menu"
+    .sidebar-header {
+      h2 {
+        color: var(--primary-color) !important;
+      }
+    }
+
+    // Força títulos do menu com cor primária
+    * {
+      &:not(.mat-list-item):not(.nav-item) {
+        h1, h2, h3, h4 {
+          color: var(--primary-color) !important;
+        }
+      }
+    }
+
+    // Força especificamente o título "Menu"
+    h2 {
+      color: var(--primary-color) !important;
+    }
+
+    // Títulos gerais do sidebar
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--primary-color) !important;
+    }
+
+    // Itens de navegação
+    .mat-list-item,
+    .sidebar-item,
+    .nav-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+
+      &.active,
+      &.selected {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+      }
+    }
+  }
+
+  // === HEADERS E TÍTULOS ===
+  .page-header,
+  .section-header,
+  .component-header {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--text-primary) !important;
+    }
+
+    * {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // === CARDS GLOBAIS ===
+  .card,
+  .info-card,
+  .data-card,
+  .summary-card,
+  .content-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+
+    * {
+      color: var(--text-primary) !important;
+    }
+
+    .card-title,
+    .card-header {
+      color: var(--text-primary) !important;
+    }
+
+    .card-subtitle,
+    .card-meta {
+      color: var(--text-secondary) !important;
+    }
+  }
+
+  // === FORMULÁRIOS GLOBAIS ===
+  .form-container,
+  .form-section {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+
+    .mat-mdc-form-field {
+      .mdc-text-field,
+      .mdc-text-field--filled {
+        background-color: var(--bg-secondary) !important;
+      }
+
+      .mat-mdc-input-element {
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // === BOTÕES E AÇÕES ===
+  .action-buttons,
+  .button-container {
+    .mat-mdc-button {
+      &:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // === COMPONENTES ESPECÍFICOS ===
+
+  // Produtos
+  .product-list-container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Vendas
+  .venda-list-container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Usuários
+  .user-list-container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Layout principal
+  .main-layout {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Header global
+  .header-container,
+  .app-header {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+
+    * {
+      color: white !important;
+    }
+  }
+
+  // Login
+  .login-container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+
+    .mat-mdc-form-field {
+      .mdc-text-field {
+        background-color: var(--bg-secondary) !important;
+      }
+
+      .mat-mdc-input-element {
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // === TODOS OS DIALOGS ===
+  .product-dialog,
+  .client-dialog,
+  .user-dialog,
+  .venda-dialog,
+  .confirmation-dialog {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+
+    .mat-mdc-form-field {
+      .mdc-text-field,
+      .mdc-text-field--filled {
+        background-color: var(--bg-secondary) !important;
+      }
+
+      .mat-mdc-input-element {
+        color: var(--text-primary) !important;
+        background-color: transparent !important;
+      }
+
+      .mdc-floating-label {
+        color: var(--text-secondary) !important;
+      }
+    }
+
+    input, textarea, select {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+    }
+
+    * {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // === FORÇAR TODOS OS ELEMENTOS COM CLASSES COMUNS ===
+
+  // Todos os containers
+  .container,
+  .main-container,
+  .content-container,
+  .wrapper {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Todas as sections
+  .section,
+  .content-section,
+  .main-section {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Todos os panels
+  .panel,
+  .info-panel,
+  .data-panel {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+
+  // === FORÇA GLOBAL PARA ELEMENTOS BRANCOS ===
+  
+  // === FORÇA FUNDO ESCURO ABSOLUTO ===
+  
+  // Força TODOS os elementos que podem ter fundo branco/cinza
+  *:not(.mat-toolbar):not(.welcome-section):not([class*="gradient"]) {
+    &:not([style*="background: linear-gradient"]):not([style*="background-color: linear-gradient"]) {
+      // Se o elemento tem background branco ou cinza, forçar para escuro
+      &[style*="background-color: white"],
+      &[style*="background-color: #fff"],
+      &[style*="background-color: #ffffff"],
+      &[style*="background: white"],
+      &[style*="background: #fff"],
+      &[style*="background: #ffffff"],
+      &[style*="background-color: #f"],
+      &[style*="background-color: #e"],
+      &[style*="background-color: rgb(2"] {
+        background-color: var(--bg-primary) !important;
+        color: var(--text-primary) !important;
+      }
+    }
+  }
+
+  // === FORÇA CORES CINZAS ESPECÍFICAS ===
+  
+  // Força elementos com cores cinzas específicas (do main-layout)
+  *[style*="background-color: #f5f5f5"],
+  *[style*="background-color: #fafafa"],
+  *[style*="background-color: #f8f9fa"],
+  *[style*="background-color: #e9ecef"],
+  .main-content,
+  .content-wrapper {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Força elementos de página principal
+  .page,
+  .main,
+  .content,
+  .wrapper,
+  .container,
+  .layout {
+    background-color: var(--bg-primary) !important;
+  }
+
+  // Força viewport e documento
+  html {
+    background-color: var(--bg-primary) !important;
+  }
+
+  body {
+    background-color: var(--bg-primary) !important;
+    background: var(--bg-primary) !important;
+  }
+
+  // Qualquer elemento que ainda tenha background branco
+  * {
+    &[style*="background-color: white"],
+    &[style*="background-color: #fff"],
+    &[style*="background-color: #ffffff"],
+    &[style*="background: white"],
+    &[style*="background: #fff"],
+    &[style*="background: #ffffff"] {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+      
+      input, textarea, select {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+      }
+    }
+
+    // Força elementos com classes comuns que podem estar brancos
+    &.white,
+    &.bg-white,
+    &.background-white {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Força inputs que possam estar escapando
+  input,
+  textarea,
+  select {
+    &:not([style*="background: linear-gradient"]) {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border-color) !important;
+    }
+  }
+
+  // === TÍTULOS COM COR PRIMÁRIA MAIS ESPECÍFICOS ===
+  
+  // Usar seletores mais específicos para garantir que os títulos fiquem roxos
+  [class*="container"] h1,
+  [class*="container"] h2,
+  .page-content h1,
+  .page-content h2,
+  .main-content h1,
+  .main-content h2 {
+    &:not([style*="color:"]):not(.welcome-text *) {
+      color: var(--primary-color) !important;
+    }
+  }
+
+  // Força títulos das grids especificamente
+  .client-list-container > h1,
+  .product-list-container > h1,
+  .venda-list-container > h1,
+  .user-list-container > h1,
+  .estoque-container > h1,
+  .dashboard-container > h1 {
+    color: var(--primary-color) !important;
+  }
+
+  // === FORÇA SIDEBAR COMPLETAMENTE ===
+  .sidebar {
+    background-color: var(--bg-secondary) !important;
+    border-right: 1px solid var(--border-color) !important;
+
+    * {
+      &:not(.active):not([class*="primary"]) {
+        color: var(--text-primary) !important;
+      }
+    }
+
+    .sidebar-item {
+      color: var(--text-primary) !important;
+
+      &:hover {
+        background-color: var(--hover-bg) !important;
+      }
+
+      &.active {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+      }
+    }
+  }  // Inputs específicos
+  input,
+  textarea,
+  select {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+
+    &::placeholder {
+      color: var(--text-muted) !important;
+    }
+
+    &:focus {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--primary-color) !important;
+    }
+
+    &:disabled {
+      background-color: var(--bg-tertiary) !important;
+      color: var(--text-muted) !important;
+    }
+  }
+
+  // Força input dentro de mat-form-field
+  .mat-mdc-form-field input {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Input search específico
+  input[type="search"],
+  input[placeholder*="Buscar"],
+  input[placeholder*="buscar"] {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+
+    &::placeholder {
+      color: var(--text-muted) !important;
+    }
+  }
+
+  // === SCROLLBARS CUSTOMIZADOS ===
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+    
+    &:hover {
+      background: var(--text-muted);
+    }
+  }
+
+  // === ÚLTIMO RECURSO - FORÇA TUDO ===
+  
+  // Se ainda houver elementos brancos, força todos
+  .mat-mdc-text-field-wrapper,
+  .mdc-text-field__input,
+  .mat-mdc-form-field-infix,
+  .mat-mdc-input-element {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Força containers principais que podem estar escapando
+  .app,
+  .main,
+  .content,
+  .wrapper,
+  .container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+  }
+}
+
+// Transições suaves para mudança de tema
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+// Aplicar tema padrão ao body se não houver classe de tema
+body:not(.light-theme):not(.dark-theme) {
+  @extend .light-theme;
+}
