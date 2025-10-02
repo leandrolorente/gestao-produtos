@@ -594,10 +594,24 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
     .mdc-text-field--filled {
       background-color: var(--bg-secondary) !important;
+      border: none !important;
+      box-shadow: none !important;
 
       .mdc-text-field__input {
         background-color: transparent !important;
         color: var(--text-primary) !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+
+      // Remove qualquer borda ou sombra interna
+      &::before,
+      &::after {
+        display: none !important;
+      }
+
+      .mdc-line-ripple {
+        display: none !important;
       }
     }
 
@@ -608,10 +622,34 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     .mat-mdc-input-element {
       color: var(--text-primary) !important;
       background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
     }
 
     .mat-mdc-form-field-infix {
       color: var(--text-primary) !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    // Remove bordas e sombras de todos os elementos internos do input
+    .mdc-text-field__input {
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    .mdc-text-field__resizer {
+      background-color: transparent !important;
+    }
+
+    // Remove linhas de foco
+    .mdc-line-ripple::before,
+    .mdc-line-ripple::after {
+      background-color: transparent !important;
     }
 
     .mat-mdc-floating-label {
