@@ -57,7 +57,7 @@ export class ClientDialogComponent {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(2)]],
+      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(99)]],
       email: ['', [Validators.required, Validators.email]],
       telefone: ['', [Validators.required]],
       cpfCnpj: ['', [Validators.required]],
@@ -82,6 +82,10 @@ export class ClientDialogComponent {
     if (field?.hasError('minlength')) {
       const requiredLength = field.errors?.['minlength']?.requiredLength;
       return `Mínimo de ${requiredLength} caracteres`;
+    }
+    if (field?.hasError('maxlength')) {
+      const requiredLength = field.errors?.['maxlength']?.requiredLength;
+      return `Máximo de ${requiredLength} caracteres`;
     }
     return '';
   }
