@@ -1,3 +1,5 @@
+//teste
+
 # 📦 Sistema de Gestão de Produtos
 
 > **Sistema completo de gestão de estoque e vendas desenvolvido em Angular 20+ com Material Design**
