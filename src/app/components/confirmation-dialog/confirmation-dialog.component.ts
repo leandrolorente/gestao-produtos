@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 export interface ConfirmationDialogData {
   title: string;
@@ -35,7 +36,8 @@ export interface ConfirmationButton {
 export class ConfirmationDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmationDialogData
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmationDialogData,
+    private sanitizer: DomSanitizer
   ) {
     // Define valores padrão
     this.data = {
@@ -54,8 +56,9 @@ export class ConfirmationDialogComponent {
     this.dialogRef.close(false);
   }
 
-  formatMessage(message: string): string {
-    // Converte quebras de linha (\n) em tags HTML <br>
-    return message.replace(/\n/g, '<br>');
+  formatMessage(message: string): SafeHtml {
+    // Converte quebras de linha (\n) em tags HTML <br> e sanitiza o conteúdo
+    const htmlMessage = message.replace(/\n/g, '<br>');
+    return this.sanitizer.bypassSecurityTrustHtml(htmlMessage);
   }
 }

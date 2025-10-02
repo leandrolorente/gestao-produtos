@@ -1,9 +1,10 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, tap, map, switchMap } from 'rxjs/operators';
 import { BaseApiService } from './base-api.service';
 import { Venda, VendaCreate, VendaResponse, VendasStats, VendaItem } from '../models/Venda';
+import { SafeStorageService } from './safe-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { Venda, VendaCreate, VendaResponse, VendasStats, VendaItem } from '../mo
 export class VendaService extends BaseApiService {
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   public readonly loading$ = this.loadingSubject.asObservable();
+  private readonly safeStorage = inject(SafeStorageService);
 
   // Signal para armazenar vendas localmente (cache)
   private readonly vendasSignal = signal<Venda[]>([]);
@@ -23,7 +25,7 @@ export class VendaService extends BaseApiService {
    * Adiciona o token JWT aos headers das requisições
    */
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('auth_token');
+    const token = this.safeStorage.getItem('auth_token');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -338,12 +340,12 @@ export class VendaService extends BaseApiService {
           console.error('Erro ao confirmar venda:', error);
           console.error('Detalhes do erro:', error.error);
           this.setLoading(false);
-          
+
           // Tratamento específico para erro de fluxo
           if (error.status === 400 && error.error?.message) {
             throw new Error(error.error.message);
           }
-          
+
           return throwError(() => error);
         })
       );
@@ -367,12 +369,12 @@ export class VendaService extends BaseApiService {
           console.error('Erro ao finalizar venda:', error);
           console.error('Detalhes do erro:', error.error);
           this.setLoading(false);
-          
+
           // Tratamento específico para erro de fluxo
           if (error.status === 400 && error.error?.message) {
             throw new Error(error.error.message);
           }
-          
+
           return throwError(() => error);
         })
       );
@@ -396,12 +398,12 @@ export class VendaService extends BaseApiService {
           console.error('Erro ao cancelar venda:', error);
           console.error('Detalhes do erro:', error.error);
           this.setLoading(false);
-          
+
           // Tratamento específico para erro de fluxo
           if (error.status === 400 && error.error?.message) {
             throw new Error(error.error.message);
           }
-          
+
           return throwError(() => error);
         })
       );

@@ -1,11 +1,12 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Observable, BehaviorSubject, throwError, forkJoin } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BaseApiService } from './base-api.service';
 import { User, DashboardStats, WidgetsData, ProductSummary, SaleSummary, RevenueData } from '../models/User';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
+import { SafeStorageService } from './safe-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,21 +15,26 @@ export class DashboardService extends BaseApiService {
   private readonly loadingSubject = new BehaviorSubject<boolean>(false);
   public readonly loading$ = this.loadingSubject.asObservable();
 
-  // Injeção de dependências
-  private readonly userService = inject(UserService);
-  private readonly authService = inject(AuthService);
-
   private readonly currentUser = signal<User | null>(null);
   private readonly dashboardStats = signal<DashboardStats | null>(null);
   private readonly widgetsData = signal<WidgetsData | null>(null);
   private readonly topProducts = signal<ProductSummary[]>([]);
   private readonly recentSales = signal<SaleSummary[]>([]);
 
+  constructor(
+    protected override http: HttpClient,
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+    private readonly safeStorage: SafeStorageService
+  ) {
+    super(http);
+  }
+
   /**
    * Adiciona o token JWT aos headers das requisições
    */
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('auth_token');
+    const token = this.safeStorage.getItem('auth_token');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });

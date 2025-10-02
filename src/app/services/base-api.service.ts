@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BaseApiService {
-  protected readonly apiUrl = 'http://localhost:5278/api';
+  protected readonly apiUrl = environment.apiUrl;
 
   protected readonly httpOptions = {
     headers: new HttpHeaders({

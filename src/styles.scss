@@ -721,27 +721,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       color: var(--text-primary) !important;
       border-bottom-color: var(--border-color) !important;
     }
-
-    // COMENTADO: REGRAS QUE INTERFEREM NOS COMPONENTES LOCAIS
-    /*
-    // FORÇAR COR ROXA NOS CABEÇALHOS DAS GRIDS
-    .mat-mdc-header-cell {
-      color: var(--primary-color) !important;
-      font-weight: 600 !important;
-    }
-
-    .mat-sort-header {
-      color: var(--primary-color) !important;
-
-      .mat-sort-header-content {
-        color: var(--primary-color) !important;
-      }
-
-      .mat-sort-header-arrow {
-        color: var(--primary-color) !important;
-      }
-    }
-    */
   }
 
   // Toolbar/Header
@@ -1036,26 +1015,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       .modern-table,
       .mat-mdc-table {
         background-color: var(--card-bg) !important;
-
-        /*
-        // FORÇAR COR ROXA NOS CABEÇALHOS DAS GRIDS
-        .mat-mdc-header-cell {
-          color: var(--primary-color) !important;
-          font-weight: 600 !important;
-        }
-
-        .mat-sort-header {
-          color: var(--primary-color) !important;
-
-          .mat-sort-header-content {
-            color: var(--primary-color) !important;
-          }
-
-          .mat-sort-header-arrow {
-            color: var(--primary-color) !important;
-          }
-        }
-        */
       }
     }
 
@@ -1594,35 +1553,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: var(--primary-color) !important;
   }
 
-  // === COMENTADO: FORÇA COR ROXA EM TODOS OS CABEÇALHOS DE TABELA ===
-  /*
-  .mat-mdc-table {
-    .mat-mdc-header-cell,
-    .mat-column-header,
-    .mat-sort-header {
-      color: var(--primary-color) !important;
-      font-weight: 600 !important;
-    }
-
-    .mat-sort-header-content,
-    .mat-sort-header-arrow,
-    .mat-sort-header-indicator {
-      color: var(--primary-color) !important;
-    }
-
-    // Headers específicos por nome de coluna
-    .mat-column-name,
-    .mat-column-sku,
-    .mat-column-barcode,
-    .mat-column-quantity,
-    .mat-column-price,
-    .mat-column-updated,
-    .mat-column-actions {
-      color: var(--primary-color) !important;
-    }
-  }
-  */
-
   // === FORÇA SIDEBAR COMPLETAMENTE ===
   .sidebar {
     background-color: var(--bg-secondary) !important;
@@ -1732,29 +1662,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 // === REGRA GLOBAL PARA CABEÇALHOS DE TABELA ===
 // Garante que os cabeçalhos das grids sempre tenham cor roxa em qualquer tema
-// === REGRAS GLOBAIS COMENTADAS PARA NÃO INTERFERIR ===
-// Estas regras estavam sobrescrevendo as regras locais dos componentes
-/*
-.mat-mdc-table .mat-mdc-header-cell,
-.mat-mdc-table .mat-sort-header,
-.mat-mdc-header-row .mat-mdc-header-cell,
-th[mat-header-cell],
-th.mat-mdc-header-cell {
-  color: var(--primary-color) !important;
-  font-weight: 600 !important;
-}
-
-.mat-sort-header-content,
-.mat-sort-header-arrow {
-  color: var(--primary-color) !important;
-}
-
-// Força especificamente nos elementos TH com atributo mat-sort-header
-th[mat-sort-header] {
-  color: var(--primary-color) !important;
-  font-weight: 600 !important;
-}
-*/
 
 // Regra adicional para tabelas Material
 table.mat-mdc-table th,
@@ -1911,25 +1818,6 @@ th.mat-mdc-header-cell.mdc-data-table__header-cell.cdk-header-cell {
   color: white !important;
   background: #667eea !important;
 }
-
-// COMENTADO: REGRAS DE TEMA QUE INTERFEREM
-/*
-// Tema escuro - cor roxa específica
-.dark-theme .mat-mdc-header-row {
-  th {
-    color: #bb86fc !important; // Tema escuro
-    font-weight: 600 !important;
-  }
-}
-
-// Tema claro - cor roxa específica
-.light-theme .mat-mdc-header-row {
-  th {
-    color: #667eea !important; // Tema claro
-    font-weight: 600 !important;
-  }
-}
-*/
 
 // Transições suaves para mudança de tema (SEM !important para não interferir nas animações do Material)
 * {

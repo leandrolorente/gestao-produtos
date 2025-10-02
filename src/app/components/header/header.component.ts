@@ -74,7 +74,7 @@ export class HeaderComponent implements OnInit {
    */
   onToggleTheme() {
     this.themeService.toggleTheme();
-    const newMode = this.isDarkMode() ? 'escuro' : 'claro';
+    const newMode = !this.isDarkMode() ? 'noturno' : 'claro';
     this.authService.showSnackbar(`Modo ${newMode} ativado`, 'success');
   }
 }
