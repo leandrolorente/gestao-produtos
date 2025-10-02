@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = "dist/gestao-produtos/browser"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[context.production]
+  environment = { API_URL = "https://gestao-produtos-api.onrender.com/api" }
+
+[context.deploy-preview]
+  environment = { API_URL = "https://gestao-produtos-api.onrender.com/api" }
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

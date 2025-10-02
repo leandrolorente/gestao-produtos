@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5278/api'
+  apiUrl: process.env['API_URL'] || 'https://gestao-produtos-api.onrender.com/api'
 };
