@@ -6,6 +6,32 @@
   background: var(--background-gradient);
 }
 
+/* --- Título da página --- */
+.page-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+  font-weight: 300;
+  font-size: 2rem;
+  line-height: 1.3;
+  word-spacing: 0.1em;
+
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+    word-spacing: 0.2em;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+    word-spacing: 0.3em;
+    padding: 0 0.5rem;
+  }
+}
+
 /* --- Seção de Estatísticas --- */
 .stats-section {
   display: grid;
@@ -158,23 +184,32 @@
   }
 }
 
-/* --- Desktop View seguindo padrão --- */
-.desktop-view {
-  @media (max-width: 768px) {
-    display: none;
-  }
-}
-
 .table-container {
   overflow: auto;
   border-radius: 16px;
   background: var(--card-background);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  // Responsividade para mobile
+  @media (max-width: 768px) {
+    overflow-x: auto;
+    border-radius: 12px;
+    -webkit-overflow-scrolling: touch; // Para scroll suave no iOS
+  }
 }
 
 .modern-table {
   width: 100%;
   background: var(--card-background);
+  min-width: 600px; // Garante largura mínima para scroll horizontal
+
+  @media (max-width: 768px) {
+    min-width: 500px; // Reduz a largura mínima no mobile
+  }
+
+  @media (max-width: 480px) {
+    min-width: 400px; // Reduz ainda mais em telas pequenas
+  }
 }
 
 .header-row {
@@ -497,6 +532,51 @@ mat-chip {
       min-width: unset;
     }
   }
+
+  // Responsividade específica para tabela
+  .table-container {
+    margin: 0 -0.5rem; // Compensa as margens do card
+  }
+
+  .modern-table {
+    font-size: 0.8rem;
+
+    .mat-mdc-header-cell {
+      padding: 12px 8px !important;
+      font-size: 0.75rem !important;
+    }
+
+    .mat-mdc-cell {
+      padding: 12px 8px !important;
+      font-size: 0.8rem !important;
+    }
+
+    // Oculta algumas colunas menos importantes no mobile
+    .mat-column-formaPagamento {
+      display: none;
+    }
+  }
+
+  // Ajusta colunas específicas para mobile
+  .mat-column-numero {
+    min-width: 70px !important;
+  }
+
+  .mat-column-cliente {
+    min-width: 120px !important;
+  }
+
+  .mat-column-status {
+    min-width: 80px !important;
+  }
+
+  .mat-column-total {
+    min-width: 90px !important;
+  }
+
+  .mat-column-acoes {
+    min-width: 60px !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -512,6 +592,87 @@ mat-chip {
       width: 100%;
       justify-content: center;
     }
+  }
+
+  // Responsividade extrema para tabela em telas muito pequenas
+  .modern-table {
+    font-size: 0.75rem;
+
+    .mat-mdc-header-cell {
+      padding: 8px 4px !important;
+      font-size: 0.7rem !important;
+    }
+
+    .mat-mdc-cell {
+      padding: 8px 4px !important;
+      font-size: 0.75rem !important;
+    }
+
+    // Oculta mais colunas em telas muito pequenas
+    .mat-column-dataVenda {
+      display: none;
+    }
+  }
+
+  .mat-column-numero {
+    min-width: 60px !important;
+  }
+
+  .mat-column-cliente {
+    min-width: 100px !important;
+  }
+
+  .mat-column-status {
+    min-width: 70px !important;
+  }
+
+  .mat-column-total {
+    min-width: 80px !important;
+  }
+
+  .mat-column-acoes {
+    min-width: 50px !important;
+  }
+}
+
+/* --- Estilos para botões de ação de vendas --- */
+.confirm-action {
+  color: #2e7d32 !important;
+
+  .mat-icon {
+    color: #2e7d32 !important;
+  }
+}
+
+.finalize-action {
+  color: #1976d2 !important;
+
+  .mat-icon {
+    color: #1976d2 !important;
+  }
+}
+
+.process-action {
+  color: #ff6f00 !important;
+
+  .mat-icon {
+    color: #ff6f00 !important;
+  }
+}
+
+.cancel-action {
+  color: #d32f2f !important;
+
+  .mat-icon {
+    color: #d32f2f !important;
+  }
+}
+
+.delete-action {
+  color: #f44336 !important;
+
+  .mat-icon {
+    color: #f44336 !important;
   }
 }
 
@@ -539,5 +700,124 @@ mat-chip {
 
   .mat-mdc-form-field-infix {
     min-height: 2.5rem;
+  }
+}
+
+/* --- Estilos para interação com as linhas da tabela --- */
+.data-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  position: relative;
+
+  &:hover {
+    background-color: rgba(102, 126, 234, 0.04) !important;
+    transform: translateX(2px);
+  }
+
+  &:active {
+    transform: translateX(1px);
+    background-color: rgba(102, 126, 234, 0.08) !important;
+  }
+}
+
+/* --- Classe para células que não devem ter double-click --- */
+.non-clickable {
+  cursor: default !important;
+
+  &:hover {
+    transform: none !important;
+    background-color: transparent !important;
+  }
+}
+
+/* --- Estilos para a coluna de ações --- */
+.actions-column {
+  width: 100px;
+  min-width: 100px;
+  position: relative;
+  z-index: 10;
+  cursor: default !important;
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 20;
+    height: 100%;
+
+    .action-btn {
+      position: relative;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      cursor: pointer !important;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &.edit-btn {
+        color: #1976d2;
+
+        &:hover {
+          background: rgba(25, 118, 210, 0.1);
+        }
+
+        &:disabled {
+          color: rgba(0, 0, 0, 0.26);
+          background: rgba(0, 0, 0, 0.05);
+          cursor: not-allowed !important;
+        }
+      }
+
+      &.menu-btn {
+        color: #424242;
+
+        &:hover {
+          background: rgba(66, 66, 66, 0.1);
+        }
+      }
+    }
+  }
+}
+
+/* Sobrescrever comportamento da linha para a coluna de ações */
+.data-row:hover .actions-column {
+  transform: none !important;
+  background-color: transparent !important;
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
   }
 }

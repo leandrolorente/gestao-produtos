@@ -15,16 +15,18 @@
     </button>
 
     <!-- Informações do usuário -->
-    <div class="user-info" *ngIf="currentUser()">
-      <img
-        [src]="currentUser()?.avatar || 'https://via.placeholder.com/40'"
-        [alt]="currentUser()?.name || 'Usuário'"
-        class="user-avatar">
-      <div class="user-details">
-        <span class="user-name">{{ currentUser()?.name || 'Usuário' }}</span>
-        <span class="user-role">{{ currentUser()?.department || 'N/A' }}</span>
+    @if (currentUser()) {
+      <div class="user-info">
+        <img
+          [src]="currentUser()?.avatar || 'https://via.placeholder.com/40'"
+          [alt]="currentUser()?.name || 'Usuário'"
+          class="user-avatar">
+        <div class="user-details">
+          <span class="user-name">{{ currentUser()?.name || 'Usuário' }}</span>
+          <span class="user-role">{{ currentUser()?.department || 'N/A' }}</span>
+        </div>
       </div>
-    </div>
+    }
 
     <!-- Menu do usuário - sempre visível -->
     <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-btn"
@@ -33,15 +35,17 @@
     </button>
 
     <mat-menu #userMenu="matMenu" class="user-menu">
-      <div class="user-menu-header" *ngIf="currentUser()">
-        <img [src]="currentUser()?.avatar || 'https://via.placeholder.com/40'"
-             class="menu-avatar">
-        <div class="menu-user-info">
-          <span class="menu-user-name">{{ currentUser()?.name || 'Usuário' }}</span>
-          <span class="menu-user-email">{{ currentUser()?.email || 'N/A' }}</span>
+      @if (currentUser()) {
+        <div class="user-menu-header">
+          <img [src]="currentUser()?.avatar || 'https://via.placeholder.com/40'"
+               class="menu-avatar">
+          <div class="menu-user-info">
+            <span class="menu-user-name">{{ currentUser()?.name || 'Usuário' }}</span>
+            <span class="menu-user-email">{{ currentUser()?.email || 'N/A' }}</span>
+          </div>
         </div>
-      </div>
-      <mat-divider *ngIf="currentUser()"></mat-divider>
+        <mat-divider></mat-divider>
+      }
       <button mat-menu-item (click)="onProfile()">
         <mat-icon>person</mat-icon>
         <span>Meu Perfil</span>
@@ -49,6 +53,10 @@
       <button mat-menu-item (click)="onSettings()">
         <mat-icon>settings</mat-icon>
         <span>Configurações</span>
+      </button>
+      <button mat-menu-item (click)="onToggleTheme()">
+        <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span>{{ isDarkMode() ? 'Modo Claro' : 'Modo Noturno' }}</span>
       </button>
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="onLogout()" class="logout-item">

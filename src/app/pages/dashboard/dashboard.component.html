@@ -62,10 +62,58 @@
       <mat-card-content>
         <div class="stat-content">
           <div class="stat-info">
-            <h3>{{ stats()?.recentTransactions || 0 }}</h3>
-            <p>Transações Recentes</p>
+            <h3>{{ stats()?.totalSales || 0 }}</h3>
+            <p>Total de Vendas</p>
           </div>
           <mat-icon class="stat-icon">trending_up</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card accent">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ (stats()?.totalRevenue || 0) | currency:'BRL' }}</h3>
+            <p>Receita Total</p>
+          </div>
+          <mat-icon class="stat-icon">monetization_on</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card secondary">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats()?.salesToday || 0 }}</h3>
+            <p>Vendas Hoje</p>
+          </div>
+          <mat-icon class="stat-icon">today</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card primary">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats()?.totalClients || 0 }}</h3>
+            <p>Total de Clientes</p>
+          </div>
+          <mat-icon class="stat-icon">people</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card info">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-info">
+            <h3>{{ stats()?.pendingSales || 0 }}</h3>
+            <p>Vendas Pendentes</p>
+          </div>
+          <mat-icon class="stat-icon">pending</mat-icon>
         </div>
       </mat-card-content>
     </mat-card>
@@ -105,21 +153,23 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Produtos mais vendidos -->
-    <mat-card class="top-products-card">
-      <mat-card-header>
-        <mat-card-title>Produtos Mais Vendidos</mat-card-title>
-        <mat-card-subtitle>Top 3 produtos por vendas</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
+    <!-- Container pai para produtos e vendas -->
+    <mat-card class="products-sales-container">
+      <!-- Produtos mais vendidos -->
+      <div class="top-products-section">
+        <div class="section-header">
+          <h3>Produtos Mais Vendidos</h3>
+          <p>Top 3 produtos por vendas e receita</p>
+        </div>
         <div class="products-list">
           <div
-            *ngFor="let product of stats()?.topSellingProducts || []; let i = index"
+            *ngFor="let product of topProducts() || stats()?.topSellingProducts || []; let i = index"
             class="product-item">
             <div class="product-rank">{{ i + 1 }}</div>
             <div class="product-info">
               <h4>{{ product.name }}</h4>
-              <p>{{ product.sales }} vendas • {{ product.quantity }} em estoque</p>
+              <p>{{ product.sales }} vendas • {{ (product.revenue || 0) | currency:'BRL' }} receita</p>
+              <small>{{ product.quantity }} em estoque</small>
             </div>
             <div class="product-status">
               <span
@@ -129,7 +179,30 @@
             </div>
           </div>
         </div>
-      </mat-card-content>
+      </div>
+
+      <!-- Vendas recentes -->
+      <div class="recent-sales-section" *ngIf="(recentSales() && recentSales()!.length > 0) || (stats()?.recentSales && stats()!.recentSales.length > 0)">
+        <div class="section-header">
+          <h3>📊 Vendas Recentes</h3>
+          <p>Últimas transações realizadas</p>
+        </div>
+        <div class="sales-list">
+          <div
+            *ngFor="let sale of recentSales() || stats()?.recentSales || []"
+            class="sale-item">
+            <div class="sale-info">
+              <h4>🧾 {{ sale.numero }}</h4>
+              <p>👤 {{ sale.clienteNome }}</p>
+              <small>🕒 {{ sale.dataVenda | date:'dd/MM/yyyy HH:mm' }}</small>
+            </div>
+            <div class="sale-amount">
+              <span class="amount">{{ sale.total | currency:'BRL' }}</span>
+              <span class="status" [class]="sale.status.toLowerCase()">{{ sale.status }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </mat-card>
   </div>
 

@@ -28,6 +28,13 @@ export interface ResetPasswordRequest {
   confirmPassword: string;
 }
 
+export interface LogoutDto {
+  userId: string;
+  token?: string; // Token atual (opcional para validação)
+  sessionId?: string; // ID da sessão (opcional)
+  deviceInfo?: string; // Informações do dispositivo (opcional)
+}
+
 export interface AuthUser {
   id: string; // Mudado para string para compatibilidade com MongoDB ObjectId
   name: string;
@@ -107,10 +114,48 @@ export class AuthService extends BaseApiService {
   }
 
   /**
+   * Obtém o ID da sessão (pode ser implementado conforme necessário)
+   */
+  private getSessionId(): string | undefined {
+    // Por enquanto, usando timestamp como sessionId temporário
+    // Pode ser melhorado para usar um ID de sessão real
+    return sessionStorage.getItem('session_id') || undefined;
+  }
+
+  /**
+   * Obtém informações do dispositivo
+   */
+  private getDeviceInfo(): string | undefined {
+    try {
+      const info = {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        timestamp: new Date().toISOString()
+      };
+      return JSON.stringify(info);
+    } catch (error) {
+      console.warn('Erro ao obter informações do dispositivo:', error);
+      return undefined;
+    }
+  }
+
+  /**
    * Realiza logout do usuário
    */
   logout(): Observable<void> {
-    return this.http.post<void>(this.buildUrl('auth/logout'), {}, this.httpOptions)
+    const currentUser = this.currentUser();
+    const storedToken = this.getStoredToken();
+    
+    // Prepara o payload do logout
+    const logoutData: LogoutDto = {
+      userId: currentUser?.id || '',
+      token: storedToken || undefined,
+      sessionId: this.getSessionId(),
+      deviceInfo: this.getDeviceInfo()
+    };
+
+    return this.http.post<void>(this.buildUrl('auth/logout'), logoutData, this.httpOptions)
       .pipe(
         tap(() => {
           this.clearAuthData();

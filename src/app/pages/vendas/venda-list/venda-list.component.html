@@ -1,6 +1,6 @@
 <mat-card class="container-card">
   <mat-card-content>
-    <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-color); font-weight: 300; font-size: 2rem;">
+    <h2 class="page-title">
       Gerenciamento de Vendas
     </h2>
 
@@ -212,13 +212,14 @@
           <!-- Coluna Ações -->
           <ng-container matColumnDef="acoes">
             <th mat-header-cell *matHeaderCellDef class="actions-column">Ações</th>
-            <td mat-cell *matCellDef="let venda" class="actions-column">
+            <td mat-cell *matCellDef="let venda" class="actions-column non-clickable">
               <div class="action-buttons">
                 <button
                   mat-icon-button
                   color="primary"
-                  (click)="openEditDialog(venda)"
-                  matTooltip="Editar Venda"
+                  [disabled]="!podeEditar(venda)"
+                  (click)="openEditDialog(venda); $event.stopPropagation()"
+                  [matTooltip]="podeEditar(venda) ? 'Editar Venda' : 'Venda não pode ser editada'"
                   class="action-btn edit-btn">
                   <mat-icon>edit</mat-icon>
                 </button>
@@ -226,25 +227,70 @@
                 <button
                   mat-icon-button
                   [matMenuTriggerFor]="menuVenda"
+                  (click)="$event.stopPropagation()"
                   matTooltip="Mais Opções"
                   class="action-btn menu-btn">
                   <mat-icon>more_vert</mat-icon>
                 </button>
 
                 <mat-menu #menuVenda="matMenu">
-                  <button mat-menu-item (click)="openEditDialog(venda)">
+                  <button mat-menu-item (click)="openViewDialog(venda)">
                     <mat-icon>visibility</mat-icon>
                     Ver Detalhes
                   </button>
-                  <button mat-menu-item>
+
+                  <!-- Ações de fluxo de venda -->
+                  <mat-divider *ngIf="podeConfirmar(venda) || podeFinalizar(venda) || podeCancelar(venda)"></mat-divider>
+
+                  <button
+                    mat-menu-item
+                    (click)="confirmarVenda(venda)"
+                    *ngIf="podeConfirmar(venda)"
+                    class="confirm-action">
+                    <mat-icon>check_circle</mat-icon>
+                    Confirmar Venda
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    (click)="finalizarVenda(venda)"
+                    *ngIf="podeFinalizar(venda)"
+                    class="finalize-action">
+                    <mat-icon>done_all</mat-icon>
+                    Finalizar Venda
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    (click)="processarVendaCompleta(venda)"
+                    *ngIf="podeConfirmar(venda)"
+                    class="process-action">
+                    <mat-icon>flash_on</mat-icon>
+                    Processar Completo
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    (click)="cancelarVenda(venda)"
+                    *ngIf="podeCancelar(venda)"
+                    class="cancel-action">
+                    <mat-icon>cancel</mat-icon>
+                    Cancelar Venda
+                  </button>
+
+                  <mat-divider></mat-divider>
+
+                  <button mat-menu-item (click)="printVenda(venda)">
                     <mat-icon>print</mat-icon>
                     Imprimir
                   </button>
-                  <mat-divider></mat-divider>
+
+                  <mat-divider *ngIf="isAdmin()"></mat-divider>
                   <button
                     mat-menu-item
                     class="delete-action"
-                    (click)="deleteVenda(venda)">
+                    (click)="deleteVenda(venda)"
+                    *ngIf="isAdmin()">
                     <mat-icon>delete</mat-icon>
                     Excluir
                   </button>
@@ -258,7 +304,7 @@
             mat-row
             *matRowDef="let row; columns: displayedColumns;"
             class="data-row"
-            (click)="openEditDialog(row)"></tr>
+            (dblclick)="onRowDoubleClick($event, row)"></tr>
         </table>
 
         <!-- Mensagem quando não há dados -->

@@ -5,7 +5,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,7 +19,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { Venda, VendaCreate, VendasStats } from '../../../models/Venda';
 import { VendaService } from '../../../services/venda.service';
+import { AuthService } from '../../../services/auth.service';
 import { VendaDialogComponent } from '../../../components/venda-dialog/venda-dialog.component';
+import { ConfirmationDialogService } from '../../../services/confirmation-dialog.service';
 
 @Component({
   selector: 'app-venda-list',
@@ -76,6 +77,9 @@ export class VendaListComponent implements OnInit {
   statusOptions = ['Todos', 'Pendente', 'Confirmada', 'Finalizada', 'Cancelada'];
   formasPagamento = ['Todas', 'Dinheiro', 'PIX', 'Cartão de Débito', 'Cartão de Crédito', 'Boleto', 'Transferência'];
 
+  // Timer para controlar double-click
+  private clickTimer: any = null;
+
   // Computed para estatísticas resumidas
   vendasHoje = computed(() => {
     const hoje = new Date().toDateString();
@@ -103,13 +107,20 @@ export class VendaListComponent implements OnInit {
   constructor(
     private vendaService: VendaService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private authService: AuthService,
+    private confirmationService: ConfirmationDialogService
   ) {}
 
   ngOnInit(): void {
     this.loadVendas();
     this.loadStats();
     this.setupFilters();
+  }
+
+  // Verifica se o usuário é admin
+  isAdmin(): boolean {
+    const currentUser = this.authService.currentUser();
+    return currentUser?.role === 'admin';
   }
 
   ngAfterViewInit(): void {
@@ -127,7 +138,7 @@ export class VendaListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar vendas:', error);
-        this.snackBar.open('Erro ao carregar vendas', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao carregar vendas', 'error');
         this.loading.set(false);
       }
     });
@@ -205,7 +216,11 @@ export class VendaListComponent implements OnInit {
     const dialogRef = this.dialog.open(VendaDialogComponent, {
       width: '900px',
       maxHeight: '90vh',
-      data: { venda, editMode: true },
+      data: {
+        venda,
+        editMode: true,
+        readOnlyClient: true // Cliente não pode ser editado na edição
+      },
       panelClass: 'custom-dialog'
     });
 
@@ -216,18 +231,141 @@ export class VendaListComponent implements OnInit {
     });
   }
 
+  /**
+   * Método para lidar com double-click na linha da tabela
+   */
+  onDoubleClick(venda: Venda): void {
+    // Limpa qualquer timer de click simples pendente
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+      this.clickTimer = null;
+    }
+
+    // Só permite ação se a venda pode ser editada
+    if (this.podeEditar(venda)) {
+      this.openEditDialog(venda);
+    } else {
+      // Para vendas não editáveis, não faz nada (não abre nem visualização)
+      return;
+    }
+  }
+
+  /**
+   * Método para lidar com double-click na linha, mas ignorando a coluna de ações
+   */
+  onRowDoubleClick(event: Event, venda: Venda): void {
+    // Verifica se o clique foi na coluna de ações ou em um botão
+    const target = event.target as HTMLElement;
+
+    // Se foi na coluna de ações, não faz nada
+    if (target.closest('.actions-column') ||
+        target.closest('.action-buttons') ||
+        target.closest('button') ||
+        target.closest('.non-clickable')) {
+      return;
+    }
+
+    // Caso contrário, executa a ação de double-click
+    this.onDoubleClick(venda);
+  }
+
+  openViewDialog(venda: Venda): void {
+    this.dialog.open(VendaDialogComponent, {
+      width: '900px',
+      maxHeight: '90vh',
+      data: { venda, editMode: false },
+      panelClass: 'custom-dialog'
+    });
+  }
+
+  printVenda(venda: Venda): void {
+    // Implementação da impressão da venda
+    const printContent = this.generatePrintContent(venda);
+    const printWindow = window.open('', '_blank');
+
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    } else {
+      this.authService.showSnackbar('Não foi possível abrir a janela de impressão', 'error');
+    }
+  }
+
+  private generatePrintContent(venda: Venda): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Venda ${venda.numero}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .info { margin-bottom: 20px; }
+          .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          .table th { background-color: #f2f2f2; }
+          .total { text-align: right; font-weight: bold; font-size: 18px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Sistema de Gestão - Venda ${venda.numero}</h1>
+        </div>
+
+        <div class="info">
+          <p><strong>Cliente:</strong> ${venda.clienteNome}</p>
+          <p><strong>Email:</strong> ${venda.clienteEmail}</p>
+          <p><strong>Data:</strong> ${this.formatDate(venda.dataVenda)}</p>
+          <p><strong>Status:</strong> ${venda.status}</p>
+          <p><strong>Forma de Pagamento:</strong> ${venda.formaPagamento}</p>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Preço Unitário</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${venda.items.map((item: any) => `
+              <tr>
+                <td>${item.produtoNome}</td>
+                <td>${item.quantidade}</td>
+                <td>R$ ${item.precoUnitario.toFixed(2)}</td>
+                <td>R$ ${item.subtotal.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="total">
+          <p>Subtotal: R$ ${venda.subtotal.toFixed(2)}</p>
+          <p>Desconto: R$ ${venda.desconto.toFixed(2)}</p>
+          <p><strong>Total: R$ ${venda.total.toFixed(2)}</strong></p>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
   private createVenda(vendaData: VendaCreate): void {
     this.vendaService.createVenda(vendaData).subscribe({
       next: (novaVenda) => {
         const vendasAtuais = this.vendas();
         this.vendas.set([...vendasAtuais, novaVenda]);
         this.dataSource.data = this.vendas();
-        this.snackBar.open('Venda criada com sucesso!', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Venda criada com sucesso!', 'success');
         this.loadStats(); // Recarrega estatísticas
       },
       error: (error) => {
         console.error('Erro ao criar venda:', error);
-        this.snackBar.open('Erro ao criar venda', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao criar venda', 'error');
       }
     });
   }
@@ -242,33 +380,240 @@ export class VendaListComponent implements OnInit {
           novasVendas[index] = venda;
           this.vendas.set(novasVendas);
           this.dataSource.data = novasVendas;
-          this.snackBar.open('Venda atualizada com sucesso!', 'Fechar', { duration: 3000 });
+          this.authService.showSnackbar('Venda atualizada com sucesso!', 'success');
           this.loadStats(); // Recarrega estatísticas
         }
       },
       error: (error) => {
         console.error('Erro ao atualizar venda:', error);
-        this.snackBar.open('Erro ao atualizar venda', 'Fechar', { duration: 3000 });
+        this.authService.showSnackbar('Erro ao atualizar venda', 'error');
       }
     });
   }
 
+  /**
+   * Confirma uma venda pendente
+   */
+  confirmarVenda(venda: Venda): void {
+    if (venda.status !== 'Pendente') {
+      this.authService.showSnackbar('Apenas vendas pendentes podem ser confirmadas', 'error');
+      return;
+    }
+
+    this.confirmationService.confirmAction(
+      'Confirmar Venda',
+      `Deseja confirmar a venda ${venda.numero}?\n\nApós confirmada, a venda poderá ser processada para finalização.`,
+      'Confirmar',
+      {
+        icon: 'check_circle',
+        iconColor: 'primary',
+        actionColor: 'primary'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.vendaService.confirmarVenda(venda.id).subscribe({
+        next: (vendaAtualizada) => {
+          const vendas = this.vendas();
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendas.set(novasVendas);
+            this.dataSource.data = this.vendas();
+          }
+          this.authService.showSnackbar(`Venda ${venda.numero} confirmada com sucesso!`, 'success');
+          this.loadStats();
+        },
+        error: (error) => {
+          console.error('Erro ao confirmar venda:', error);
+          const mensagem = error.message || 'Erro ao confirmar venda';
+          this.authService.showSnackbar(mensagem, 'error');
+        }
+      });
+    });
+  }
+
+  /**
+   * Finaliza uma venda confirmada
+   */
+  finalizarVenda(venda: Venda): void {
+    if (venda.status !== 'Confirmada') {
+      this.authService.showSnackbar('Apenas vendas confirmadas podem ser finalizadas', 'error');
+      return;
+    }
+
+    this.confirmationService.confirmAction(
+      'Finalizar Venda',
+      `Deseja finalizar a venda ${venda.numero}?\n\nApós finalizada, a venda será marcada como concluída e não poderá mais ser alterada.`,
+      'Finalizar',
+      {
+        icon: 'task_alt',
+        iconColor: 'primary',
+        actionColor: 'primary'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.vendaService.finalizarVenda(venda.id).subscribe({
+        next: (vendaAtualizada) => {
+          const vendas = this.vendas();
+          const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+          if (index !== -1) {
+            const novasVendas = [...vendas];
+            novasVendas[index] = vendaAtualizada;
+            this.vendas.set(novasVendas);
+            this.dataSource.data = this.vendas();
+          }
+          this.authService.showSnackbar(`Venda ${venda.numero} finalizada com sucesso!`, 'success');
+          this.loadStats();
+        },
+        error: (error) => {
+          console.error('Erro ao finalizar venda:', error);
+          const mensagem = error.message || 'Erro ao finalizar venda';
+          this.authService.showSnackbar(mensagem, 'error');
+        }
+      });
+    });
+  }
+
+  /**
+   * Processa uma venda completamente (Confirma → Finaliza)
+   */
+  processarVendaCompleta(venda: Venda): void {
+    if (venda.status !== 'Pendente') {
+      this.authService.showSnackbar('Apenas vendas pendentes podem ser processadas', 'error');
+      return;
+    }
+
+    this.confirmationService.confirmAction(
+      'Processar Venda Completa',
+      `Deseja processar completamente a venda ${venda.numero}?\n\nIsso irá:\n1. Confirmar a venda\n2. Finalizar a venda automaticamente`,
+      'Processar',
+      {
+        icon: 'flash_on',
+        iconColor: 'primary',
+        actionColor: 'primary'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+    this.vendaService.processarVendaCompleta(venda.id).subscribe({
+      next: (vendaFinalizada) => {
+        const vendas = this.vendas();
+        const index = vendas.findIndex(v => v.id === vendaFinalizada.id);
+        if (index !== -1) {
+          const novasVendas = [...vendas];
+          novasVendas[index] = vendaFinalizada;
+          this.vendas.set(novasVendas);
+          this.dataSource.data = this.vendas();
+        }
+        this.authService.showSnackbar(`Venda ${venda.numero} processada e finalizada com sucesso!`, 'success');
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Erro ao processar venda:', error);
+        const mensagem = error.message || 'Erro ao processar venda';
+        this.authService.showSnackbar(mensagem, 'error');
+      }
+    });
+    });
+  }
+
+  /**
+   * Cancela uma venda
+   */
+  cancelarVenda(venda: Venda): void {
+    if (venda.status !== 'Pendente' && venda.status !== 'Confirmada') {
+      this.authService.showSnackbar('Apenas vendas pendentes ou confirmadas podem ser canceladas', 'error');
+      return;
+    }
+
+    this.confirmationService.confirmAction(
+      'Cancelar Venda',
+      `Tem certeza que deseja cancelar a venda ${venda.numero}?\n\nEsta ação não pode ser desfeita.`,
+      'Cancelar',
+      {
+        icon: 'cancel',
+        iconColor: 'warn',
+        actionColor: 'warn'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+    this.vendaService.cancelarVenda(venda.id).subscribe({
+      next: (vendaAtualizada) => {
+        const vendas = this.vendas();
+        const index = vendas.findIndex(v => v.id === vendaAtualizada.id);
+        if (index !== -1) {
+          const novasVendas = [...vendas];
+          novasVendas[index] = vendaAtualizada;
+          this.vendas.set(novasVendas);
+          this.dataSource.data = this.vendas();
+        }
+        this.authService.showSnackbar(`Venda ${venda.numero} cancelada com sucesso!`, 'success');
+        this.loadStats();
+      },
+      error: (error) => {
+        console.error('Erro ao cancelar venda:', error);
+        const mensagem = error.message || 'Erro ao cancelar venda';
+        this.authService.showSnackbar(mensagem, 'error');
+      }
+    });
+    });
+  }
+
+  /**
+   * Verifica se uma venda pode ser confirmada
+   */
+  podeConfirmar(venda: Venda): boolean {
+    return this.vendaService.podeConfirmar(venda);
+  }
+
+  /**
+   * Verifica se uma venda pode ser finalizada
+   */
+  podeFinalizar(venda: Venda): boolean {
+    return this.vendaService.podeFinalizar(venda);
+  }
+
+  /**
+   * Verifica se uma venda pode ser cancelada
+   */
+  podeCancelar(venda: Venda): boolean {
+    return this.vendaService.podeCancelar(venda);
+  }
+
+  /**
+   * Verifica se uma venda pode ser editada
+   */
+  podeEditar(venda: Venda): boolean {
+    return this.vendaService.podeEditar(venda);
+  }
+
   deleteVenda(venda: Venda): void {
-    if (confirm(`Tem certeza que deseja excluir a venda ${venda.numero}?`)) {
+    this.confirmationService.confirmDelete(
+      `venda ${venda.numero}`,
+      {
+        customMessage: `Tem certeza que deseja excluir a venda ${venda.numero}?\n\nEsta ação é irreversível e todos os dados da venda serão perdidos.`
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
       this.vendaService.deleteVenda(venda.id).subscribe({
         next: () => {
           const vendas = this.vendas();
           this.vendas.set(vendas.filter(v => v.id !== venda.id));
           this.dataSource.data = this.vendas();
-          this.snackBar.open('Venda excluída com sucesso!', 'Fechar', { duration: 3000 });
+          this.authService.showSnackbar('Venda excluída com sucesso!', 'success');
           this.loadStats(); // Recarrega estatísticas
         },
         error: (error) => {
           console.error('Erro ao excluir venda:', error);
-          this.snackBar.open('Erro ao excluir venda', 'Fechar', { duration: 3000 });
+          this.authService.showSnackbar('Erro ao excluir venda', 'error');
         }
       });
-    }
+    });
   }
 
   exportToCsv(): void {

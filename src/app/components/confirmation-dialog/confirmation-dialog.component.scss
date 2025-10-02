@@ -1,0 +1,170 @@
+.confirmation-dialog {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  animation: slideInUp 0.3s ease-out;
+
+  .dialog-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 24px 16px 24px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: rotate(45deg);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .dialog-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+        color: white !important;
+      }
+
+      .dialog-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+        color: white;
+      }
+    }
+  }
+
+  .dialog-content {
+    padding: 24px;
+    min-height: 60px;
+    background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+
+    .dialog-message {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(0, 0, 0, 0.87);
+      animation: fadeInContent 0.4s ease-out 0.1s both;
+
+      // Estilização para quebras de linha
+      ::ng-deep br {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  .dialog-actions {
+    padding: 8px 16px 16px 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    background-color: #fafafa;
+
+    .action-button {
+      min-width: 80px;
+      height: 36px;
+      font-weight: 500;
+      text-transform: uppercase;
+      border-radius: 4px;
+
+      &.mat-raised {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+        &:hover {
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+      }
+
+      &.mat-stroked {
+        border: 1px solid currentColor;
+      }
+
+      // Cores personalizadas baseadas no tema
+      &[color="primary"] {
+        &.mat-raised {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+      }
+
+      &[color="warn"] {
+        &.mat-raised {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          color: white;
+        }
+      }
+
+      &[color="accent"] {
+        &.mat-raised {
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+// Sobrescrever estilos do mat-dialog-container
+::ng-deep .confirmation-dialog-container {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+  }
+}
+
+// Animações
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  50% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+}
+
+@keyframes buttonPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Hover effects para botões
+.action-button {
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    animation: buttonPulse 0.3s ease-in-out;
+  }
+}
