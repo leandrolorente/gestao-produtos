@@ -401,10 +401,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
   // Todos os mat-form-field
   .mat-mdc-form-field {
-    * {
-      background-color: var(--bg-secondary) !important;
-    }
-
+    // Aplicar apenas aos elementos container, não a todos os elementos
     .mdc-text-field,
     .mdc-text-field--filled,
     .mdc-text-field--outlined,
@@ -618,7 +615,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
 
     .mat-mdc-floating-label {
-      color: var(--text-secondary) !important;
+      color: var(--text-secondary);
+      // Preservar transições originais do Material Design
+      transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .mat-mdc-form-field-hint {
@@ -627,6 +626,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
     // Underline colors
     .mdc-line-ripple {
+      // Preservar transições originais
+      transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
       &::before {
         border-bottom-color: var(--border-color) !important;
       }
@@ -959,7 +961,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
       .mdc-floating-label,
       .mat-mdc-floating-label {
-        color: var(--text-secondary) !important;
+        color: var(--text-secondary);
+        // Preservar animações originais
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       input, textarea {
@@ -1024,7 +1028,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       }
 
       .mdc-floating-label {
-        color: var(--text-secondary) !important;
+        color: var(--text-secondary);
+        // Preservar animações originais
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
       }
     }
 
@@ -1303,7 +1309,29 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       }
 
       .mdc-floating-label {
-        color: var(--text-secondary) !important;
+        color: var(--text-secondary);
+        // Preservar animações originais
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    // Força especificamente campos com classes específicas
+    .half-width,
+    .price-field,
+    .barcode-field {
+      .mat-mdc-form-field {
+        .mdc-text-field,
+        .mdc-text-field--filled,
+        .mdc-text-field--outlined,
+        .mat-mdc-text-field-wrapper {
+          background-color: var(--bg-secondary) !important;
+        }
+
+        input,
+        textarea {
+          background-color: transparent !important;
+          color: var(--text-primary) !important;
+        }
       }
     }
 
@@ -1314,6 +1342,36 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
     * {
       color: var(--text-primary) !important;
+    }
+  }
+
+  // === FORÇA DIALOGS DO MATERIAL DESIGN ===
+  .mat-mdc-dialog-container {
+    // Força TODOS os campos de input, independente de suas classes
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+      background-color: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+    }
+
+    // Força todos os wrappers de text field
+    .mdc-text-field,
+    .mdc-text-field--filled,
+    .mdc-text-field--outlined,
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--bg-secondary) !important;
+    }
+
+    // Força todos os form fields
+    .mat-mdc-form-field {
+      input,
+      textarea {
+        background-color: transparent !important;
+        color: var(--text-primary) !important;
+      }
     }
   }
 
@@ -1568,9 +1626,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 }
 
-// Transições suaves para mudança de tema
+// Transições suaves para mudança de tema (SEM !important para não interferir nas animações do Material)
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 // Aplicar tema padrão ao body se não houver classe de tema
