@@ -244,7 +244,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   color: var(--text-primary) !important;
 
   // === FORÇA FUNDO ESCURO TOTAL ===
-  
+
   // Força o fundo de toda a aplicação
   html, body {
     background-color: var(--bg-primary) !important;
@@ -312,17 +312,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === LAYOUT ESPECÍFICO ===
-  
+
   // Main layout e seus containers
   .main-layout {
     background-color: var(--bg-primary) !important;
-    
+
     .layout-container {
       background-color: var(--bg-primary) !important;
-      
+
       .main-content {
         background-color: var(--bg-primary) !important;
-        
+
         .content-wrapper {
           background-color: var(--bg-primary) !important;
         }
@@ -398,7 +398,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === FORÇAR TODOS OS ELEMENTOS DE ENTRADA ===
-  
+
   // Todos os mat-form-field
   .mat-mdc-form-field {
     * {
@@ -420,7 +420,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === FORÇAR ELEMENTOS ESPECÍFICOS COM FUNDO BRANCO ===
-  
+
   // SKU fields e código de barras (elementos que aparecem brancos na grid)
   .sku-field,
   .barcode-field,
@@ -437,7 +437,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   .mat-mdc-table {
     .mat-mdc-cell {
       // Qualquer input dentro de células da tabela
-      input, 
+      input,
       .mat-mdc-form-field,
       .mdc-text-field {
         background-color: var(--bg-secondary) !important;
@@ -506,13 +506,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === TÍTULOS DAS GRIDS COM COR ROXA ===
-  
+
   // Forçar títulos das grids a usar cor primária
   .page-title,
   .grid-title,
   .section-title,
   h1:contains("Gerenciamento"),
-  h2:contains("Gerenciamento"), 
+  h2:contains("Gerenciamento"),
   h1[innerText*="Gerenciamento"],
   h2[innerText*="Gerenciamento"] {
     color: var(--primary-color) !important;
@@ -1017,7 +1017,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       .mdc-text-field--outlined {
         background-color: var(--bg-secondary) !important;
       }
-      
+
       .mat-mdc-input-element {
         color: var(--text-primary) !important;
         background-color: transparent !important;
@@ -1039,7 +1039,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     * {
       &:not([style*="background: linear-gradient"]):not([class*="mat-primary"]):not([class*="mat-accent"]):not([class*="mat-warn"]) {
         background-color: transparent !important;
-        
+
         &.mat-mdc-form-field,
         &.mdc-text-field {
           background-color: var(--bg-secondary) !important;
@@ -1108,7 +1108,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === FORÇA MENU HAMBURGER ESPECÍFICO ===
-  
+
   // Menu drawer/sidebar
   .mat-drawer,
   .mat-sidenav,
@@ -1346,9 +1346,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === FORÇA GLOBAL PARA ELEMENTOS BRANCOS ===
-  
+
   // === FORÇA FUNDO ESCURO ABSOLUTO ===
-  
+
   // Força TODOS os elementos que podem ter fundo branco/cinza
   *:not(.mat-toolbar):not(.welcome-section):not([class*="gradient"]) {
     &:not([style*="background: linear-gradient"]):not([style*="background-color: linear-gradient"]) {
@@ -1369,7 +1369,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === FORÇA CORES CINZAS ESPECÍFICAS ===
-  
+
   // Força elementos com cores cinzas específicas (do main-layout)
   *[style*="background-color: #f5f5f5"],
   *[style*="background-color: #fafafa"],
@@ -1410,7 +1410,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     &[style*="background: #ffffff"] {
       background-color: var(--bg-secondary) !important;
       color: var(--text-primary) !important;
-      
+
       input, textarea, select {
         background-color: var(--bg-secondary) !important;
         color: var(--text-primary) !important;
@@ -1438,7 +1438,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   }
 
   // === TÍTULOS COM COR PRIMÁRIA MAIS ESPECÍFICOS ===
-  
+
   // Usar seletores mais específicos para garantir que os títulos fiquem roxos
   [class*="container"] h1,
   [class*="container"] h2,
@@ -1532,22 +1532,22 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     width: 8px;
     height: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
     background: var(--bg-secondary);
   }
-  
+
   ::-webkit-scrollbar-thumb {
     background: var(--border-color);
     border-radius: 4px;
-    
+
     &:hover {
       background: var(--text-muted);
     }
   }
 
   // === ÚLTIMO RECURSO - FORÇA TUDO ===
-  
+
   // Se ainda houver elementos brancos, força todos
   .mat-mdc-text-field-wrapper,
   .mdc-text-field__input,
