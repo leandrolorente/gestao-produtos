@@ -1,0 +1,121 @@
+<!-- src/app/pages/reports/clientes/relatorio-clientes.component.html -->
+<div class="relatorio-container">
+  <div class="relatorio-header">
+    <h2>
+      <mat-icon>people</mat-icon>
+      Relatório de Clientes
+    </h2>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="exportarCSV()" [disabled]="loading()">
+        <mat-icon>download</mat-icon>
+        Exportar CSV
+      </button>
+      <button mat-icon-button (click)="carregarDados()" [disabled]="loading()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="loading()">
+    <mat-spinner></mat-spinner>
+    <p>Carregando dados dos clientes...</p>
+  </div>
+
+  <div class="relatorio-content" *ngIf="!loading()">
+    <!-- Cards de Resumo -->
+    <div class="resumo-cards">
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().totalClientes }}</h3>
+            <p>Total de Clientes</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().clientesAtivos }}</h3>
+            <p>Clientes Ativos</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>person_add</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().novosMes }}</h3>
+            <p>Novos Este Mês</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Tabela de Clientes -->
+    <mat-card class="tabela-card">
+      <mat-card-header>
+        <mat-card-title>Clientes Cadastrados</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="clientes()" class="clientes-table">
+          <!-- Nome Column -->
+          <ng-container matColumnDef="nome">
+            <th mat-header-cell *matHeaderCellDef> Nome </th>
+            <td mat-cell *matCellDef="let cliente"> {{ cliente.nome }} </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef> Email </th>
+            <td mat-cell *matCellDef="let cliente"> {{ cliente.email }} </td>
+          </ng-container>
+
+          <!-- Telefone Column -->
+          <ng-container matColumnDef="telefone">
+            <th mat-header-cell *matHeaderCellDef> Telefone </th>
+            <td mat-cell *matCellDef="let cliente"> {{ cliente.telefone }} </td>
+          </ng-container>
+
+          <!-- Tipo Column -->
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef> Tipo </th>
+            <td mat-cell *matCellDef="let cliente"> {{ cliente.tipo }} </td>
+          </ng-container>
+
+          <!-- Cidade Column -->
+          <ng-container matColumnDef="cidade">
+            <th mat-header-cell *matHeaderCellDef> Cidade </th>
+            <td mat-cell *matCellDef="let cliente"> {{ cliente.cidade }} </td>
+          </ng-container>
+
+          <!-- Estado Column -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef> Estado </th>
+            <td mat-cell *matCellDef="let cliente"> {{ cliente.estado }} </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let cliente"> 
+              <span [class]="'status-' + cliente.status">{{ cliente.status }}</span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

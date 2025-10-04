@@ -8,6 +8,13 @@ import { VendaListComponent } from './pages/vendas/venda-list/venda-list.compone
 import { LoginComponent } from './pages/login/login.component';
 import { authGuard, loginGuard } from './guards/auth.guard';
 
+// Importações dos componentes de relatórios
+import { RelatorioClientesComponent } from './pages/reports/clientes/relatorio-clientes.component';
+import { RelatorioProdutosComponent } from './pages/reports/produtos/relatorio-produtos.component';
+import { RelatorioVendasComponent } from './pages/reports/vendas/relatorio-vendas.component';
+import { RelatorioEstoqueComponent } from './pages/reports/estoque/relatorio-estoque.component';
+import { RelatorioFinanceiroComponent } from './pages/reports/financeiro/relatorio-financeiro.component';
+
 export const routes: Routes = [
   // Rota de login (sem layout)
   {
@@ -40,6 +47,27 @@ export const routes: Routes = [
       {
         path: 'usuarios',
         component: UserListComponent
+      },
+      // Rotas de relatórios
+      {
+        path: 'relatorios/clientes',
+        component: RelatorioClientesComponent
+      },
+      {
+        path: 'relatorios/produtos',
+        component: RelatorioProdutosComponent
+      },
+      {
+        path: 'relatorios/vendas',
+        component: RelatorioVendasComponent
+      },
+      {
+        path: 'relatorios/estoque',
+        component: RelatorioEstoqueComponent
+      },
+      {
+        path: 'relatorios/financeiro',
+        component: RelatorioFinanceiroComponent
       },
       {
         path: '',

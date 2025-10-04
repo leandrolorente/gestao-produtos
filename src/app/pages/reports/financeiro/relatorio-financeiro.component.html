@@ -1,0 +1,133 @@
+<!-- src/app/pages/reports/financeiro/relatorio-financeiro.component.html -->
+<div class="relatorio-container">
+  <div class="relatorio-header">
+    <h2>
+      <mat-icon>account_balance</mat-icon>
+      Relatório Financeiro
+    </h2>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="exportarCSV()" [disabled]="carregando()">
+        <mat-icon>download</mat-icon>
+        Exportar CSV
+      </button>
+      <button mat-icon-button (click)="carregarDados()" [disabled]="carregando()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-container" *ngIf="carregando()">
+    <mat-spinner></mat-spinner>
+    <p>Carregando dados financeiros...</p>
+  </div>
+
+  <div class="relatorio-content" *ngIf="!carregando()">
+    <!-- Cards de Resumo -->
+    <div class="resumo-cards">
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().totalReceitas | currency:'BRL':'symbol':'1.2-2' }}</h3>
+            <p>Total Receitas</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>trending_down</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().totalDespesas | currency:'BRL':'symbol':'1.2-2' }}</h3>
+            <p>Total Despesas</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>account_balance</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().saldoLiquido | currency:'BRL':'symbol':'1.2-2' }}</h3>
+            <p>Saldo Líquido</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="resumo-card">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>pending</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{ resumo().transacoesPendentes }}</h3>
+            <p>Transações Pendentes</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Tabela de Transações -->
+    <mat-card class="tabela-card">
+      <mat-card-header>
+        <mat-card-title>Transações Financeiras</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="transacoes()" class="transacoes-table">
+          <!-- Descrição Column -->
+          <ng-container matColumnDef="descricao">
+            <th mat-header-cell *matHeaderCellDef> Descrição </th>
+            <td mat-cell *matCellDef="let transacao"> {{ transacao.descricao }} </td>
+          </ng-container>
+
+          <!-- Tipo Column -->
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef> Tipo </th>
+            <td mat-cell *matCellDef="let transacao"> 
+              <span [class]="'tipo-' + transacao.tipo">{{ transacao.tipo }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Valor Column -->
+          <ng-container matColumnDef="valor">
+            <th mat-header-cell *matHeaderCellDef> Valor </th>
+            <td mat-cell *matCellDef="let transacao"> 
+              {{ transacao.valor | currency:'BRL':'symbol':'1.2-2' }}
+            </td>
+          </ng-container>
+
+          <!-- Categoria Column -->
+          <ng-container matColumnDef="categoria">
+            <th mat-header-cell *matHeaderCellDef> Categoria </th>
+            <td mat-cell *matCellDef="let transacao"> {{ transacao.categoria }} </td>
+          </ng-container>
+
+          <!-- Data Column -->
+          <ng-container matColumnDef="data">
+            <th mat-header-cell *matHeaderCellDef> Data </th>
+            <td mat-cell *matCellDef="let transacao"> 
+              {{ transacao.data | date:'dd/MM/yyyy' }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let transacao"> 
+              <span [class]="'status-' + transacao.status">{{ transacao.status }}</span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

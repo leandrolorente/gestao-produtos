@@ -63,7 +63,9 @@ export class Sidebar {
       children: [
         { label: 'Vendas', icon: 'trending_up', route: '/relatorios/vendas' },
         { label: 'Estoque', icon: 'inventory_2', route: '/relatorios/estoque' },
-        { label: 'Financeiro', icon: 'account_balance', route: '/relatorios/financeiro' }
+        { label: 'Financeiro', icon: 'account_balance', route: '/relatorios/financeiro' },
+        { label: 'Clientes', icon: 'people_alt', route: '/relatorios/clientes' },
+        { label: 'Produtos', icon: 'category', route: '/relatorios/produtos' }
       ]
     },
     {
