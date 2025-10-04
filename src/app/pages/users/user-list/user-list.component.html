@@ -115,57 +115,63 @@
         </table>
 
         <!-- Loader -->
-        <div *ngIf="isLoading()" class="loading-container">
-          <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
-          <p>Carregando usuários...</p>
-        </div>
+        @if (isLoading()) {
+          <div class="loading-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+            <p>Carregando usuários...</p>
+          </div>
+        }
 
         <!-- Estado vazio -->
-        <div *ngIf="!isLoading() && dataSource.data.length === 0" class="empty-state">
-          <mat-icon class="empty-icon">person_off</mat-icon>
-          <h3>Nenhum usuário encontrado</h3>
-          <p>Clique em "Adicionar Usuário" para começar</p>
-          <button mat-raised-button color="primary" (click)="openUserDialog()">
-            <mat-icon>person_add</mat-icon>
-            Adicionar Primeiro Usuário
-          </button>
-        </div>
+        @if (!isLoading() && dataSource.data.length === 0) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">person_off</mat-icon>
+            <h3>Nenhum usuário encontrado</h3>
+            <p>Clique em "Adicionar Usuário" para começar</p>
+            <button mat-raised-button color="primary" (click)="openUserDialog()">
+              <mat-icon>person_add</mat-icon>
+              Adicionar Primeiro Usuário
+            </button>
+          </div>
+        }
       </div>
     </div>
 
     <!-- Mobile view -->
     <div class="mobile-view">
       <div class="mobile-cards">
-        <mat-card *ngFor="let user of dataSource.data" class="mobile-card" (click)="selectUser(user)">
-          <mat-card-content>
-            <div class="mobile-card-header">
-              <img [src]="user.avatar"
-                   [alt]="user.name"
-                   class="mobile-avatar"
-                   (error)="onAvatarError($event)">
-              <div class="mobile-user-info">
-                <h4>{{user.name}}</h4>
-                <p class="mobile-email">{{user.email}}</p>
-                <span class="mobile-department" [class]="getDepartmentClass(user.department)">
-                  <mat-icon>{{getDepartmentIcon(user.department)}}</mat-icon>
-                  {{user.department}}
-                </span>
+        @for (user of dataSource.data; track user.id) {
+          <mat-card class="mobile-card" (click)="selectUser(user)">
+            <mat-card-content>
+              <div class="mobile-card-header">
+                <img [src]="user.avatar"
+                     [alt]="user.name"
+                     class="mobile-avatar"
+                     (error)="onAvatarError($event)">
+                <div class="mobile-user-info">
+                  <h4>{{user.name}}</h4>
+                  <p class="mobile-email">{{user.email}}</p>
+                  <span class="mobile-department" [class]="getDepartmentClass(user.department)">
+                    <mat-icon>{{getDepartmentIcon(user.department)}}</mat-icon>
+                    {{user.department}}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <div class="mobile-card-footer">
-              <span class="mobile-date">{{user.lastUpdated ? formatDate(user.lastUpdated) : ''}}</span>
-              <div class="mobile-actions">
-                <button mat-icon-button (click)="editUser(user); $event.stopPropagation()">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button (click)="deleteUser(user); $event.stopPropagation()">
-                  <mat-icon>delete</mat-icon>
-                </button>
+              <div class="mobile-card-footer">
+                <span class="mobile-date">{{user.lastUpdated ? formatDate(user.lastUpdated) : ''}}</span>
+                <div class="mobile-actions">
+                  <button mat-icon-button (click)="editUser(user); $event.stopPropagation()">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="deleteUser(user); $event.stopPropagation()">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
+            </mat-card-content>
+          </mat-card>
+        }
       </div>
     </div>
   </mat-card-content>

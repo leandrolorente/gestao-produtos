@@ -38,20 +38,22 @@
           (optionSelected)="onClienteOptionSelected($event)"
           (opened)="onClienteAutocompleteOpened()"
           (closed)="onClienteAutocompleteClosed()">
-          <mat-option
-            *ngFor="let cliente of clientesFiltrados()"
-            [value]="cliente">
-            <div class="autocomplete-option">
-              <div class="primary-text">{{ cliente.nome }}</div>
-              <div class="secondary-text">{{ cliente.email }}</div>
-            </div>
-          </mat-option>
+          @for (cliente of clientesFiltrados(); track cliente.id) {
+            <mat-option [value]="cliente">
+              <div class="autocomplete-option">
+                <div class="primary-text">{{ cliente.nome }}</div>
+                <div class="secondary-text">{{ cliente.email }}</div>
+              </div>
+            </mat-option>
+          }
         </mat-autocomplete>
         <mat-error>{{ getFieldErrorMessage('clienteId', 'Cliente') }}</mat-error>
-        <mat-hint *ngIf="clienteReadOnly()" class="readonly-hint">
-          <mat-icon>info</mat-icon>
-          Cliente não pode ser alterado durante a edição
-        </mat-hint>
+        @if (clienteReadOnly()) {
+          <mat-hint class="readonly-hint">
+            <mat-icon>info</mat-icon>
+            Cliente não pode ser alterado durante a edição
+          </mat-hint>
+        }
       </mat-form-field>
     </div>
 
@@ -62,94 +64,93 @@
     </div>
 
     <div formArrayName="items" class="items-container">
-      <div
-        *ngFor="let item of itemsArray.controls; let i = index"
-        [formGroupName]="i"
-        class="item-card">
+      @for (item of itemsArray.controls; track $index; let i = $index) {
+        <div [formGroupName]="i" class="item-card">
 
-        <div class="item-header">
-          <span class="item-label">Item {{ i + 1 }}</span>
-          <button
-            type="button"
-            mat-icon-button
-            color="warn"
-            (click)="removeItem(i)"
-            [disabled]="itemsArray.length === 1"
-            matTooltip="Remover Item"
-            class="remove-item-btn">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-
-        <div class="item-fields">
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="produto-field">
-              <mat-label>Produto</mat-label>
-              <input
-                matInput
-                formControlName="produtoNome"
-                [matAutocomplete]="autoProduto"
-                (input)="onProdutoInput($event)"
-                placeholder="Digite o nome do produto">
-              <mat-icon matSuffix>search</mat-icon>
-              <mat-autocomplete
-                #autoProduto="matAutocomplete"
-                [displayWith]="displayProdutoFn"
-                (optionSelected)="onProdutoOptionSelected($event, i)"
-                (opened)="onProdutoAutocompleteOpened()"
-                (closed)="onProdutoAutocompleteClosed()">
-                <mat-option
-                  *ngFor="let produto of produtosFiltrados()"
-                  [value]="produto">
-                  <div class="autocomplete-option">
-                    <div class="primary-text">{{ produto.name }}</div>
-                    <div class="secondary-text">
-                      <span class="sku">{{ produto.sku }}</span>
-                      <span class="price">{{ formatPrice(produto.price) }}</span>
-                    </div>
-                  </div>
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
+          <div class="item-header">
+            <span class="item-label">Item {{ i + 1 }}</span>
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              (click)="removeItem(i)"
+              [disabled]="itemsArray.length === 1"
+              matTooltip="Remover Item"
+              class="remove-item-btn">
+              <mat-icon>delete</mat-icon>
+            </button>
           </div>
 
-          <div class="form-row quantity-price-row">
-            <mat-form-field appearance="outline" class="quantity-field">
-              <mat-label>Quantidade</mat-label>
-              <input
-                matInput
-                type="number"
-                formControlName="quantidade"
-                min="1"
-                (input)="onQuantidadeChange(i)">
-              <mat-icon matSuffix>format_list_numbered</mat-icon>
-            </mat-form-field>
+          <div class="item-fields">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="produto-field">
+                <mat-label>Produto</mat-label>
+                <input
+                  matInput
+                  formControlName="produtoNome"
+                  [matAutocomplete]="autoProduto"
+                  (input)="onProdutoInput($event)"
+                  placeholder="Digite o nome do produto">
+                <mat-icon matSuffix>search</mat-icon>
+                <mat-autocomplete
+                  #autoProduto="matAutocomplete"
+                  [displayWith]="displayProdutoFn"
+                  (optionSelected)="onProdutoOptionSelected($event, i)"
+                  (opened)="onProdutoAutocompleteOpened()"
+                  (closed)="onProdutoAutocompleteClosed()">
+                  @for (produto of produtosFiltrados(); track produto.id) {
+                    <mat-option [value]="produto">
+                      <div class="autocomplete-option">
+                        <div class="primary-text">{{ produto.name }}</div>
+                        <div class="secondary-text">
+                          <span class="sku">{{ produto.sku }}</span>
+                          <span class="price">{{ formatPrice(produto.price) }}</span>
+                        </div>
+                      </div>
+                    </mat-option>
+                  }
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline" class="price-field">
-              <mat-label>Preço Unitário</mat-label>
-              <input
-                matInput
-                type="number"
-                formControlName="precoUnitario"
-                step="0.01"
-                min="0"
-                (input)="onPrecoChange(i)">
-              <span matTextPrefix>R$ </span>
-              <mat-icon matSuffix>attach_money</mat-icon>
-            </mat-form-field>
+            <div class="form-row quantity-price-row">
+              <mat-form-field appearance="outline" class="quantity-field">
+                <mat-label>Quantidade</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="quantidade"
+                  min="1"
+                  (input)="onQuantidadeChange(i)">
+                <mat-icon matSuffix>format_list_numbered</mat-icon>
+              </mat-form-field>
 
-            <mat-form-field appearance="outline" class="subtotal-field">
-              <mat-label>Subtotal</mat-label>
-              <input
-                matInput
-                formControlName="subtotal"
-                readonly>
-              <span matTextPrefix>R$ </span>
-              <mat-icon matSuffix>calculate</mat-icon>
-            </mat-form-field>
+              <mat-form-field appearance="outline" class="price-field">
+                <mat-label>Preço Unitário</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="precoUnitario"
+                  step="0.01"
+                  min="0"
+                  (input)="onPrecoChange(i)">
+                <span matTextPrefix>R$ </span>
+                <mat-icon matSuffix>attach_money</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="subtotal-field">
+                <mat-label>Subtotal</mat-label>
+                <input
+                  matInput
+                  formControlName="subtotal"
+                  readonly>
+                <span matTextPrefix>R$ </span>
+                <mat-icon matSuffix>calculate</mat-icon>
+              </mat-form-field>
+            </div>
           </div>
         </div>
-      </div>
+      }
     </div>
 
     <!-- Botão flutuante para adicionar item -->
@@ -175,23 +176,29 @@
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>Forma de Pagamento</mat-label>
         <mat-select formControlName="formaPagamento">
-          <mat-option *ngFor="let forma of formasPagamento" [value]="forma">
-            {{ forma }}
-          </mat-option>
+          @for (forma of formasPagamento; track forma) {
+            <mat-option [value]="forma">
+              {{ forma }}
+            </mat-option>
+          }
         </mat-select>
         <mat-icon matSuffix>credit_card</mat-icon>
         <mat-error>{{ getFieldErrorMessage('formaPagamento', 'Forma de Pagamento') }}</mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="half-width" *ngIf="editMode">
-        <mat-label>Status</mat-label>
-        <mat-select formControlName="status">
-          <mat-option *ngFor="let status of statusOptions" [value]="status">
-            {{ status }}
-          </mat-option>
-        </mat-select>
-        <mat-icon matSuffix>flag</mat-icon>
-      </mat-form-field>
+      @if (editMode) {
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            @for (status of statusOptions; track status) {
+              <mat-option [value]="status">
+                {{ status }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matSuffix>flag</mat-icon>
+        </mat-form-field>
+      }
     </div>
 
     <div class="form-row">

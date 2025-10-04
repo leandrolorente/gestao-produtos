@@ -21,18 +21,19 @@
   </div>
 
   <!-- Cards de estatísticas -->
-  <div class="stats-grid" *ngIf="stats(); else loadingStats">
-    <mat-card class="stat-card primary">
-      <mat-card-content>
-        <div class="stat-content">
-          <div class="stat-info">
-            <h3>{{ stats()?.totalProducts || 0 }}</h3>
-            <p>Total de Produtos</p>
+  @if (stats()) {
+    <div class="stats-grid">
+      <mat-card class="stat-card primary">
+        <mat-card-content>
+          <div class="stat-content">
+            <div class="stat-info">
+              <h3>{{ stats()?.totalProducts || 0 }}</h3>
+              <p>Total de Produtos</p>
+            </div>
+            <mat-icon class="stat-icon">inventory</mat-icon>
           </div>
-          <mat-icon class="stat-icon">inventory</mat-icon>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
 
     <mat-card class="stat-card warning" [class.alert]="(stats()?.lowStockProducts || 0) > 0">
       <mat-card-content>
@@ -137,18 +138,19 @@
       </mat-card-header>
       <mat-card-content>
         <div class="actions-grid">
-          <button
-            *ngFor="let action of quickActions"
-            mat-raised-button
-            [color]="action.color"
-            [routerLink]="action.route"
-            class="action-button">
-            <mat-icon>{{ action.icon }}</mat-icon>
-            <div class="action-text">
-              <span class="action-title">{{ action.title }}</span>
-              <span class="action-description">{{ action.description }}</span>
-            </div>
-          </button>
+          @for (action of quickActions; track action.title) {
+            <button
+              mat-raised-button
+              [color]="action.color"
+              [routerLink]="action.route"
+              class="action-button">
+              <mat-icon>{{ action.icon }}</mat-icon>
+              <div class="action-text">
+                <span class="action-title">{{ action.title }}</span>
+                <span class="action-description">{{ action.description }}</span>
+              </div>
+            </button>
+          }
         </div>
       </mat-card-content>
     </mat-card>
@@ -162,62 +164,72 @@
           <p>Top 3 produtos por vendas e receita</p>
         </div>
         <div class="products-list">
-          <div
-            *ngFor="let product of topProducts() || stats()?.topSellingProducts || []; let i = index"
-            class="product-item">
-            <div class="product-rank">{{ i + 1 }}</div>
-            <div class="product-info">
-              <h4>{{ product.name }}</h4>
-              <p>{{ product.sales }} vendas • {{ (product.revenue || 0) | currency:'BRL' }} receita</p>
-              <small>{{ product.quantity }} em estoque</small>
+          @for (product of topProducts() || stats()?.topSellingProducts || []; track product.name; let i = $index) {
+            <div class="product-item">
+              <div class="product-rank">{{ i + 1 }}</div>
+              <div class="product-info">
+                <h4>{{ product.name }}</h4>
+                <p>{{ product.sales }} vendas • {{ (product.revenue || 0) | currency:'BRL' }} receita</p>
+                <small>{{ product.quantity }} em estoque</small>
+              </div>
+              <div class="product-status">
+                <span
+                  class="stock-indicator"
+                  [class]="getStockLevel(product.quantity)">
+                </span>
+              </div>
             </div>
-            <div class="product-status">
-              <span
-                class="stock-indicator"
-                [class]="getStockLevel(product.quantity)">
-              </span>
-            </div>
-          </div>
+          }
         </div>
       </div>
 
       <!-- Vendas recentes -->
-      <div class="recent-sales-section" *ngIf="(recentSales() && recentSales()!.length > 0) || (stats()?.recentSales && stats()!.recentSales.length > 0)">
-        <div class="section-header">
-          <h3>📊 Vendas Recentes</h3>
-          <p>Últimas transações realizadas</p>
-        </div>
-        <div class="sales-list">
-          <div
-            *ngFor="let sale of recentSales() || stats()?.recentSales || []"
-            class="sale-item">
-            <div class="sale-info">
-              <h4>🧾 {{ sale.numero }}</h4>
-              <p>👤 {{ sale.clienteNome }}</p>
-              <small>🕒 {{ sale.dataVenda | date:'dd/MM/yyyy HH:mm' }}</small>
-            </div>
-            <div class="sale-amount">
-              <span class="amount">{{ sale.total | currency:'BRL' }}</span>
-              <span class="status" [class]="sale.status.toLowerCase()">{{ sale.status }}</span>
-            </div>
+      @if ((recentSales() && recentSales()!.length > 0) || (stats()?.recentSales && stats()!.recentSales.length > 0)) {
+        <div class="recent-sales-section">
+          <div class="section-header">
+            <h3>📊 Vendas Recentes</h3>
+            <p>Últimas transações realizadas</p>
+          </div>
+          <div class="sales-list">
+            @for (sale of recentSales() || stats()?.recentSales || []; track sale.numero) {
+              <div class="sale-item">
+                <div class="sale-info">
+                  <h4>🧾 {{ sale.numero }}</h4>
+                  <p>👤 {{ sale.clienteNome }}</p>
+                  <small>🕒 {{ sale.dataVenda | date:'dd/MM/yyyy HH:mm' }}</small>
+                </div>
+                <div class="sale-amount">
+                  <span class="amount">{{ sale.total | currency:'BRL' }}</span>
+                  <span class="status" [class]="sale.status.toLowerCase()">{{ sale.status }}</span>
+                </div>
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
     </mat-card>
   </div>
+  } @else {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Carregando dados do dashboard...</p>
+    </div>
+  }
 
   <!-- Alerta de estoque baixo -->
-  <mat-card *ngIf="(stats()?.lowStockProducts || 0) > 0" class="alert-card">
-    <mat-card-content>
-      <div class="alert-content">
-        <mat-icon class="alert-icon">warning</mat-icon>
-        <div class="alert-text">
-          <h3>Atenção: Estoque Baixo</h3>
-          <p>Você tem {{ stats()?.lowStockProducts || 0 }} produto(s) com estoque baixo.
-             <a routerLink="/produtos" class="alert-link">Clique aqui para verificar</a>
-          </p>
+  @if ((stats()?.lowStockProducts || 0) > 0) {
+    <mat-card class="alert-card">
+      <mat-card-content>
+        <div class="alert-content">
+          <mat-icon class="alert-icon">warning</mat-icon>
+          <div class="alert-text">
+            <h3>Atenção: Estoque Baixo</h3>
+            <p>Você tem {{ stats()?.lowStockProducts || 0 }} produto(s) com estoque baixo.
+               <a routerLink="/produtos" class="alert-link">Clique aqui para verificar</a>
+            </p>
+          </div>
         </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  }
 </div>

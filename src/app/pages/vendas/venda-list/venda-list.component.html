@@ -2,9 +2,16 @@
   <mat-card-content>
     <h2 class="page-title">
       Gerenciamento de Vendas
-    </h2>
-
-    <!-- Seção de estatísticas -->
+    </h2>    <!-- Loading -->
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="60">
+        </mat-progress-spinner>
+        <p>Carregando vendas...</p>
+      </div>
+    }!-- Seção de estatísticas -->
     <div class="stats-section">
       <mat-card class="stat-card">
         <mat-card-content>
@@ -42,17 +49,19 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card" *ngIf="stats()">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon">trending_up</mat-icon>
-            <div class="stat-info">
-              <div class="stat-value">{{ formatPrice(stats()!.ticketMedio) }}</div>
-              <div class="stat-label">Ticket Médio</div>
+      @if (stats()) {
+        <mat-card class="stat-card">
+          <mat-card-content>
+            <div class="stat-content">
+              <mat-icon class="stat-icon">trending_up</mat-icon>
+              <div class="stat-info">
+                <div class="stat-value">{{ formatPrice(stats()!.ticketMedio) }}</div>
+                <div class="stat-label">Ticket Médio</div>
+              </div>
             </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+          </mat-card-content>
+        </mat-card>
+      }
     </div>
 
     <div class="actions-header">
@@ -103,18 +112,22 @@
       <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Status</mat-label>
         <mat-select [formControl]="statusFilter">
-          <mat-option *ngFor="let status of statusOptions" [value]="status === 'Todos' ? '' : status">
-            {{ status }}
-          </mat-option>
+          @for (status of statusOptions; track status) {
+            <mat-option [value]="status === 'Todos' ? '' : status">
+              {{ status }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="filter-field">
         <mat-label>Forma de Pagamento</mat-label>
         <mat-select [formControl]="formaPagamentoFilter">
-          <mat-option *ngFor="let forma of formasPagamento" [value]="forma === 'Todas' ? '' : forma">
-            {{ forma }}
-          </mat-option>
+          @for (forma of formasPagamento; track forma) {
+            <mat-option [value]="forma === 'Todas' ? '' : forma">
+              {{ forma }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </div>
@@ -165,10 +178,12 @@
             <td mat-cell *matCellDef="let venda">
               <div class="data-info">
                 <div class="data-principal">{{ formatDateTime(venda.dataVenda) }}</div>
-                <div class="vendedor-info" *ngIf="venda.vendedorNome">
-                  <mat-icon class="small-icon">person</mat-icon>
-                  {{ venda.vendedorNome }}
-                </div>
+                @if (venda.vendedorNome) {
+                  <div class="vendedor-info">
+                    <mat-icon class="small-icon">person</mat-icon>
+                    {{ venda.vendedorNome }}
+                  </div>
+                }
               </div>
             </td>
           </ng-container>

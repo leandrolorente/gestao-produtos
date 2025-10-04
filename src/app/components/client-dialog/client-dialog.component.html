@@ -65,8 +65,12 @@
                 (click)="buscarDadosCep()"
                 [disabled]="buscandoCep() || !clienteForm.get('cep')?.value"
                 matTooltip="Buscar CEP">
-          <mat-icon *ngIf="!buscandoCep()">search</mat-icon>
-          <mat-spinner *ngIf="buscandoCep()" diameter="20"></mat-spinner>
+          @if (!buscandoCep()) {
+            <mat-icon>search</mat-icon>
+          }
+          @if (buscandoCep()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          }
         </button>
         <mat-error>{{ getFieldErrorMessage('cep') }}</mat-error>
       </mat-form-field>
@@ -106,9 +110,11 @@
       <mat-form-field appearance="outline">
         <mat-label>Estado</mat-label>
         <mat-select formControlName="uf">
-          <mat-option *ngFor="let estado of estados" [value]="estado.sigla">
-            {{ estado.sigla }} - {{ estado.nome }}
-          </mat-option>
+          @for (estado of estados; track estado.sigla) {
+            <mat-option [value]="estado.sigla">
+              {{ estado.sigla }} - {{ estado.nome }}
+            </mat-option>
+          }
         </mat-select>
         <mat-error>{{ getFieldErrorMessage('uf') }}</mat-error>
       </mat-form-field>
@@ -121,11 +127,13 @@
     </div>
 
     <!-- Status Ativo -->
-    <div class="form-row" *ngIf="isEdit">
-      <mat-checkbox formControlName="ativo">
-        Cliente Ativo
-      </mat-checkbox>
-    </div>
+    @if (isEdit) {
+      <div class="form-row">
+        <mat-checkbox formControlName="ativo">
+          Cliente Ativo
+        </mat-checkbox>
+      </div>
+    }
 
     <!-- Observações -->
     <div class="form-row">

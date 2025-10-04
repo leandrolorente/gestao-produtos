@@ -32,34 +32,38 @@
       </mat-form-field>
     </div>
 
-    <div class="form-row" *ngIf="!isEditMode || showPasswordField">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ isEditMode ? 'Nova Senha (Opcional)' : 'Senha' }}</mat-label>
-        <input matInput
-               [type]="hidePassword ? 'password' : 'text'"
-               formControlName="password"
-               placeholder="••••••••"
-               maxlength="50">
-        <button mat-icon-button matSuffix
-                (click)="hidePassword = !hidePassword"
-                type="button"
-                [attr.aria-label]="'Ocultar senha'"
-                [attr.aria-pressed]="hidePassword">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-        <mat-error>{{ getFieldErrorMessage('password') }}</mat-error>
-      </mat-form-field>
-    </div>
+    @if (!isEditMode || showPasswordField) {
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ isEditMode ? 'Nova Senha (Opcional)' : 'Senha' }}</mat-label>
+          <input matInput
+                 [type]="hidePassword ? 'password' : 'text'"
+                 formControlName="password"
+                 placeholder="••••••••"
+                 maxlength="50">
+          <button mat-icon-button matSuffix
+                  (click)="hidePassword = !hidePassword"
+                  type="button"
+                  [attr.aria-label]="'Ocultar senha'"
+                  [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error>{{ getFieldErrorMessage('password') }}</mat-error>
+        </mat-form-field>
+      </div>
+    }
 
-    <div class="form-row" *ngIf="isEditMode && !showPasswordField">
-      <button mat-stroked-button
-              type="button"
-              (click)="showPasswordField = true"
-              class="password-change-btn">
-        <mat-icon>lock_reset</mat-icon>
-        Alterar Senha
-      </button>
-    </div>
+    @if (isEditMode && !showPasswordField) {
+      <div class="form-row">
+        <button mat-stroked-button
+                type="button"
+                (click)="showPasswordField = true"
+                class="password-change-btn">
+          <mat-icon>lock_reset</mat-icon>
+          Alterar Senha
+        </button>
+      </div>
+    }
 
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
@@ -113,13 +117,15 @@
     </div>
 
     <!-- Preview do Avatar -->
-    <div class="avatar-preview" *ngIf="form.get('avatar')?.value">
-      <p class="preview-label">Preview do Avatar:</p>
-      <img [src]="form.get('avatar')?.value"
-           alt="Preview do avatar"
-           class="avatar-image"
-           (error)="onAvatarError($event)">
-    </div>
+    @if (form.get('avatar')?.value) {
+      <div class="avatar-preview">
+        <p class="preview-label">Preview do Avatar:</p>
+        <img [src]="form.get('avatar')?.value"
+             alt="Preview do avatar"
+             class="avatar-image"
+             (error)="onAvatarError($event)">
+      </div>
+    }
 
   </div>
 
@@ -136,8 +142,12 @@
             [disabled]="form.invalid || isSubmitting()"
             type="submit"
             class="submit-btn">
-      <mat-icon *ngIf="isSubmitting()">hourglass_empty</mat-icon>
-      <mat-icon *ngIf="!isSubmitting()">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      @if (isSubmitting()) {
+        <mat-icon>hourglass_empty</mat-icon>
+      }
+      @if (!isSubmitting()) {
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      }
       {{ isSubmitting() ? 'Salvando...' : (isEditMode ? 'Salvar' : 'Criar') }}
     </button>
   </div>
