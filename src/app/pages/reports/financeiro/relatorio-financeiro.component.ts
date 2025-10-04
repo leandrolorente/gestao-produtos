@@ -8,8 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
-import { RelatorioService, FiltroRelatorio } from '../../../services/relatorio.service';
-import { FiltrosRelatorioComponent } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { RelatorioService } from '../../../services/relatorio.service';
+import { FiltrosRelatorioComponent, CampoFiltro } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { FiltroRelatorio } from '../../../models/FiltroRelatorio';
 
 interface TransacaoFinanceira {
   id: string;
@@ -54,6 +55,47 @@ export class RelatorioFinanceiroComponent implements OnInit {
   });
 
   protected filtrosAplicados = signal<FiltroRelatorio[]>([]);
+  protected camposFiltro: CampoFiltro[] = [
+    {
+      nome: 'descricao',
+      label: 'Descrição',
+      tipo: 'text'
+    },
+    {
+      nome: 'tipo',
+      label: 'Tipo',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'receita', label: 'Receita' },
+        { valor: 'despesa', label: 'Despesa' }
+      ]
+    },
+    {
+      nome: 'categoria',
+      label: 'Categoria',
+      tipo: 'text'
+    },
+    {
+      nome: 'status',
+      label: 'Status',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'pago', label: 'Pago' },
+        { valor: 'pendente', label: 'Pendente' },
+        { valor: 'vencido', label: 'Vencido' }
+      ]
+    },
+    {
+      nome: 'valorMinimo',
+      label: 'Valor Mínimo',
+      tipo: 'number'
+    },
+    {
+      nome: 'valorMaximo',
+      label: 'Valor Máximo',
+      tipo: 'number'
+    }
+  ];
   protected displayedColumns: string[] = ['descricao', 'tipo', 'valor', 'categoria', 'data', 'status'];
 
   // Configurações dos gráficos
@@ -118,7 +160,13 @@ export class RelatorioFinanceiroComponent implements OnInit {
     // Primeiro carregamos os dados das vendas para gerar as transações financeiras
     this.relatorioService.getDadosVendas().subscribe({
       next: (dadosVendas: any[]) => {
-        const transacoesGeradas = this.gerarTransacoesFinanceiras(dadosVendas);
+        let transacoesGeradas = this.gerarTransacoesFinanceiras(dadosVendas);
+
+        // Aplicar filtros se existirem
+        if (this.filtrosAplicados().length > 0) {
+          transacoesGeradas = this.aplicarFiltrosNaListagem(transacoesGeradas);
+        }
+
         this.transacoes.set(transacoesGeradas);
         this.atualizarResumo(transacoesGeradas);
         this.atualizarGraficos(transacoesGeradas);
@@ -134,6 +182,70 @@ export class RelatorioFinanceiroComponent implements OnInit {
   aplicarFiltros(filtros: FiltroRelatorio[]) {
     this.filtrosAplicados.set(filtros);
     this.carregarDados();
+  }
+
+  gerarRelatorio() {
+    this.carregarDados();
+  }
+
+  private aplicarFiltrosNaListagem(transacoes: TransacaoFinanceira[]): TransacaoFinanceira[] {
+    let transacoesFiltradas = [...transacoes];
+
+    this.filtrosAplicados().forEach(filtro => {
+      switch (filtro.campo) {
+        case 'dataInicio':
+          if (filtro.valor) {
+            const dataInicio = new Date(filtro.valor);
+            transacoesFiltradas = transacoesFiltradas.filter(t => t.data >= dataInicio);
+          }
+          break;
+        case 'dataFim':
+          if (filtro.valor) {
+            const dataFim = new Date(filtro.valor);
+            dataFim.setHours(23, 59, 59, 999);
+            transacoesFiltradas = transacoesFiltradas.filter(t => t.data <= dataFim);
+          }
+          break;
+        case 'descricao':
+          if (filtro.valor) {
+            transacoesFiltradas = transacoesFiltradas.filter(t =>
+              t.descricao.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'tipo':
+          if (filtro.valor) {
+            transacoesFiltradas = transacoesFiltradas.filter(t => t.tipo === filtro.valor);
+          }
+          break;
+        case 'categoria':
+          if (filtro.valor) {
+            transacoesFiltradas = transacoesFiltradas.filter(t =>
+              t.categoria.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'status':
+          if (filtro.valor) {
+            transacoesFiltradas = transacoesFiltradas.filter(t => t.status === filtro.valor);
+          }
+          break;
+        case 'valorMinimo':
+          if (filtro.valor) {
+            const valorMin = parseFloat(filtro.valor);
+            transacoesFiltradas = transacoesFiltradas.filter(t => t.valor >= valorMin);
+          }
+          break;
+        case 'valorMaximo':
+          if (filtro.valor) {
+            const valorMax = parseFloat(filtro.valor);
+            transacoesFiltradas = transacoesFiltradas.filter(t => t.valor <= valorMax);
+          }
+          break;
+      }
+    });
+
+    return transacoesFiltradas;
   }
 
   exportarCSV() {

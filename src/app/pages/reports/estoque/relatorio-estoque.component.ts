@@ -8,8 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
-import { RelatorioService, FiltroRelatorio } from '../../../services/relatorio.service';
-import { FiltrosRelatorioComponent } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { RelatorioService } from '../../../services/relatorio.service';
+import { FiltrosRelatorioComponent, CampoFiltro } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { FiltroRelatorio } from '../../../models/FiltroRelatorio';
 
 interface MovimentacaoEstoque {
   id: string;
@@ -54,6 +55,32 @@ export class RelatorioEstoqueComponent implements OnInit {
   });
 
   protected filtrosAplicados = signal<FiltroRelatorio[]>([]);
+  protected camposFiltro: CampoFiltro[] = [
+    {
+      nome: 'produto',
+      label: 'Produto',
+      tipo: 'text'
+    },
+    {
+      nome: 'tipo',
+      label: 'Tipo de Movimentação',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'entrada', label: 'Entrada' },
+        { valor: 'saida', label: 'Saída' }
+      ]
+    },
+    {
+      nome: 'motivo',
+      label: 'Motivo',
+      tipo: 'text'
+    },
+    {
+      nome: 'usuario',
+      label: 'Usuário',
+      tipo: 'text'
+    }
+  ];
   protected displayedColumns: string[] = ['produto', 'tipo', 'quantidade', 'motivo', 'data', 'usuario'];
 
   // Configurações dos gráficos
@@ -119,7 +146,13 @@ export class RelatorioEstoqueComponent implements OnInit {
     this.relatorioService.getDadosProdutos().subscribe({
       next: (dadosProdutos: any[]) => {
         // Gerar movimentações fictícias baseadas nos produtos
-        const movimentacoesGeradas = this.gerarMovimentacoesFicticias(dadosProdutos);
+        let movimentacoesGeradas = this.gerarMovimentacoesFicticias(dadosProdutos);
+
+        // Aplicar filtros se existirem
+        if (this.filtrosAplicados().length > 0) {
+          movimentacoesGeradas = this.aplicarFiltrosNaListagem(movimentacoesGeradas);
+        }
+
         this.movimentacoes.set(movimentacoesGeradas);
         this.atualizarResumo(movimentacoesGeradas);
         this.atualizarGraficos(movimentacoesGeradas);
@@ -135,6 +168,60 @@ export class RelatorioEstoqueComponent implements OnInit {
   aplicarFiltros(filtros: FiltroRelatorio[]) {
     this.filtrosAplicados.set(filtros);
     this.carregarDados();
+  }
+
+  gerarRelatorio() {
+    this.carregarDados();
+  }
+
+  private aplicarFiltrosNaListagem(movimentacoes: MovimentacaoEstoque[]): MovimentacaoEstoque[] {
+    let movimentacoesFiltradas = [...movimentacoes];
+
+    this.filtrosAplicados().forEach(filtro => {
+      switch (filtro.campo) {
+        case 'dataInicio':
+          if (filtro.valor) {
+            const dataInicio = new Date(filtro.valor);
+            movimentacoesFiltradas = movimentacoesFiltradas.filter(m => m.data >= dataInicio);
+          }
+          break;
+        case 'dataFim':
+          if (filtro.valor) {
+            const dataFim = new Date(filtro.valor);
+            dataFim.setHours(23, 59, 59, 999);
+            movimentacoesFiltradas = movimentacoesFiltradas.filter(m => m.data <= dataFim);
+          }
+          break;
+        case 'produto':
+          if (filtro.valor) {
+            movimentacoesFiltradas = movimentacoesFiltradas.filter(m =>
+              m.produto.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'tipo':
+          if (filtro.valor) {
+            movimentacoesFiltradas = movimentacoesFiltradas.filter(m => m.tipo === filtro.valor);
+          }
+          break;
+        case 'motivo':
+          if (filtro.valor) {
+            movimentacoesFiltradas = movimentacoesFiltradas.filter(m =>
+              m.motivo.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'usuario':
+          if (filtro.valor) {
+            movimentacoesFiltradas = movimentacoesFiltradas.filter(m =>
+              m.usuario.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+      }
+    });
+
+    return movimentacoesFiltradas;
   }
 
   exportarCSV() {

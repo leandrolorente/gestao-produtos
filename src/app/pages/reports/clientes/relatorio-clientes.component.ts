@@ -8,8 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
-import { FiltrosRelatorioComponent } from '../../../components/filtros-relatorio/filtros-relatorio.component';
-import { RelatorioService, FiltroRelatorio } from '../../../services/relatorio.service';
+import { FiltrosRelatorioComponent, CampoFiltro } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { RelatorioService } from '../../../services/relatorio.service';
+import { FiltroRelatorio } from '../../../models/FiltroRelatorio';
 
 interface ClienteRelatorio {
   id: string;
@@ -56,6 +57,41 @@ export class RelatorioClientesComponent implements OnInit {
   });
 
   protected filtrosAplicados = signal<FiltroRelatorio[]>([]);
+  protected camposFiltro: CampoFiltro[] = [
+    {
+      nome: 'nome',
+      label: 'Nome do Cliente',
+      tipo: 'text'
+    },
+    {
+      nome: 'tipo',
+      label: 'Tipo de Cliente',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'PF', label: 'Pessoa Física' },
+        { valor: 'PJ', label: 'Pessoa Jurídica' }
+      ]
+    },
+    {
+      nome: 'status',
+      label: 'Status',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'ativo', label: 'Ativo' },
+        { valor: 'inativo', label: 'Inativo' }
+      ]
+    },
+    {
+      nome: 'cidade',
+      label: 'Cidade',
+      tipo: 'text'
+    },
+    {
+      nome: 'estado',
+      label: 'Estado',
+      tipo: 'text'
+    }
+  ];
 
   protected displayedColumns: string[] = ['nome', 'email', 'telefone', 'tipo', 'cidade', 'estado', 'status'];
 
@@ -134,7 +170,13 @@ export class RelatorioClientesComponent implements OnInit {
 
     this.relatorioService.getDadosClientes().subscribe({
       next: (dados: any[]) => {
-        const clientesProcessados = this.processarDadosClientes(dados);
+        let clientesProcessados = this.processarDadosClientes(dados);
+
+        // Aplicar filtros se existirem
+        if (this.filtrosAplicados().length > 0) {
+          clientesProcessados = this.aplicarFiltrosNaListagem(clientesProcessados);
+        }
+
         this.clientes.set(clientesProcessados);
         this.atualizarResumo(clientesProcessados);
         this.atualizarGraficos(clientesProcessados);
@@ -150,6 +192,65 @@ export class RelatorioClientesComponent implements OnInit {
   aplicarFiltros(filtros: FiltroRelatorio[]) {
     this.filtrosAplicados.set(filtros);
     this.carregarDados();
+  }
+
+  gerarRelatorio() {
+    this.carregarDados();
+  }
+
+  private aplicarFiltrosNaListagem(clientes: ClienteRelatorio[]): ClienteRelatorio[] {
+    let clientesFiltrados = [...clientes];
+
+    this.filtrosAplicados().forEach(filtro => {
+      switch (filtro.campo) {
+        case 'dataInicio':
+          if (filtro.valor) {
+            const dataInicio = new Date(filtro.valor);
+            clientesFiltrados = clientesFiltrados.filter(c => c.dataCadastro >= dataInicio);
+          }
+          break;
+        case 'dataFim':
+          if (filtro.valor) {
+            const dataFim = new Date(filtro.valor);
+            dataFim.setHours(23, 59, 59, 999); // Incluir todo o dia
+            clientesFiltrados = clientesFiltrados.filter(c => c.dataCadastro <= dataFim);
+          }
+          break;
+        case 'nome':
+          if (filtro.valor) {
+            clientesFiltrados = clientesFiltrados.filter(c =>
+              c.nome.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'tipo':
+          if (filtro.valor) {
+            clientesFiltrados = clientesFiltrados.filter(c => c.tipo === filtro.valor);
+          }
+          break;
+        case 'status':
+          if (filtro.valor) {
+            clientesFiltrados = clientesFiltrados.filter(c => c.status === filtro.valor);
+          }
+          break;
+        case 'cidade':
+          if (filtro.valor) {
+            clientesFiltrados = clientesFiltrados.filter(c =>
+              c.cidade.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'estado':
+          if (filtro.valor) {
+            clientesFiltrados = clientesFiltrados.filter(c =>
+              c.estado.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+      }
+    });
+
+    return clientesFiltrados;
   }
 
   exportarCSV() {

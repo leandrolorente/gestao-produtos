@@ -6,6 +6,10 @@
       Relatório de Clientes
     </h2>
     <div class="header-actions">
+      <button mat-raised-button color="accent" (click)="gerarRelatorio()" [disabled]="loading()">
+        <mat-icon>analytics</mat-icon>
+        Gerar Relatório
+      </button>
       <button mat-raised-button color="primary" (click)="exportarCSV()" [disabled]="loading()">
         <mat-icon>download</mat-icon>
         Exportar CSV
@@ -15,6 +19,12 @@
       </button>
     </div>
   </div>
+
+  <!-- Componente de Filtros -->
+  <app-filtros-relatorio
+    [campos]="camposFiltro"
+    (filtrosChange)="aplicarFiltros($event)">
+  </app-filtros-relatorio>
 
   <div class="loading-container" *ngIf="loading()">
     <mat-spinner></mat-spinner>

@@ -8,8 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { ChartConfiguration, ChartType } from 'chart.js';
 
-import { RelatorioService, FiltroRelatorio } from '../../../services/relatorio.service';
-import { FiltrosRelatorioComponent } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { RelatorioService } from '../../../services/relatorio.service';
+import { FiltrosRelatorioComponent, CampoFiltro } from '../../../components/filtros-relatorio/filtros-relatorio.component';
+import { FiltroRelatorio } from '../../../models/FiltroRelatorio';
 
 interface ProdutoRelatorio {
   id: string;
@@ -56,6 +57,41 @@ export class RelatorioProdutosComponent implements OnInit {
   });
 
   protected filtrosAplicados = signal<FiltroRelatorio[]>([]);
+  protected camposFiltro: CampoFiltro[] = [
+    {
+      nome: 'nome',
+      label: 'Nome do Produto',
+      tipo: 'text'
+    },
+    {
+      nome: 'categoria',
+      label: 'Categoria',
+      tipo: 'text'
+    },
+    {
+      nome: 'codigo',
+      label: 'Código',
+      tipo: 'text'
+    },
+    {
+      nome: 'status',
+      label: 'Status',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'ativo', label: 'Ativo' },
+        { valor: 'inativo', label: 'Inativo' }
+      ]
+    },
+    {
+      nome: 'baixoEstoque',
+      label: 'Baixo Estoque',
+      tipo: 'select',
+      opcoes: [
+        { valor: 'sim', label: 'Sim' },
+        { valor: 'nao', label: 'Não' }
+      ]
+    }
+  ];
   protected displayedColumns: string[] = ['codigo', 'nome', 'categoria', 'preco', 'quantidade', 'status'];
 
   // Configurações dos gráficos
@@ -116,7 +152,13 @@ export class RelatorioProdutosComponent implements OnInit {
 
     this.relatorioService.getDadosProdutos().subscribe({
       next: (dados: any[]) => {
-        const produtosProcessados = this.processarDadosProdutos(dados);
+        let produtosProcessados = this.processarDadosProdutos(dados);
+
+        // Aplicar filtros se existirem
+        if (this.filtrosAplicados().length > 0) {
+          produtosProcessados = this.aplicarFiltrosNaListagem(produtosProcessados);
+        }
+
         this.produtos.set(produtosProcessados);
         this.atualizarResumo(produtosProcessados);
         this.atualizarGraficos(produtosProcessados);
@@ -132,6 +174,67 @@ export class RelatorioProdutosComponent implements OnInit {
   aplicarFiltros(filtros: FiltroRelatorio[]) {
     this.filtrosAplicados.set(filtros);
     this.carregarDados();
+  }
+
+  gerarRelatorio() {
+    this.carregarDados();
+  }
+
+  private aplicarFiltrosNaListagem(produtos: ProdutoRelatorio[]): ProdutoRelatorio[] {
+    let produtosFiltrados = [...produtos];
+
+    this.filtrosAplicados().forEach(filtro => {
+      switch (filtro.campo) {
+        case 'dataInicio':
+          if (filtro.valor) {
+            const dataInicio = new Date(filtro.valor);
+            produtosFiltrados = produtosFiltrados.filter(p => p.dataUltimaMovimentacao >= dataInicio);
+          }
+          break;
+        case 'dataFim':
+          if (filtro.valor) {
+            const dataFim = new Date(filtro.valor);
+            dataFim.setHours(23, 59, 59, 999);
+            produtosFiltrados = produtosFiltrados.filter(p => p.dataUltimaMovimentacao <= dataFim);
+          }
+          break;
+        case 'nome':
+          if (filtro.valor) {
+            produtosFiltrados = produtosFiltrados.filter(p =>
+              p.nome.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'categoria':
+          if (filtro.valor) {
+            produtosFiltrados = produtosFiltrados.filter(p =>
+              p.categoria.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'codigo':
+          if (filtro.valor) {
+            produtosFiltrados = produtosFiltrados.filter(p =>
+              p.codigo.toLowerCase().includes(filtro.valor!.toLowerCase())
+            );
+          }
+          break;
+        case 'status':
+          if (filtro.valor) {
+            produtosFiltrados = produtosFiltrados.filter(p => p.status === filtro.valor);
+          }
+          break;
+        case 'baixoEstoque':
+          if (filtro.valor === 'sim') {
+            produtosFiltrados = produtosFiltrados.filter(p => p.quantidade <= p.estoqueMinimo);
+          } else if (filtro.valor === 'nao') {
+            produtosFiltrados = produtosFiltrados.filter(p => p.quantidade > p.estoqueMinimo);
+          }
+          break;
+      }
+    });
+
+    return produtosFiltrados;
   }
 
   exportarCSV() {
