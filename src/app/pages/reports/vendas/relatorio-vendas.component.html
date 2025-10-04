@@ -26,12 +26,15 @@
     (filtrosChange)="aplicarFiltros($event)">
   </app-filtros-relatorio>
 
-  <div class="loading-container" *ngIf="carregando()">
-    <mat-spinner></mat-spinner>
-    <p>Carregando dados de vendas...</p>
-  </div>
+  @if (carregando()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Carregando dados de vendas...</p>
+    </div>
+  }
 
-  <div class="relatorio-content" *ngIf="!carregando()">
+  @if (!carregando()) {
+    <div class="relatorio-content">
     <!-- Cards de Resumo -->
     <div class="resumo-cards">
       <mat-card class="resumo-card">
@@ -119,5 +122,6 @@
         </table>
       </mat-card-content>
     </mat-card>
-  </div>
+    </div>
+  }
 </div>

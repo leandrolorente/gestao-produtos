@@ -1,49 +1,57 @@
 <nav class="sidebar" [class.open]="isOpen()">
 
   <mat-nav-list class="nav-list">
-    <ng-container *ngFor="let item of menuItems">
+    @for (item of menuItems; track item.label) {
       <!-- Item sem filhos -->
-      <a
-        *ngIf="!item.children"
-        mat-list-item
-        [routerLink]="item.route"
-        routerLinkActive="active"
-        class="nav-item"
-        (click)="onItemClick()">
-        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span matListItemTitle>{{ item.label }}</span>
-        <span *ngIf="item.badge" class="badge">{{ item.badge }}</span>
-      </a>
-
-      <!-- Item com filhos -->
-      <div *ngIf="item.children" class="nav-group">
+      @if (!item.children) {
         <a
           mat-list-item
-          (click)="toggleExpanded(item)"
-          class="nav-item expandable"
-          [class.expanded]="isExpanded(item)">
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="onItemClick()">
           <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
           <span matListItemTitle>{{ item.label }}</span>
-          <mat-icon class="expand-icon">
-            {{ isExpanded(item) ? 'expand_less' : 'expand_more' }}
-          </mat-icon>
+          @if (item.badge) {
+            <span class="badge">{{ item.badge }}</span>
+          }
         </a>
+      }
 
-        <div class="sub-menu" [class.expanded]="isExpanded(item)">
+      <!-- Item com filhos -->
+      @if (item.children) {
+        <div class="nav-group">
           <a
-            *ngFor="let child of item.children"
             mat-list-item
-            [routerLink]="child.route"
-            routerLinkActive="active"
-            class="nav-item sub-item"
-            (click)="onItemClick()">
-            <mat-icon matListItemIcon>{{ child.icon }}</mat-icon>
-            <span matListItemTitle>{{ child.label }}</span>
+            (click)="toggleExpanded(item)"
+            class="nav-item expandable"
+            [class.expanded]="isExpanded(item)">
+            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+            <mat-icon class="expand-icon">
+              {{ isExpanded(item) ? 'expand_less' : 'expand_more' }}
+            </mat-icon>
           </a>
-        </div>
-      </div>
 
-      <mat-divider *ngIf="item.label === 'Vendas' || item.label === 'Fornecedores'"></mat-divider>
-    </ng-container>
+          <div class="sub-menu" [class.expanded]="isExpanded(item)">
+            @for (child of item.children; track child.label) {
+              <a
+                mat-list-item
+                [routerLink]="child.route"
+                routerLinkActive="active"
+                class="nav-item sub-item"
+                (click)="onItemClick()">
+                <mat-icon matListItemIcon>{{ child.icon }}</mat-icon>
+                <span matListItemTitle>{{ child.label }}</span>
+              </a>
+            }
+          </div>
+        </div>
+      }
+
+      @if (item.label === 'Vendas' || item.label === 'Fornecedores') {
+        <mat-divider></mat-divider>
+      }
+    }
   </mat-nav-list>
 </nav>

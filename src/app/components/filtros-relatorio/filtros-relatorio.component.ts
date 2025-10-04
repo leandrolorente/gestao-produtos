@@ -65,38 +65,48 @@ export interface CampoFiltro {
             </mat-form-field>
 
             <!-- Campos dinâmicos -->
-            <ng-container *ngFor="let campo of campos">
+            @for (campo of campos; track campo.nome) {
               <!-- Campo de texto -->
-              <mat-form-field appearance="outline" *ngIf="campo.tipo === 'text'">
-                <mat-label>{{ campo.label }}</mat-label>
-                <input matInput [formControlName]="campo.nome" [placeholder]="campo.label">
-              </mat-form-field>
+              @if (campo.tipo === 'text') {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ campo.label }}</mat-label>
+                  <input matInput [formControlName]="campo.nome" [placeholder]="campo.label">
+                </mat-form-field>
+              }
 
               <!-- Campo de número -->
-              <mat-form-field appearance="outline" *ngIf="campo.tipo === 'number'">
-                <mat-label>{{ campo.label }}</mat-label>
-                <input matInput type="number" [formControlName]="campo.nome" [placeholder]="campo.label">
-              </mat-form-field>
+              @if (campo.tipo === 'number') {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ campo.label }}</mat-label>
+                  <input matInput type="number" [formControlName]="campo.nome" [placeholder]="campo.label">
+                </mat-form-field>
+              }
 
               <!-- Campo de seleção -->
-              <mat-form-field appearance="outline" *ngIf="campo.tipo === 'select'">
-                <mat-label>{{ campo.label }}</mat-label>
-                <mat-select [formControlName]="campo.nome">
-                  <mat-option value="">Todos</mat-option>
-                  <mat-option *ngFor="let opcao of campo.opcoes" [value]="opcao.valor">
-                    {{ opcao.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+              @if (campo.tipo === 'select') {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ campo.label }}</mat-label>
+                  <mat-select [formControlName]="campo.nome">
+                    <mat-option value="">Todos</mat-option>
+                    @for (opcao of campo.opcoes; track opcao.valor) {
+                      <mat-option [value]="opcao.valor">
+                        {{ opcao.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              }
 
               <!-- Campo de data -->
-              <mat-form-field appearance="outline" *ngIf="campo.tipo === 'date'">
-                <mat-label>{{ campo.label }}</mat-label>
-                <input matInput [matDatepicker]="picker" [formControlName]="campo.nome">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
-            </ng-container>
+              @if (campo.tipo === 'date') {
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ campo.label }}</mat-label>
+                  <input matInput [matDatepicker]="picker" [formControlName]="campo.nome">
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              }
+            }
           </div>
         </form>
       </mat-card-content>
@@ -114,17 +124,21 @@ export interface CampoFiltro {
     </mat-card>
 
     <!-- Filtros ativos -->
-    <div class="filtros-ativos" *ngIf="filtrosAtivos.length > 0">
-      <h4>Filtros Ativos:</h4>
-      <mat-chip-set>
-        <mat-chip *ngFor="let filtro of filtrosAtivos" (removed)="removerFiltro(filtro.campo)">
-          <strong>{{ filtro.label }}:</strong> {{ filtro.valor }}
-          <button matChipRemove>
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip>
-      </mat-chip-set>
-    </div>
+    @if (filtrosAtivos.length > 0) {
+      <div class="filtros-ativos">
+        <h4>Filtros Ativos:</h4>
+        <mat-chip-set>
+          @for (filtro of filtrosAtivos; track filtro.campo) {
+            <mat-chip (removed)="removerFiltro(filtro.campo)">
+              <strong>{{ filtro.label }}:</strong> {{ filtro.valor }}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          }
+        </mat-chip-set>
+      </div>
+    }
   `,
   styles: [`
     .filtros-card {
