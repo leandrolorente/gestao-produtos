@@ -113,7 +113,7 @@ export class RelatorioProdutosComponent implements OnInit {
 
   carregarDados() {
     this.carregando.set(true);
-    
+
     this.relatorioService.getDadosProdutos().subscribe({
       next: (dados: any[]) => {
         const produtosProcessados = this.processarDadosProdutos(dados);

@@ -62,7 +62,7 @@ export class RelatorioVendasComponent implements OnInit {
 
   carregarDados() {
     this.carregando.set(true);
-    
+
     this.relatorioService.getDadosVendas().subscribe({
       next: (dados: any[]) => {
         const vendasProcessadas = this.processarDadosVendas(dados);

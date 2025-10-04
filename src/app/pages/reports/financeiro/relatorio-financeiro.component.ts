@@ -114,7 +114,7 @@ export class RelatorioFinanceiroComponent implements OnInit {
 
   carregarDados() {
     this.carregando.set(true);
-    
+
     // Primeiro carregamos os dados das vendas para gerar as transações financeiras
     this.relatorioService.getDadosVendas().subscribe({
       next: (dadosVendas: any[]) => {
@@ -162,7 +162,7 @@ export class RelatorioFinanceiroComponent implements OnInit {
 
   private gerarTransacoesFinanceiras(vendas: any[]): TransacaoFinanceira[] {
     const transacoes: TransacaoFinanceira[] = [];
-    
+
     // Gerar receitas baseadas nas vendas
     vendas.forEach((venda, index) => {
       transacoes.push({
@@ -179,17 +179,17 @@ export class RelatorioFinanceiroComponent implements OnInit {
     // Gerar algumas despesas fictícias
     const categoriasDespesas = ['Fornecedores', 'Salários', 'Aluguel', 'Energia', 'Internet', 'Marketing'];
     const agora = new Date();
-    
+
     for (let i = 0; i < 30; i++) {
       const data = new Date(agora);
       data.setDate(data.getDate() - i);
-      
+
       // Gerar 1-3 despesas por dia
       const numDespesas = Math.floor(Math.random() * 3) + 1;
-      
+
       for (let j = 0; j < numDespesas; j++) {
         const categoria = categoriasDespesas[Math.floor(Math.random() * categoriasDespesas.length)];
-        
+
         transacoes.push({
           id: `despesa_${i}_${j}`,
           descricao: `Pagamento - ${categoria}`,
@@ -208,7 +208,7 @@ export class RelatorioFinanceiroComponent implements OnInit {
   private atualizarResumo(transacoes: TransacaoFinanceira[]) {
     const receitas = transacoes.filter(t => t.tipo === 'receita');
     const despesas = transacoes.filter(t => t.tipo === 'despesa');
-    
+
     const totalReceitas = receitas.reduce((sum, t) => sum + t.valor, 0);
     const totalDespesas = despesas.reduce((sum, t) => sum + t.valor, 0);
     const transacoesPendentes = transacoes.filter(t => t.status === 'pendente').length;
@@ -236,19 +236,19 @@ export class RelatorioFinanceiroComponent implements OnInit {
     for (let i = 11; i >= 0; i--) {
       const mes = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
       const proximoMes = new Date(agora.getFullYear(), agora.getMonth() - i + 1, 1);
-      
-      const transacoesDoMes = transacoes.filter(t => 
+
+      const transacoesDoMes = transacoes.filter(t =>
         t.data >= mes && t.data < proximoMes
       );
-      
+
       const receitasMes = transacoesDoMes
         .filter(t => t.tipo === 'receita')
         .reduce((sum, t) => sum + t.valor, 0);
-        
+
       const despesasMes = transacoesDoMes
         .filter(t => t.tipo === 'despesa')
         .reduce((sum, t) => sum + t.valor, 0);
-      
+
       meses.push(mes.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
       receitas.push(receitasMes);
       despesas.push(despesasMes);
@@ -320,7 +320,7 @@ export class RelatorioFinanceiroComponent implements OnInit {
       datasets: [{
         data: Object.values(porCategoria),
         backgroundColor: [
-          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
           '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
         ]
       }]

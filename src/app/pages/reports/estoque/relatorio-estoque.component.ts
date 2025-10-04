@@ -114,7 +114,7 @@ export class RelatorioEstoqueComponent implements OnInit {
 
   carregarDados() {
     this.carregando.set(true);
-    
+
     // Primeiro carregamos os dados dos produtos para gerar as movimentações
     this.relatorioService.getDadosProdutos().subscribe({
       next: (dadosProdutos: any[]) => {
@@ -175,11 +175,11 @@ export class RelatorioEstoqueComponent implements OnInit {
 
       // Gerar 2-5 movimentações por dia
       const numMovimentacoes = Math.floor(Math.random() * 4) + 2;
-      
+
       for (let j = 0; j < numMovimentacoes; j++) {
         const produto = produtos[Math.floor(Math.random() * produtos.length)];
         const tipo = tipos[Math.floor(Math.random() * tipos.length)];
-        
+
         movimentacoes.push({
           id: `mov_${i}_${j}`,
           produto: produto.nome,
@@ -222,14 +222,14 @@ export class RelatorioEstoqueComponent implements OnInit {
     for (let i = 29; i >= 0; i--) {
       const dia = new Date(agora);
       dia.setDate(dia.getDate() - i);
-      
-      const movimentacoesDoDia = movimentacoes.filter(m => 
+
+      const movimentacoesDoDia = movimentacoes.filter(m =>
         m.data.toDateString() === dia.toDateString()
       );
-      
+
       const entradasDoDia = movimentacoesDoDia.filter(m => m.tipo === 'entrada').length;
       const saidasDoDia = movimentacoesDoDia.filter(m => m.tipo === 'saida').length;
-      
+
       dias.push(dia.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
       entradas.push(entradasDoDia);
       saidas.push(saidasDoDia);

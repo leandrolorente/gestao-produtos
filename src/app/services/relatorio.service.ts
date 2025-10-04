@@ -70,15 +70,15 @@ export class RelatorioService {
    */
   getRelatorioClientes(filtros?: FiltroRelatorio[]): Observable<any[]> {
     this.loadingSubject.next(true);
-    
+
     return this.getDadosClientes().pipe(
       map(clientes => {
         let dadosFiltrados = [...clientes];
-        
+
         if (filtros) {
           dadosFiltrados = this.aplicarFiltros(dadosFiltrados, filtros);
         }
-        
+
         this.loadingSubject.next(false);
         return dadosFiltrados;
       })
@@ -90,15 +90,15 @@ export class RelatorioService {
    */
   getRelatorioProdutos(filtros?: FiltroRelatorio[]): Observable<any[]> {
     this.loadingSubject.next(true);
-    
+
     return this.getDadosProdutos().pipe(
       map(produtos => {
         let dadosFiltrados = [...produtos];
-        
+
         if (filtros) {
           dadosFiltrados = this.aplicarFiltros(dadosFiltrados, filtros);
         }
-        
+
         this.loadingSubject.next(false);
         return dadosFiltrados;
       })
@@ -110,15 +110,15 @@ export class RelatorioService {
    */
   getRelatorioVendas(filtros?: FiltroRelatorio[]): Observable<any[]> {
     this.loadingSubject.next(true);
-    
+
     return this.getDadosVendas().pipe(
       map(vendas => {
         let dadosFiltrados = [...vendas];
-        
+
         if (filtros) {
           dadosFiltrados = this.aplicarFiltros(dadosFiltrados, filtros);
         }
-        
+
         this.loadingSubject.next(false);
         return dadosFiltrados;
       })
@@ -130,7 +130,7 @@ export class RelatorioService {
    */
   getRelatorioEstoque(filtros?: FiltroRelatorio[]): Observable<any[]> {
     this.loadingSubject.next(true);
-    
+
     return forkJoin({
       produtos: this.getDadosProdutos(),
       vendas: this.getDadosVendas()
@@ -138,13 +138,13 @@ export class RelatorioService {
       map(({ produtos, vendas }) => {
         // Gerar movimentações simuladas baseadas nos dados existentes
         const movimentacoes = this.gerarMovimentacaoEstoque(produtos, vendas);
-        
+
         let dadosFiltrados = [...movimentacoes];
-        
+
         if (filtros) {
           dadosFiltrados = this.aplicarFiltros(dadosFiltrados, filtros);
         }
-        
+
         this.loadingSubject.next(false);
         return dadosFiltrados;
       })
@@ -156,18 +156,18 @@ export class RelatorioService {
    */
   getRelatorioFinanceiro(filtros?: FiltroRelatorio[]): Observable<any[]> {
     this.loadingSubject.next(true);
-    
+
     return this.getDadosVendas().pipe(
       map(vendas => {
         // Gerar transações financeiras baseadas nas vendas
         const transacoes = this.gerarTransacoesFinanceiras(vendas);
-        
+
         let dadosFiltrados = [...transacoes];
-        
+
         if (filtros) {
           dadosFiltrados = this.aplicarFiltros(dadosFiltrados, filtros);
         }
-        
+
         this.loadingSubject.next(false);
         return dadosFiltrados;
       })
@@ -179,10 +179,10 @@ export class RelatorioService {
    */
   private aplicarFiltros(dados: any[], filtros: FiltroRelatorio[]): any[] {
     let dadosFiltrados = [...dados];
-    
+
     filtros.forEach(filtro => {
       if (!filtro.valor) return;
-      
+
       switch (filtro.campo) {
         case 'dataInicio':
           const dataInicio = new Date(filtro.valor);
@@ -191,7 +191,7 @@ export class RelatorioService {
             return itemData >= dataInicio;
           });
           break;
-          
+
         case 'dataFim':
           const dataFim = new Date(filtro.valor);
           dadosFiltrados = dadosFiltrados.filter(item => {
@@ -199,33 +199,33 @@ export class RelatorioService {
             return itemData <= dataFim;
           });
           break;
-          
+
         case 'categoria':
-          dadosFiltrados = dadosFiltrados.filter(item => 
+          dadosFiltrados = dadosFiltrados.filter(item =>
             item.categoria?.toLowerCase().includes(filtro.valor!.toLowerCase())
           );
           break;
-          
+
         case 'tipo':
-          dadosFiltrados = dadosFiltrados.filter(item => 
+          dadosFiltrados = dadosFiltrados.filter(item =>
             item.tipo === filtro.valor
           );
           break;
-          
+
         case 'status':
-          dadosFiltrados = dadosFiltrados.filter(item => 
+          dadosFiltrados = dadosFiltrados.filter(item =>
             item.status === filtro.valor
           );
           break;
-          
+
         default:
           // Filtro genérico por string
-          dadosFiltrados = dadosFiltrados.filter(item => 
+          dadosFiltrados = dadosFiltrados.filter(item =>
             item[filtro.campo]?.toString().toLowerCase().includes(filtro.valor!.toLowerCase())
           );
       }
     });
-    
+
     return dadosFiltrados;
   }
 
@@ -235,7 +235,7 @@ export class RelatorioService {
   private gerarMovimentacaoEstoque(produtos: any[], vendas: any[]): any[] {
     const movimentacoes: any[] = [];
     const baseDate = new Date();
-    
+
     // Gerar movimentações baseadas nos produtos e vendas
     produtos.forEach((produto, index) => {
       // Entrada de estoque
@@ -251,7 +251,7 @@ export class RelatorioService {
         observacao: 'Reposição de estoque'
       });
     });
-    
+
     // Gerar saídas baseadas nas vendas
     vendas.forEach((venda, index) => {
       if (venda.itens) {
@@ -270,7 +270,7 @@ export class RelatorioService {
         });
       }
     });
-    
+
     return movimentacoes.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
   }
 
@@ -280,7 +280,7 @@ export class RelatorioService {
   private gerarTransacoesFinanceiras(vendas: any[]): any[] {
     const transacoes: any[] = [];
     const baseDate = new Date();
-    
+
     // Receitas das vendas
     vendas.forEach((venda, index) => {
       transacoes.push({
@@ -295,7 +295,7 @@ export class RelatorioService {
         cliente: venda.cliente
       });
     });
-    
+
     // Despesas simuladas
     const categoriasDespesas = ['Fornecedores', 'Operacional', 'Pessoal', 'Marketing'];
     for (let i = 0; i < 20; i++) {
@@ -312,7 +312,7 @@ export class RelatorioService {
         fornecedor: categoria === 'Fornecedores' ? 'Fornecedor Ltda' : undefined
       });
     }
-    
+
     return transacoes.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
   }
 
@@ -326,7 +326,7 @@ export class RelatorioService {
       'Pessoal': ['Salários', 'Benefícios', 'Encargos trabalhistas'],
       'Marketing': ['Publicidade online', 'Material promocional', 'Campanhas']
     };
-    
+
     const opcoes = descricoes[categoria] || ['Despesa geral'];
     return opcoes[Math.floor(Math.random() * opcoes.length)];
   }

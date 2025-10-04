@@ -131,7 +131,7 @@ export class RelatorioClientesComponent implements OnInit {
 
   carregarDados() {
     this.loading.set(true);
-    
+
     this.relatorioService.getDadosClientes().subscribe({
       next: (dados: any[]) => {
         const clientesProcessados = this.processarDadosClientes(dados);
@@ -195,7 +195,7 @@ export class RelatorioClientesComponent implements OnInit {
   private atualizarResumo(clientes: ClienteRelatorio[]) {
     const agora = new Date();
     const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
-    
+
     const clientesAtivos = clientes.filter(c => c.status === 'ativo').length;
     const novosMes = clientes.filter(c => c.dataCadastro >= inicioMes).length;
 
@@ -255,15 +255,15 @@ export class RelatorioClientesComponent implements OnInit {
     const agora = new Date();
     const meses = [];
     const dados = [];
-    
+
     for (let i = 11; i >= 0; i--) {
       const mes = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
       const proximoMes = new Date(agora.getFullYear(), agora.getMonth() - i + 1, 1);
-      
-      const clientesNoMes = clientes.filter(c => 
+
+      const clientesNoMes = clientes.filter(c =>
         c.dataCadastro >= mes && c.dataCadastro < proximoMes
       ).length;
-      
+
       meses.push(mes.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }));
       dados.push(clientesNoMes);
     }

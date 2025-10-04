@@ -89,7 +89,7 @@
           <!-- Tipo Column -->
           <ng-container matColumnDef="tipo">
             <th mat-header-cell *matHeaderCellDef> Tipo </th>
-            <td mat-cell *matCellDef="let transacao"> 
+            <td mat-cell *matCellDef="let transacao">
               <span [class]="'tipo-' + transacao.tipo">{{ transacao.tipo }}</span>
             </td>
           </ng-container>
@@ -97,7 +97,7 @@
           <!-- Valor Column -->
           <ng-container matColumnDef="valor">
             <th mat-header-cell *matHeaderCellDef> Valor </th>
-            <td mat-cell *matCellDef="let transacao"> 
+            <td mat-cell *matCellDef="let transacao">
               {{ transacao.valor | currency:'BRL':'symbol':'1.2-2' }}
             </td>
           </ng-container>
@@ -111,7 +111,7 @@
           <!-- Data Column -->
           <ng-container matColumnDef="data">
             <th mat-header-cell *matHeaderCellDef> Data </th>
-            <td mat-cell *matCellDef="let transacao"> 
+            <td mat-cell *matCellDef="let transacao">
               {{ transacao.data | date:'dd/MM/yyyy' }}
             </td>
           </ng-container>
@@ -119,7 +119,7 @@
           <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status </th>
-            <td mat-cell *matCellDef="let transacao"> 
+            <td mat-cell *matCellDef="let transacao">
               <span [class]="'status-' + transacao.status">{{ transacao.status }}</span>
             </td>
           </ng-container>
