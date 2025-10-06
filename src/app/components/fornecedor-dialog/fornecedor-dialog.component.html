@@ -11,12 +11,12 @@
 
   <mat-dialog-content class="dialog-content">
     <mat-tab-group animationDuration="300ms">
-      
+
       <!-- Aba 1: Dados Gerais -->
       <mat-tab label="Dados Gerais">
         <div class="tab-content">
           <form [formGroup]="formGeral" class="form-grid">
-            
+
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Razão Social</mat-label>
               <input matInput formControlName="razaoSocial" placeholder="Razão social completa" required>
@@ -34,7 +34,7 @@
 
             <mat-form-field appearance="outline">
               <mat-label>CNPJ/CPF</mat-label>
-              <input matInput formControlName="cnpjCpf" (input)="formatCnpjCpf($event)" 
+              <input matInput formControlName="cnpjCpf" (input)="formatCnpjCpf($event)"
                      placeholder="00.000.000/0000-00" required>
               <mat-icon matPrefix>badge</mat-icon>
               @if (formGeral.get('cnpjCpf')?.invalid && formGeral.get('cnpjCpf')?.touched) {
@@ -98,7 +98,7 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Telefone</mat-label>
-              <input matInput formControlName="telefone" 
+              <input matInput formControlName="telefone"
                      (input)="formatTelefone($event, 'telefone')"
                      placeholder="(00) 00000-0000" required>
               <mat-icon matPrefix>phone</mat-icon>
@@ -128,7 +128,7 @@
       <mat-tab label="Endereço">
         <div class="tab-content">
           <form [formGroup]="formEndereco" class="form-grid">
-            
+
             <mat-form-field appearance="outline">
               <mat-label>Tipo de Endereço</mat-label>
               <mat-select formControlName="tipo">
@@ -141,7 +141,7 @@
 
             <mat-form-field appearance="outline">
               <mat-label>CEP</mat-label>
-              <input matInput formControlName="cep" (input)="formatCep($event)" 
+              <input matInput formControlName="cep" (input)="formatCep($event)"
                      (blur)="buscarCep()" placeholder="00000-000">
               <mat-icon matPrefix>pin_drop</mat-icon>
               @if (isLoadingCep()) {
@@ -202,7 +202,7 @@
       <mat-tab label="Dados Bancários">
         <div class="tab-content">
           <form [formGroup]="formBancario" class="form-grid">
-            
+
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Banco</mat-label>
               <input matInput formControlName="banco" placeholder="Nome do banco">
@@ -236,7 +236,7 @@
       <mat-tab label="Condições Comerciais">
         <div class="tab-content">
           <form [formGroup]="formComercial" class="form-grid">
-            
+
             <mat-form-field appearance="outline">
               <mat-label>Prazo de Pagamento Padrão (dias)</mat-label>
               <input matInput type="number" formControlName="prazoPagamentoPadrao" placeholder="30" required>
@@ -257,7 +257,7 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Condições de Pagamento</mat-label>
-              <input matInput formControlName="condicoesPagamento" 
+              <input matInput formControlName="condicoesPagamento"
                      placeholder="Ex: 30/60/90 dias, Boleto, Transferência">
               <mat-icon matPrefix>event_note</mat-icon>
             </mat-form-field>
@@ -274,7 +274,7 @@
       <mat-icon>close</mat-icon>
       Cancelar
     </button>
-    <button mat-raised-button color="primary" (click)="onSave()" 
+    <button mat-raised-button color="primary" (click)="onSave()"
             [disabled]="!formGeral.valid" class="save-btn">
       <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
       {{ isEditMode ? 'Salvar' : 'Criar' }}

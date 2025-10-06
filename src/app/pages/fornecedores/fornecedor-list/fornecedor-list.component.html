@@ -171,7 +171,7 @@
                   <mat-icon>edit</mat-icon>
                   <span>Editar</span>
                 </button>
-                
+
                 @if (element.status === statusFornecedor.Ativo) {
                   <button mat-menu-item (click)="inativarFornecedor(element)">
                     <mat-icon>cancel</mat-icon>
@@ -182,23 +182,23 @@
                     <span>Bloquear</span>
                   </button>
                 }
-                
+
                 @if (element.status === statusFornecedor.Inativo) {
                   <button mat-menu-item (click)="ativarFornecedor(element)">
                     <mat-icon>check_circle</mat-icon>
                     <span>Ativar</span>
                   </button>
                 }
-                
+
                 @if (element.status === statusFornecedor.Bloqueado) {
                   <button mat-menu-item (click)="desbloquearFornecedor(element)">
                     <mat-icon>lock_open</mat-icon>
                     <span>Desbloquear</span>
                   </button>
                 }
-                
+
                 <mat-divider></mat-divider>
-                
+
                 <button mat-menu-item (click)="deleteFornecedor(element)" class="delete-action">
                   <mat-icon>delete</mat-icon>
                   <span>Excluir</span>

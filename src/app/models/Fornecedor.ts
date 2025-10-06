@@ -32,13 +32,13 @@ export interface FornecedorBase {
   observacoes?: string;
   contatoPrincipal?: string;
   site?: string;
-  
+
   // Dados bancários
   banco?: string;
   agencia?: string;
   conta?: string;
   pix?: string;
-  
+
   // Condições comerciais
   prazoPagamentoPadrao: number;
   limiteCredito: number;
@@ -52,7 +52,7 @@ export interface Fornecedor extends FornecedorBase {
   id: string;
   endereco?: Endereco;
   status: StatusFornecedor;
-  
+
   // Estatísticas
   quantidadeProdutos: number;
   ultimaCompra?: string;
@@ -60,7 +60,7 @@ export interface Fornecedor extends FornecedorBase {
   quantidadeCompras: number;
   ticketMedio: number;
   ehFrequente: boolean;
-  
+
   // Auditoria
   dataCriacao: string;
   dataAtualizacao: string;

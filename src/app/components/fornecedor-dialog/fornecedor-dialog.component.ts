@@ -52,7 +52,7 @@ export class FornecedorDialogComponent implements OnInit {
   formEndereco: FormGroup;
   formBancario: FormGroup;
   formComercial: FormGroup;
-  
+
   isEditMode: boolean;
   isLoadingCep = signal(false);
 
@@ -61,13 +61,13 @@ export class FornecedorDialogComponent implements OnInit {
     { value: TipoFornecedor.Nacional, label: 'Nacional' },
     { value: TipoFornecedor.Internacional, label: 'Internacional' }
   ];
-  
+
   statusFornecedor = [
     { value: StatusFornecedor.Ativo, label: 'Ativo' },
     { value: StatusFornecedor.Inativo, label: 'Inativo' },
     { value: StatusFornecedor.Bloqueado, label: 'Bloqueado' }
   ];
-  
+
   tiposEndereco = [
     { value: TipoEndereco.Residencial, label: 'Residencial' },
     { value: TipoEndereco.Comercial, label: 'Comercial' },
@@ -83,7 +83,7 @@ export class FornecedorDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: Fornecedor | null
   ) {
     this.isEditMode = !!data?.id;
-    
+
     // Form Dados Gerais
     this.formGeral = this.fb.group({
       id: [data?.id],
@@ -152,13 +152,13 @@ export class FornecedorDialogComponent implements OnInit {
    */
   buscarCep(): void {
     const cep = this.formEndereco.get('cep')?.value?.replace(/\D/g, '');
-    
+
     if (!cep || cep.length !== 8) {
       return;
     }
 
     this.isLoadingCep.set(true);
-    
+
     this.http.get<ViaCepResponse>(`https://viacep.com.br/ws/${cep}/json/`)
       .subscribe({
         next: (data) => {
@@ -282,7 +282,7 @@ export class FornecedorDialogComponent implements OnInit {
    */
   formatCnpjCpf(event: any): void {
     let value = event.target.value.replace(/\D/g, '');
-    
+
     if (value.length <= 11) {
       // CPF: 000.000.000-00
       value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -290,7 +290,7 @@ export class FornecedorDialogComponent implements OnInit {
       // CNPJ: 00.000.000/0000-00
       value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
     }
-    
+
     event.target.value = value;
     this.formGeral.get('cnpjCpf')?.setValue(value.replace(/\D/g, ''));
   }
@@ -310,7 +310,7 @@ export class FornecedorDialogComponent implements OnInit {
    */
   formatTelefone(event: any, fieldName: string): void {
     let value = event.target.value.replace(/\D/g, '');
-    
+
     if (value.length <= 10) {
       // (00) 0000-0000
       value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
@@ -318,7 +318,7 @@ export class FornecedorDialogComponent implements OnInit {
       // (00) 00000-0000
       value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
     }
-    
+
     event.target.value = value;
     this.formGeral.get(fieldName)?.setValue(value.replace(/\D/g, ''));
   }
@@ -328,7 +328,7 @@ export class FornecedorDialogComponent implements OnInit {
    */
   getFieldErrorMessage(fieldName: string, formGroup: FormGroup = this.formGeral): string {
     const control = formGroup.get(fieldName);
-    
+
     if (control?.hasError('required')) {
       return `${this.getFieldLabel(fieldName)} é obrigatório`;
     }
@@ -343,7 +343,7 @@ export class FornecedorDialogComponent implements OnInit {
         return 'CPF/CNPJ inválido';
       }
     }
-    
+
     return '';
   }
 

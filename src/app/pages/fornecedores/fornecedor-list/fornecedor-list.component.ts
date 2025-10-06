@@ -49,7 +49,7 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
     'totalComprado',
     'actions'
   ];
-  
+
   dataSource = new MatTableDataSource<Fornecedor>([]);
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -75,7 +75,7 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    
+
     // Configurar filtro customizado
     this.dataSource.filterPredicate = (data: Fornecedor, filter: string) => {
       const searchTerm = filter.toLowerCase();
@@ -200,7 +200,7 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
   private createFornecedor(fornecedorData: any): void {
     this.isLoading.set(true);
     console.log('🚀 Criando fornecedor com dados:', fornecedorData);
-    
+
     this.fornecedorService.create(fornecedorData).subscribe({
       next: (newFornecedor) => {
         console.log('✅ Fornecedor criado:', newFornecedor);
@@ -213,7 +213,7 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
         console.error('❌ Erro ao criar fornecedor:', error);
         console.error('Status:', error.status);
         console.error('Mensagem:', error.error);
-        
+
         let errorMessage = 'Erro ao criar fornecedor';
         if (error.error?.errors) {
           const errors = Object.values(error.error.errors).flat();
@@ -223,7 +223,7 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
         } else if (error.message) {
           errorMessage = error.message;
         }
-        
+
         this.showSnackBar(errorMessage, 'error');
         this.isLoading.set(false);
       }
