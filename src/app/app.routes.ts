@@ -5,6 +5,7 @@ import { ProductListComponent } from './pages/products/product-list/product-list
 import { ClientListComponent } from './pages/clients/client-list/client-list.component';
 import { UserListComponent } from './pages/users/user-list/user-list.component';
 import { VendaListComponent } from './pages/vendas/venda-list/venda-list.component';
+import { FornecedorListComponent } from './pages/fornecedores/fornecedor-list/fornecedor-list.component';
 import { LoginComponent } from './pages/login/login.component';
 import { authGuard, loginGuard } from './guards/auth.guard';
 
@@ -43,6 +44,10 @@ export const routes: Routes = [
       {
         path: 'vendas',
         component: VendaListComponent
+      },
+      {
+        path: 'fornecedores',
+        component: FornecedorListComponent
       },
       {
         path: 'usuarios',

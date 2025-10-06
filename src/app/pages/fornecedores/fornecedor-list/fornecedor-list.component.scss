@@ -1,0 +1,384 @@
+/* Fornecedor List Component Styles */
+
+/* --- Layout Geral e Cabeçalho --- */
+.container-card {
+  margin: 1rem;
+  background: var(--background-gradient);
+}
+
+/* --- Estatísticas --- */
+.statistics-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--card-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: var(--primary-color);
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+  }
+
+  &.active mat-icon {
+    color: var(--success-color);
+  }
+
+  &.inactive mat-icon {
+    color: var(--text-secondary);
+  }
+
+  &.blocked mat-icon {
+    color: var(--danger-color);
+  }
+}
+
+/* --- Ações --- */
+.actions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 0 2rem 0;
+}
+
+.export-btn {
+  background: var(--info-gradient) !important;
+  color: white !important;
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #4299e1, #3182ce) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
+  }
+}
+
+.add-btn {
+  background: var(--primary-gradient) !important;
+  color: white !important;
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px var(--shadow-purple);
+  }
+}
+
+/* --- Campo de Busca --- */
+.search-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Loading --- */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+
+  p {
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+}
+
+/* --- Tabela --- */
+.table-container {
+  overflow: auto;
+  border-radius: 16px;
+  background: var(--card-background);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.modern-table {
+  width: 100%;
+  background: var(--card-background);
+}
+
+/* Headers da tabela */
+.header-row {
+  background: var(--primary-color);
+
+  .mat-mdc-header-cell {
+    color: white !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-bottom: none;
+  }
+}
+
+::ng-deep .header-row {
+  .mat-mdc-header-cell,
+  .mat-sort-header,
+  th[mat-sort-header],
+  th {
+    color: white !important;
+    font-weight: 600 !important;
+  }
+
+  .mat-sort-header-content,
+  .mat-sort-header-arrow {
+    color: white !important;
+  }
+}
+
+/* Células da tabela */
+.mat-mdc-cell {
+  padding: 1rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.table-row {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.05);
+  }
+}
+
+/* --- Coluna Nome --- */
+.name-cell {
+  .supplier-name {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .tipo-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--text-secondary);
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .razao-social {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+/* --- CNPJ/CPF --- */
+.cnpj-code {
+  font-family: 'Courier New', monospace;
+  padding: 0.25rem 0.5rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* --- Tipo Chip --- */
+.tipo-chip {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 500;
+
+  &.nacional {
+    background: rgba(72, 187, 120, 0.1);
+    color: var(--success-color);
+  }
+
+  &.internacional {
+    background: rgba(66, 153, 225, 0.1);
+    color: var(--info-color);
+  }
+}
+
+/* --- Contato --- */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+
+    .contact-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-tertiary);
+    }
+  }
+}
+
+/* --- Status Chips --- */
+.status-ativo {
+  background: rgba(72, 187, 120, 0.1);
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+.status-inativo {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.status-bloqueado {
+  background: rgba(245, 101, 101, 0.1);
+  color: var(--danger-color);
+  font-weight: 500;
+}
+
+/* --- Compras Info --- */
+.compras-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .price-value {
+    color: var(--success-color);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .ultima-compra {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+}
+
+/* --- Ações --- */
+.actions-column {
+  width: 80px;
+  text-align: center;
+}
+
+.delete-action {
+  color: var(--danger-color);
+}
+
+/* --- Sem dados --- */
+.no-data-cell {
+  text-align: center;
+  padding: 3rem 1rem !important;
+}
+
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+  .statistics-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-card {
+    padding: 1rem;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .stat-content .stat-value {
+      font-size: 1.5rem;
+    }
+  }
+
+  .actions-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .modern-table {
+    min-width: 1000px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-container {
+    grid-template-columns: 1fr;
+  }
+
+  .container-card {
+    margin: 0.5rem;
+  }
+}
