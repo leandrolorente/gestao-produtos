@@ -55,23 +55,8 @@
       </mat-form-field>
     </div>
 
-    <!-- Endereço -->
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Endereço</mat-label>
-        <input matInput formControlName="endereco" placeholder="Rua, Avenida, número">
-        <mat-error>{{ getFieldErrorMessage('endereco') }}</mat-error>
-      </mat-form-field>
-    </div>
-
-    <!-- Cidade, Estado e CEP -->
-    <div class="form-row three-columns">
-      <mat-form-field appearance="outline">
-        <mat-label>Cidade</mat-label>
-        <input matInput formControlName="cidade" placeholder="Nome da cidade">
-        <mat-error>{{ getFieldErrorMessage('cidade') }}</mat-error>
-      </mat-form-field>
-
+    <!-- Estado e Cidade (mesma linha, cada um metade do espaço) -->
+    <div class="form-row two-columns">
       <mat-form-field appearance="outline">
         <mat-label>Estado</mat-label>
         <mat-select formControlName="estado">
@@ -80,6 +65,21 @@
           </mat-option>
         </mat-select>
         <mat-error>{{ getFieldErrorMessage('estado') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cidade</mat-label>
+        <input matInput formControlName="cidade" placeholder="Nome da cidade">
+        <mat-error>{{ getFieldErrorMessage('cidade') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Endereço e CEP (lado a lado) -->
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Endereço</mat-label>
+        <input matInput formControlName="endereco" placeholder="Rua, Avenida, número">
+        <mat-error>{{ getFieldErrorMessage('endereco') }}</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
