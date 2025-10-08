@@ -258,3 +258,31 @@
     padding: 0.75rem;
   }
 }
+
+/* --- Checkbox Group --- */
+.checkbox-group {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.02);
+
+  ::ng-deep .mat-mdc-checkbox {
+    .mdc-checkbox {
+      padding: 8px;
+    }
+
+    .mdc-form-field {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      mat-icon {
+        color: var(--primary-color);
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}

@@ -194,6 +194,31 @@
               <mat-icon matPrefix>public</mat-icon>
             </mat-form-field>
 
+            <mat-form-field appearance="outline">
+              <mat-label>Unidade</mat-label>
+              <input matInput formControlName="unidade" placeholder="Apto, Loja...">
+              <mat-icon matPrefix>store</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Região</mat-label>
+              <input matInput formControlName="regiao" placeholder="Centro, Zona Sul...">
+              <mat-icon matPrefix>explore</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Ponto de Referência</mat-label>
+              <input matInput formControlName="referencia" placeholder="Próximo ao shopping...">
+              <mat-icon matPrefix>place</mat-icon>
+            </mat-form-field>
+
+            <div class="checkbox-group full-width">
+              <mat-checkbox formControlName="isPrincipal">
+                <mat-icon>home</mat-icon>
+                Endereço Principal
+              </mat-checkbox>
+            </div>
+
           </form>
         </div>
       </mat-tab>

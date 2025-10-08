@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { Fornecedor, TipoFornecedor, StatusFornecedor } from '../../models/Fornecedor';
 import { TipoEndereco } from '../../models/Endereco';
@@ -42,7 +43,8 @@ interface ViaCepResponse {
     MatTooltipModule,
     MatSelectModule,
     MatTabsModule,
-    MatDividerModule
+    MatDividerModule,
+    MatCheckboxModule
   ],
   templateUrl: './fornecedor-dialog.component.html',
   styleUrls: ['./fornecedor-dialog.component.scss']
@@ -145,6 +147,16 @@ export class FornecedorDialogComponent implements OnInit {
       }
       cnpjControl?.updateValueAndValidity();
     });
+
+    // No modo de edição
+    if (this.isEditMode) {
+      // Status é obrigatório
+      this.formGeral.get('status')?.setValidators([Validators.required]);
+      this.formGeral.get('status')?.updateValueAndValidity();
+
+      // CNPJ/CPF não pode ser alterado
+      this.formGeral.get('cnpjCpf')?.disable();
+    }
   }
 
   /**
@@ -226,17 +238,15 @@ export class FornecedorDialogComponent implements OnInit {
       }
     });
 
-    // Monta objeto fornecedor conforme CreateFornecedorDto
+    // Monta objeto fornecedor conforme CreateFornecedorDto ou UpdateFornecedorDto
     const fornecedor: any = {
       razaoSocial: this.formGeral.value.razaoSocial,
       nomeFantasia: this.formGeral.value.nomeFantasia || null,
-      cnpjCpf: this.formGeral.value.cnpjCpf,
       email: this.formGeral.value.email,
       telefone: this.formGeral.value.telefone,
       inscricaoEstadual: this.formGeral.value.inscricaoEstadual || null,
       inscricaoMunicipal: this.formGeral.value.inscricaoMunicipal || null,
-      tipo: Number(this.formGeral.value.tipo),
-      status: this.formGeral.value.status ? Number(this.formGeral.value.status) : null,
+      tipo: Number(this.formGeral.value.tipo) || TipoFornecedor.Nacional, // Padrão: Nacional
       observacoes: this.formGeral.value.observacoes || null,
       contatoPrincipal: this.formGeral.value.contatoPrincipal || null,
       site: this.formGeral.value.site || null,
@@ -249,12 +259,44 @@ export class FornecedorDialogComponent implements OnInit {
       condicoesPagamento: this.formComercial.value.condicoesPagamento || null
     };
 
-    // Adiciona endereço apenas se houver dados
+    // CNPJ/CPF: apenas para CREATE (não deve ser alterado em UPDATE)
+    if (!this.isEditMode) {
+      fornecedor.cnpjCpf = this.formGeral.value.cnpjCpf;
+    }
+
+    // Status: obrigatório para UPDATE, opcional para CREATE
+    if (this.isEditMode) {
+      fornecedor.status = Number(this.formGeral.value.status) || StatusFornecedor.Ativo; // Padrão: Ativo
+    } else {
+      fornecedor.status = this.formGeral.value.status ? Number(this.formGeral.value.status) : null;
+    }
+
+    // Adiciona endereço com campos obrigatórios preenchidos
     if (Object.keys(enderecoValue).length > 0) {
       fornecedor.endereco = {
-        ...enderecoValue,
-        tipo: enderecoValue.tipo ? Number(enderecoValue.tipo) : TipoEndereco.Comercial
+        tipo: enderecoValue.tipo ? Number(enderecoValue.tipo) : TipoEndereco.Comercial,
+        cep: enderecoValue.cep || "",
+        logradouro: enderecoValue.logradouro || "",
+        numero: enderecoValue.numero || "",
+        complemento: enderecoValue.complemento || "",
+        unidade: enderecoValue.unidade || "",
+        bairro: enderecoValue.bairro || "",
+        localidade: enderecoValue.localidade || "",
+        uf: enderecoValue.uf || "",
+        estado: enderecoValue.estado || "",
+        regiao: enderecoValue.regiao || "Sudeste",
+        referencia: enderecoValue.referencia || "",
+        isPrincipal: enderecoValue.isPrincipal ?? true
       };
+    }
+
+    // Validações finais antes de enviar
+    if (!fornecedor.tipo) {
+      fornecedor.tipo = TipoFornecedor.Nacional; // Nacional por padrão
+    }
+
+    if (this.isEditMode && !fornecedor.status) {
+      fornecedor.status = StatusFornecedor.Ativo; // Ativo por padrão
     }
 
     // Adiciona ID se estiver editando (para PUT)
@@ -262,7 +304,7 @@ export class FornecedorDialogComponent implements OnInit {
       fornecedor.id = this.formGeral.value.id;
     }
 
-    console.log('✅ Payload válido sendo enviado:', JSON.stringify(fornecedor, null, 2));
+    console.log(`✅ Payload ${this.isEditMode ? 'UPDATE' : 'CREATE'} sendo enviado:`, JSON.stringify(fornecedor, null, 2));
     this.dialogRef.close(fornecedor);
   }
 
