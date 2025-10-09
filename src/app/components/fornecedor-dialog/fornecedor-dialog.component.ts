@@ -96,78 +96,82 @@ export class FornecedorDialogComponent implements OnInit {
   ) {
     this.isEditMode = !!data?.id;
 
+    // Converte os tipos string para enum se necessário
+    const fornecedorData = this.convertApiDataTypes(data);
+    console.log('Dados convertidos:', fornecedorData);
+
     // Form Dados Gerais
     this.formGeral = this.fb.group({
-      id: [data?.id],
-      razaoSocial: [data?.razaoSocial || '', [
+      id: [fornecedorData?.id],
+      razaoSocial: [fornecedorData?.razaoSocial || '', [
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(200)
       ]],
-      nomeFantasia: [data?.nomeFantasia || '', [Validators.maxLength(200)]],
-      cnpjCpf: [data?.cnpjCpf || '', [
+      nomeFantasia: [fornecedorData?.nomeFantasia || '', [Validators.maxLength(200)]],
+      cnpjCpf: [fornecedorData?.cnpjCpf || '', [
         Validators.required,
         Validators.pattern(/^(\d{11}|\d{14}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/) // CPF/CNPJ formatado ou não
       ]],
-      email: [data?.email || '', [
+      email: [fornecedorData?.email || '', [
         Validators.required,
         Validators.email,
         Validators.maxLength(100)
       ]],
-      telefone: [data?.telefone || '', [
+      telefone: [fornecedorData?.telefone || '', [
         Validators.required,
         Validators.pattern(/^\(?([0-9]{2})\)?\s?([0-9]{4,5})-?([0-9]{4})$|^\d{10,11}$/) // Telefone formatado ou apenas números
       ]],
-      inscricaoEstadual: [data?.inscricaoEstadual || '', [Validators.maxLength(20)]],
-      inscricaoMunicipal: [data?.inscricaoMunicipal || '', [Validators.maxLength(20)]],
-      tipo: [data?.tipo || TipoFornecedor.Nacional, Validators.required],
-      status: [data?.status || StatusFornecedor.Ativo],
-      contatoPrincipal: [data?.contatoPrincipal || '', [Validators.maxLength(100)]],
-      site: [data?.site || '', [
+      inscricaoEstadual: [fornecedorData?.inscricaoEstadual || '', [Validators.maxLength(20)]],
+      inscricaoMunicipal: [fornecedorData?.inscricaoMunicipal || '', [Validators.maxLength(20)]],
+      tipo: [fornecedorData?.tipo || TipoFornecedor.Nacional, Validators.required],
+      status: [fornecedorData?.status || StatusFornecedor.Ativo],
+      contatoPrincipal: [fornecedorData?.contatoPrincipal || '', [Validators.maxLength(100)]],
+      site: [fornecedorData?.site || '', [
         Validators.pattern(/^https?:\/\/.+\..+/) // URL válida
       ]],
-      observacoes: [data?.observacoes || '', [Validators.maxLength(500)]]
+      observacoes: [fornecedorData?.observacoes || '', [Validators.maxLength(500)]]
     });
 
     // Form Endereço
     this.formEndereco = this.fb.group({
-      tipo: [data?.endereco?.tipo || TipoEndereco.Comercial],
-      cep: [data?.endereco?.cep || '', [
+      tipo: [fornecedorData?.endereco?.tipo || TipoEndereco.Comercial],
+      cep: [fornecedorData?.endereco?.cep || '', [
         Validators.pattern(/^\d{8}$|^\d{5}-\d{3}$/) // CEP: 8 dígitos ou formatado 00000-000
       ]],
-      logradouro: [data?.endereco?.logradouro || '', [Validators.maxLength(200)]],
-      numero: [data?.endereco?.numero || '', [Validators.maxLength(10)]],
-      complemento: [data?.endereco?.complemento || '', [Validators.maxLength(100)]],
-      unidade: [data?.endereco?.unidade || '', [Validators.maxLength(50)]],
-      bairro: [data?.endereco?.bairro || '', [Validators.maxLength(100)]],
-      localidade: [data?.endereco?.localidade || '', [Validators.maxLength(100)]],
-      uf: [data?.endereco?.uf || '', [
+      logradouro: [fornecedorData?.endereco?.logradouro || '', [Validators.maxLength(200)]],
+      numero: [fornecedorData?.endereco?.numero || '', [Validators.maxLength(10)]],
+      complemento: [fornecedorData?.endereco?.complemento || '', [Validators.maxLength(100)]],
+      unidade: [fornecedorData?.endereco?.unidade || '', [Validators.maxLength(50)]],
+      bairro: [fornecedorData?.endereco?.bairro || '', [Validators.maxLength(100)]],
+      localidade: [fornecedorData?.endereco?.localidade || '', [Validators.maxLength(100)]],
+      uf: [fornecedorData?.endereco?.uf || '', [
         Validators.pattern(/^[A-Z]{2}$/), // UF: 2 letras maiúsculas
         Validators.maxLength(2)
       ]],
-      estado: [data?.endereco?.estado || '', [Validators.maxLength(50)]],
-      regiao: [data?.endereco?.regiao || '', [Validators.maxLength(50)]],
-      referencia: [data?.endereco?.referencia || '', [Validators.maxLength(200)]],
-      isPrincipal: [data?.endereco?.isPrincipal ?? true]
+      estado: [fornecedorData?.endereco?.estado || '', [Validators.maxLength(50)]],
+      regiao: [fornecedorData?.endereco?.regiao || '', [Validators.maxLength(50)]],
+      referencia: [fornecedorData?.endereco?.referencia || '', [Validators.maxLength(200)]],
+      isPrincipal: [fornecedorData?.endereco?.isPrincipal ?? true]
     });
 
     // Form Bancário
     this.formBancario = this.fb.group({
-      banco: [data?.banco || '', [Validators.maxLength(100)]],
-      agencia: [data?.agencia || '', [
+      banco: [fornecedorData?.banco || '', [Validators.maxLength(100)]],
+      agencia: [fornecedorData?.agencia || '', [
         Validators.pattern(/^\d{4,5}$/) // Agência: 4 ou 5 dígitos
       ]],
-      conta: [data?.conta || '', [
+      conta: [fornecedorData?.conta || '', [
         Validators.pattern(/^\d{5,12}$/) // Conta: 5 a 12 dígitos
       ]],
-      pix: [data?.pix || '', [Validators.maxLength(200)]]
+      pix: [fornecedorData?.pix || '', [Validators.maxLength(200)]]
     });
 
     // Form Comercial
     this.formComercial = this.fb.group({
-      prazoPagamentoPadrao: [data?.prazoPagamentoPadrao || 0, [Validators.required, Validators.min(0)]],
-      limiteCredito: [data?.limiteCredito || 0, [Validators.required, Validators.min(0)]],
-      condicoesPagamento: [data?.condicoesPagamento || '']
+      prazoPagamentoPadrao: [fornecedorData?.prazoPagamentoPadrao || 0, [Validators.required, Validators.min(0)]],
+      limiteCredito: [fornecedorData?.limiteCredito || 0, [Validators.required, Validators.min(0)]],
+      condicoesPagamento: [fornecedorData?.condicoesPagamento || '']
     });
   }
 
@@ -439,5 +443,42 @@ export class FornecedorDialogComponent implements OnInit {
       contatoEmail: 'Email'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  /**
+   * Converte os tipos string da API para enums
+   */
+  private convertApiDataTypes(data: Fornecedor | null): Fornecedor | null {
+    if (!data) return null;
+
+    return {
+      ...data,
+      // Converte tipo de string para enum number
+      tipo: typeof data.tipo === 'string' ? parseInt(data.tipo) : data.tipo,
+      // Converte status de string para enum number  
+      status: typeof data.status === 'string' ? parseInt(data.status) : data.status,
+      endereco: data.endereco ? {
+        ...data.endereco,
+        // Converte tipo do endereço de string para enum
+        tipo: this.convertEnderecoTipo(data.endereco.tipo)
+      } : undefined
+    };
+  }
+
+  /**
+   * Converte tipo de endereço string para enum
+   */
+  private convertEnderecoTipo(tipo: any): TipoEndereco {
+    if (typeof tipo === 'number') return tipo;
+    
+    const tipoMap: { [key: string]: TipoEndereco } = {
+      'Residencial': TipoEndereco.Residencial,
+      'Comercial': TipoEndereco.Comercial,
+      'Cobranca': TipoEndereco.Cobranca,
+      'Entrega': TipoEndereco.Entrega,
+      'Outro': TipoEndereco.Outro
+    };
+
+    return tipoMap[tipo] || TipoEndereco.Comercial;
   }
 }
