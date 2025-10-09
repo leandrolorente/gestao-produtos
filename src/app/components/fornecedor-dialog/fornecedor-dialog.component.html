@@ -37,7 +37,7 @@
             <mat-form-field appearance="outline">
               <mat-label>CNPJ/CPF</mat-label>
               <input matInput formControlName="cnpjCpf" cnpjCpfMask
-                     placeholder="00.000.000/0000-00" required autocomplete="off">
+                     placeholder="00.000.000/0000-00" required autocomplete="off" maxlength="18">
               <mat-icon matPrefix>badge</mat-icon>
               @if (formGeral.get('cnpjCpf')?.invalid && formGeral.get('cnpjCpf')?.touched) {
                 <mat-error>{{ getFieldErrorMessage('cnpjCpf') }}</mat-error>
@@ -108,7 +108,7 @@
             <mat-form-field appearance="outline">
               <mat-label>Telefone</mat-label>
               <input matInput formControlName="telefone" telefoneMask
-                     placeholder="(00) 00000-0000" required>
+                     placeholder="(00) 00000-0000" required maxlength="15">
               <mat-icon matPrefix>phone</mat-icon>
               @if (formGeral.get('telefone')?.invalid && formGeral.get('telefone')?.touched) {
                 <mat-error>{{ getFieldErrorMessage('telefone') }}</mat-error>
@@ -151,7 +151,7 @@
             <mat-form-field appearance="outline">
               <mat-label>CEP</mat-label>
               <input matInput formControlName="cep" cepMask
-                     (blur)="buscarCep()" placeholder="00000-000">
+                     (blur)="buscarCep()" placeholder="00000-000" maxlength="9">
               <mat-icon matPrefix>pin_drop</mat-icon>
               @if (isLoadingCep()) {
                 <mat-icon matSuffix class="loading-icon">

@@ -17,6 +17,11 @@ export class TelefoneMaskDirective {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
 
+    // Limita a 11 dígitos máximo
+    if (value.length > 11) {
+      value = value.substring(0, 11);
+    }
+
     if (value.length <= 10) {
       // (00) 0000-0000
       value = value.replace(/(\d{2})(\d)/, '($1) $2');
@@ -29,9 +34,9 @@ export class TelefoneMaskDirective {
 
     input.value = value;
 
-    // Atualiza FormControl com apenas números
+    // Atualiza FormControl com valor formatado
     if (this.control?.control) {
-      this.control.control.setValue(value.replace(/\D/g, ''), { emitEvent: false });
+      this.control.control.setValue(value, { emitEvent: false });
     }
   }
 

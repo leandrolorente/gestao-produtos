@@ -19,7 +19,7 @@ import { Fornecedor, TipoFornecedor, StatusFornecedor } from '../../models/Forne
 import { TipoEndereco } from '../../models/Endereco';
 import { HttpClient } from '@angular/common/http';
 import { CnpjCpfMaskDirective } from '../../directives/cnpj-cpf-mask.directive';
-import { TelefoneMaskDirective } from '../../directives/telefone-mask.directive';
+import { TelefoneMaskDirective } from '../../directives/telefone-mask-new.directive';
 import { CepMaskDirective } from '../../directives/cep-mask.directive';
 import { NumbersOnlyMaskDirective } from '../../directives/numbers-only-mask.directive';
 import { UfMaskDirective } from '../../directives/uf-mask.directive';

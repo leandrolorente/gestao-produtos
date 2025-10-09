@@ -17,6 +17,11 @@ export class CnpjCpfMaskDirective {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
 
+    // Limita a 14 dígitos máximo (CNPJ)
+    if (value.length > 14) {
+      value = value.substring(0, 14);
+    }
+
     if (value.length <= 11) {
       // CPF: 000.000.000-00
       value = value.replace(/(\d{3})(\d)/, '$1.$2');
