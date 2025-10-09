@@ -17,6 +17,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { FornecedorDialogComponent } from '../../../components/fornecedor-dialog/fornecedor-dialog.component';
 import { Fornecedor, StatusFornecedor, TipoFornecedor } from '../../../models/Fornecedor';
 import { FornecedorService } from '../../../services/fornecedor.service';
+import { ConfirmationDialogService } from '../../../services/confirmation-dialog.service';
 
 @Component({
   selector: 'app-fornecedor-list',
@@ -66,7 +67,8 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
   constructor(
     public dialog: MatDialog,
     private fornecedorService: FornecedorService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private confirmationService: ConfirmationDialogService
   ) {}
 
   ngOnInit(): void {
@@ -336,20 +338,25 @@ export class FornecedorListComponent implements OnInit, AfterViewInit {
    * Deleta um fornecedor (soft delete)
    */
   deleteFornecedor(fornecedor: Fornecedor): void {
-    if (!confirm(`Deseja realmente excluir o fornecedor "${fornecedor.nomeFantasia}"?`)) {
-      return;
-    }
-
-    this.fornecedorService.delete(fornecedor.id).subscribe({
-      next: () => {
-        this.dataSource.data = this.dataSource.data.filter(f => f.id !== fornecedor.id);
-        this.calcularEstatisticas(this.dataSource.data);
-        this.showSnackBar('Fornecedor excluído com sucesso!', 'success');
-      },
-      error: (error) => {
-        console.error('Erro ao excluir fornecedor:', error);
-        this.showSnackBar('Erro ao excluir fornecedor', 'error');
+    this.confirmationService.confirmDelete(
+      `fornecedor "${fornecedor.nomeFantasia || fornecedor.razaoSocial}"`,
+      {
+        customMessage: `Tem certeza que deseja excluir o fornecedor "${fornecedor.nomeFantasia || fornecedor.razaoSocial}"?\n\nEsta ação é irreversível e todos os dados do fornecedor serão perdidos.`
       }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.fornecedorService.delete(fornecedor.id).subscribe({
+        next: () => {
+          this.dataSource.data = this.dataSource.data.filter(f => f.id !== fornecedor.id);
+          this.calcularEstatisticas(this.dataSource.data);
+          this.showSnackBar('Fornecedor excluído com sucesso!', 'success');
+        },
+        error: (error) => {
+          console.error('Erro ao excluir fornecedor:', error);
+          this.showSnackBar('Erro ao excluir fornecedor', 'error');
+        }
+      });
     });
   }
 

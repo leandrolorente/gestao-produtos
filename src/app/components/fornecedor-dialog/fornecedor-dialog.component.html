@@ -19,7 +19,8 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Razão Social</mat-label>
-              <input matInput formControlName="razaoSocial" placeholder="Razão social completa" required>
+              <input matInput formControlName="razaoSocial" placeholder="Razão social completa"
+                     required maxlength="200">
               <mat-icon matPrefix>domain</mat-icon>
               @if (formGeral.get('razaoSocial')?.invalid && formGeral.get('razaoSocial')?.touched) {
                 <mat-error>{{ getFieldErrorMessage('razaoSocial') }}</mat-error>
@@ -28,14 +29,15 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Nome Fantasia</mat-label>
-              <input matInput formControlName="nomeFantasia" placeholder="Nome fantasia (opcional)">
+              <input matInput formControlName="nomeFantasia" placeholder="Nome fantasia (opcional)"
+                     maxlength="200">
               <mat-icon matPrefix>business</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>CNPJ/CPF</mat-label>
-              <input matInput formControlName="cnpjCpf" (input)="formatCnpjCpf($event)"
-                     placeholder="00.000.000/0000-00" required>
+              <input matInput formControlName="cnpjCpf" cnpjCpfMask
+                     placeholder="00.000.000/0000-00" required autocomplete="off">
               <mat-icon matPrefix>badge</mat-icon>
               @if (formGeral.get('cnpjCpf')?.invalid && formGeral.get('cnpjCpf')?.touched) {
                 <mat-error>{{ getFieldErrorMessage('cnpjCpf') }}</mat-error>
@@ -44,13 +46,15 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Inscrição Estadual</mat-label>
-              <input matInput formControlName="inscricaoEstadual" placeholder="000.000.000.000">
+              <input matInput formControlName="inscricaoEstadual" placeholder="000.000.000.000"
+                     maxlength="20">
               <mat-icon matPrefix>description</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Inscrição Municipal</mat-label>
-              <input matInput formControlName="inscricaoMunicipal" placeholder="00000000">
+              <input matInput formControlName="inscricaoMunicipal" placeholder="00000000"
+                     maxlength="20">
               <mat-icon matPrefix>description</mat-icon>
             </mat-form-field>
 
@@ -76,8 +80,12 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Site</mat-label>
-              <input matInput formControlName="site" placeholder="https://exemplo.com.br">
+              <input matInput formControlName="site" (blur)="formatUrl($event)"
+                     placeholder="https://exemplo.com.br">
               <mat-icon matPrefix>language</mat-icon>
+              @if (formGeral.get('site')?.invalid && formGeral.get('site')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('site') }}</mat-error>
+              }
             </mat-form-field>
 
             <mat-divider class="full-width"></mat-divider>
@@ -89,7 +97,8 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="contato@exemplo.com" required>
+              <input matInput type="email" formControlName="email"
+                     placeholder="contato@exemplo.com" required maxlength="100">
               <mat-icon matPrefix>email</mat-icon>
               @if (formGeral.get('email')?.invalid && formGeral.get('email')?.touched) {
                 <mat-error>{{ getFieldErrorMessage('email') }}</mat-error>
@@ -98,24 +107,24 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Telefone</mat-label>
-              <input matInput formControlName="telefone"
-                     (input)="formatTelefone($event, 'telefone')"
+              <input matInput formControlName="telefone" telefoneMask
                      placeholder="(00) 00000-0000" required>
               <mat-icon matPrefix>phone</mat-icon>
               @if (formGeral.get('telefone')?.invalid && formGeral.get('telefone')?.touched) {
-                <mat-error>Telefone é obrigatório</mat-error>
+                <mat-error>{{ getFieldErrorMessage('telefone') }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Contato Principal</mat-label>
-              <input matInput formControlName="contatoPrincipal" placeholder="Nome do responsável">
+              <input matInput formControlName="contatoPrincipal" placeholder="Nome do responsável"
+                     maxlength="100">
               <mat-icon matPrefix>person</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Observações</mat-label>
-              <textarea matInput formControlName="observacoes" rows="3"
+              <textarea matInput formControlName="observacoes" rows="3" maxlength="500"
                         placeholder="Informações adicionais sobre o fornecedor"></textarea>
               <mat-icon matPrefix>notes</mat-icon>
             </mat-form-field>
@@ -141,7 +150,7 @@
 
             <mat-form-field appearance="outline">
               <mat-label>CEP</mat-label>
-              <input matInput formControlName="cep" (input)="formatCep($event)"
+              <input matInput formControlName="cep" cepMask
                      (blur)="buscarCep()" placeholder="00000-000">
               <mat-icon matPrefix>pin_drop</mat-icon>
               @if (isLoadingCep()) {
@@ -149,66 +158,78 @@
                   <span class="spinner"></span>
                 </mat-icon>
               }
+              @if (formEndereco.get('cep')?.invalid && formEndereco.get('cep')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('cep', formEndereco) }}</mat-error>
+              }
               <mat-hint>Digite o CEP e pressione TAB para buscar</mat-hint>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Logradouro</mat-label>
-              <input matInput formControlName="logradouro" placeholder="Rua, Avenida...">
+              <input matInput formControlName="logradouro" placeholder="Rua, Avenida..."
+                     maxlength="200">
               <mat-icon matPrefix>signpost</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Número</mat-label>
-              <input matInput formControlName="numero" placeholder="123">
+              <input matInput formControlName="numero" placeholder="123" maxlength="10">
               <mat-icon matPrefix>tag</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Complemento</mat-label>
-              <input matInput formControlName="complemento" placeholder="Sala, Bloco...">
+              <input matInput formControlName="complemento" placeholder="Sala, Bloco..."
+                     maxlength="100">
               <mat-icon matPrefix>apartment</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Bairro</mat-label>
-              <input matInput formControlName="bairro" placeholder="Centro">
+              <input matInput formControlName="bairro" placeholder="Centro" maxlength="100">
               <mat-icon matPrefix>map</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Cidade</mat-label>
-              <input matInput formControlName="localidade" placeholder="São Paulo">
+              <input matInput formControlName="localidade" placeholder="São Paulo"
+                     maxlength="100">
               <mat-icon matPrefix>location_city</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>UF</mat-label>
-              <input matInput formControlName="uf" placeholder="SP" maxlength="2">
+              <input matInput formControlName="uf" ufMask
+                     placeholder="SP" maxlength="2">
               <mat-icon matPrefix>flag</mat-icon>
+              @if (formEndereco.get('uf')?.invalid && formEndereco.get('uf')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('uf', formEndereco) }}</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Estado</mat-label>
-              <input matInput formControlName="estado" placeholder="São Paulo">
+              <input matInput formControlName="estado" placeholder="São Paulo" maxlength="50">
               <mat-icon matPrefix>public</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Unidade</mat-label>
-              <input matInput formControlName="unidade" placeholder="Apto, Loja...">
+              <input matInput formControlName="unidade" placeholder="Apto, Loja..." maxlength="50">
               <mat-icon matPrefix>store</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Região</mat-label>
-              <input matInput formControlName="regiao" placeholder="Centro, Zona Sul...">
+              <input matInput formControlName="regiao" placeholder="Centro, Zona Sul..."
+                     maxlength="50">
               <mat-icon matPrefix>explore</mat-icon>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Ponto de Referência</mat-label>
-              <input matInput formControlName="referencia" placeholder="Próximo ao shopping...">
+              <input matInput formControlName="referencia" placeholder="Próximo ao shopping..."
+                     maxlength="200">
               <mat-icon matPrefix>place</mat-icon>
             </mat-form-field>
 
@@ -236,19 +257,28 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Agência</mat-label>
-              <input matInput formControlName="agencia" placeholder="0000">
+              <input matInput formControlName="agencia" numbersOnlyMask
+                     placeholder="0000" maxlength="5">
               <mat-icon matPrefix>store</mat-icon>
+              @if (formBancario.get('agencia')?.invalid && formBancario.get('agencia')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('agencia', formBancario) }}</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Conta</mat-label>
-              <input matInput formControlName="conta" placeholder="00000-0">
+              <input matInput formControlName="conta" numbersOnlyMask
+                     placeholder="00000-0" maxlength="12">
               <mat-icon matPrefix>credit_card</mat-icon>
+              @if (formBancario.get('conta')?.invalid && formBancario.get('conta')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('conta', formBancario) }}</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Chave PIX</mat-label>
-              <input matInput formControlName="pix" placeholder="Email, telefone, CPF/CNPJ ou chave aleatória">
+              <input matInput formControlName="pix" maxlength="200"
+                     placeholder="Email, telefone, CPF/CNPJ ou chave aleatória">
               <mat-icon matPrefix>pix</mat-icon>
               <mat-hint>Informe a chave PIX do fornecedor</mat-hint>
             </mat-form-field>

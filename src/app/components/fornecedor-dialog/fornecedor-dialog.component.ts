@@ -18,6 +18,11 @@ import { CommonModule } from '@angular/common';
 import { Fornecedor, TipoFornecedor, StatusFornecedor } from '../../models/Fornecedor';
 import { TipoEndereco } from '../../models/Endereco';
 import { HttpClient } from '@angular/common/http';
+import { CnpjCpfMaskDirective } from '../../directives/cnpj-cpf-mask.directive';
+import { TelefoneMaskDirective } from '../../directives/telefone-mask.directive';
+import { CepMaskDirective } from '../../directives/cep-mask.directive';
+import { NumbersOnlyMaskDirective } from '../../directives/numbers-only-mask.directive';
+import { UfMaskDirective } from '../../directives/uf-mask.directive';
 
 interface ViaCepResponse {
   cep: string;
@@ -44,7 +49,12 @@ interface ViaCepResponse {
     MatSelectModule,
     MatTabsModule,
     MatDividerModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    CnpjCpfMaskDirective,
+    TelefoneMaskDirective,
+    CepMaskDirective,
+    NumbersOnlyMaskDirective,
+    UfMaskDirective
   ],
   templateUrl: './fornecedor-dialog.component.html',
   styleUrls: ['./fornecedor-dialog.component.scss']
@@ -89,43 +99,68 @@ export class FornecedorDialogComponent implements OnInit {
     // Form Dados Gerais
     this.formGeral = this.fb.group({
       id: [data?.id],
-      razaoSocial: [data?.razaoSocial || '', [Validators.required, Validators.minLength(3)]],
-      nomeFantasia: [data?.nomeFantasia || ''],
-      cnpjCpf: [data?.cnpjCpf || '', [Validators.required]],
-      email: [data?.email || '', [Validators.required, Validators.email]],
-      telefone: [data?.telefone || '', [Validators.required]],
-      inscricaoEstadual: [data?.inscricaoEstadual || ''],
-      inscricaoMunicipal: [data?.inscricaoMunicipal || ''],
+      razaoSocial: [data?.razaoSocial || '', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(200)
+      ]],
+      nomeFantasia: [data?.nomeFantasia || '', [Validators.maxLength(200)]],
+      cnpjCpf: [data?.cnpjCpf || '', [
+        Validators.required,
+        Validators.pattern(/^(\d{11}|\d{14}|\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/) // CPF/CNPJ formatado ou não
+      ]],
+      email: [data?.email || '', [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(100)
+      ]],
+      telefone: [data?.telefone || '', [
+        Validators.required,
+        Validators.pattern(/^\(?([0-9]{2})\)?\s?([0-9]{4,5})-?([0-9]{4})$|^\d{10,11}$/) // Telefone formatado ou apenas números
+      ]],
+      inscricaoEstadual: [data?.inscricaoEstadual || '', [Validators.maxLength(20)]],
+      inscricaoMunicipal: [data?.inscricaoMunicipal || '', [Validators.maxLength(20)]],
       tipo: [data?.tipo || TipoFornecedor.Nacional, Validators.required],
       status: [data?.status || StatusFornecedor.Ativo],
-      contatoPrincipal: [data?.contatoPrincipal || ''],
-      site: [data?.site || ''],
-      observacoes: [data?.observacoes || '']
+      contatoPrincipal: [data?.contatoPrincipal || '', [Validators.maxLength(100)]],
+      site: [data?.site || '', [
+        Validators.pattern(/^https?:\/\/.+\..+/) // URL válida
+      ]],
+      observacoes: [data?.observacoes || '', [Validators.maxLength(500)]]
     });
 
     // Form Endereço
     this.formEndereco = this.fb.group({
       tipo: [data?.endereco?.tipo || TipoEndereco.Comercial],
-      cep: [data?.endereco?.cep || ''],
-      logradouro: [data?.endereco?.logradouro || ''],
-      numero: [data?.endereco?.numero || ''],
-      complemento: [data?.endereco?.complemento || ''],
-      unidade: [data?.endereco?.unidade || ''],
-      bairro: [data?.endereco?.bairro || ''],
-      localidade: [data?.endereco?.localidade || ''],
-      uf: [data?.endereco?.uf || ''],
-      estado: [data?.endereco?.estado || ''],
-      regiao: [data?.endereco?.regiao || ''],
-      referencia: [data?.endereco?.referencia || ''],
+      cep: [data?.endereco?.cep || '', [
+        Validators.pattern(/^\d{8}$|^\d{5}-\d{3}$/) // CEP: 8 dígitos ou formatado 00000-000
+      ]],
+      logradouro: [data?.endereco?.logradouro || '', [Validators.maxLength(200)]],
+      numero: [data?.endereco?.numero || '', [Validators.maxLength(10)]],
+      complemento: [data?.endereco?.complemento || '', [Validators.maxLength(100)]],
+      unidade: [data?.endereco?.unidade || '', [Validators.maxLength(50)]],
+      bairro: [data?.endereco?.bairro || '', [Validators.maxLength(100)]],
+      localidade: [data?.endereco?.localidade || '', [Validators.maxLength(100)]],
+      uf: [data?.endereco?.uf || '', [
+        Validators.pattern(/^[A-Z]{2}$/), // UF: 2 letras maiúsculas
+        Validators.maxLength(2)
+      ]],
+      estado: [data?.endereco?.estado || '', [Validators.maxLength(50)]],
+      regiao: [data?.endereco?.regiao || '', [Validators.maxLength(50)]],
+      referencia: [data?.endereco?.referencia || '', [Validators.maxLength(200)]],
       isPrincipal: [data?.endereco?.isPrincipal ?? true]
     });
 
     // Form Bancário
     this.formBancario = this.fb.group({
-      banco: [data?.banco || ''],
-      agencia: [data?.agencia || ''],
-      conta: [data?.conta || ''],
-      pix: [data?.pix || '']
+      banco: [data?.banco || '', [Validators.maxLength(100)]],
+      agencia: [data?.agencia || '', [
+        Validators.pattern(/^\d{4,5}$/) // Agência: 4 ou 5 dígitos
+      ]],
+      conta: [data?.conta || '', [
+        Validators.pattern(/^\d{5,12}$/) // Conta: 5 a 12 dígitos
+      ]],
+      pix: [data?.pix || '', [Validators.maxLength(200)]]
     });
 
     // Form Comercial
@@ -141,9 +176,18 @@ export class FornecedorDialogComponent implements OnInit {
     this.formGeral.get('tipo')?.valueChanges.subscribe(tipo => {
       const cnpjControl = this.formGeral.get('cnpjCpf');
       if (tipo === TipoFornecedor.Nacional) {
-        cnpjControl?.setValidators([Validators.required, Validators.pattern(/^\d{11}|\d{14}$/)]);
+        // CPF: 11 dígitos ou CNPJ: 14 dígitos
+        cnpjControl?.setValidators([
+          Validators.required,
+          Validators.pattern(/^(\d{11}|\d{14})$/)
+        ]);
       } else {
-        cnpjControl?.setValidators([Validators.required]);
+        // Internacional: qualquer documento
+        cnpjControl?.setValidators([
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(20)
+        ]);
       }
       cnpjControl?.updateValueAndValidity();
     });
@@ -157,9 +201,20 @@ export class FornecedorDialogComponent implements OnInit {
       // CNPJ/CPF não pode ser alterado
       this.formGeral.get('cnpjCpf')?.disable();
     }
+
+    // Aplica máscaras aos valores iniciais
+    this.applyInitialMasks();
   }
 
   /**
+   * Aplica máscaras aos valores que já existem no formulário
+   * As diretivas cuidam das máscaras em tempo real
+   */
+  private applyInitialMasks(): void {
+    // As diretivas já aplicam as máscaras automaticamente
+    // Esta função pode ser removida no futuro se não houver necessidade
+    // de inicialização especial
+  }  /**
    * Busca endereço pelo CEP usando ViaCEP
    */
   buscarCep(): void {
@@ -320,53 +375,20 @@ export class FornecedorDialogComponent implements OnInit {
   }
 
   /**
-   * Formata CNPJ/CPF durante digitação
+   * Formata URL
    */
-  formatCnpjCpf(event: any): void {
-    let value = event.target.value.replace(/\D/g, '');
+  formatUrl(event: any): void {
+    let value = event.target.value.trim();
 
-    if (value.length <= 11) {
-      // CPF: 000.000.000-00
-      value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-    } else {
-      // CNPJ: 00.000.000/0000-00
-      value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    // Auto-adiciona https:// se não existir
+    if (value && !value.match(/^https?:\/\//)) {
+      value = 'https://' + value;
+      event.target.value = value;
     }
 
-    event.target.value = value;
-    this.formGeral.get('cnpjCpf')?.setValue(value.replace(/\D/g, ''));
-  }
-
-  /**
-   * Formata CEP durante digitação
-   */
-  formatCep(event: any): void {
-    let value = event.target.value.replace(/\D/g, '');
-    value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
-    event.target.value = value;
-    this.formEndereco.get('cep')?.setValue(value.replace(/\D/g, ''));
-  }
-
-  /**
-   * Formata telefone durante digitação
-   */
-  formatTelefone(event: any, fieldName: string): void {
-    let value = event.target.value.replace(/\D/g, '');
-
-    if (value.length <= 10) {
-      // (00) 0000-0000
-      value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-    } else {
-      // (00) 00000-0000
-      value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-    }
-
-    event.target.value = value;
-    this.formGeral.get(fieldName)?.setValue(value.replace(/\D/g, ''));
-  }
-
-  /**
-   * Retorna mensagem de erro do campo
+    this.formGeral.get('site')?.setValue(value, { emitEvent: false });
+  }  /**
+   * Retorna mensagem de erro do campo melhorada
    */
   getFieldErrorMessage(fieldName: string, formGroup: FormGroup = this.formGeral): string {
     const control = formGroup.get(fieldName);
@@ -377,12 +399,30 @@ export class FornecedorDialogComponent implements OnInit {
     if (control?.hasError('minlength')) {
       return `Mínimo ${control.errors?.['minlength'].requiredLength} caracteres`;
     }
+    if (control?.hasError('maxlength')) {
+      return `Máximo ${control.errors?.['maxlength'].requiredLength} caracteres`;
+    }
     if (control?.hasError('email')) {
       return 'Email inválido';
     }
     if (control?.hasError('pattern')) {
-      if (fieldName === 'cnpjCpf') {
-        return 'CPF/CNPJ inválido';
+      switch (fieldName) {
+        case 'cnpjCpf':
+          return 'CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos';
+        case 'telefone':
+          return 'Telefone deve ter 10 ou 11 dígitos';
+        case 'cep':
+          return 'CEP deve ter 8 dígitos';
+        case 'uf':
+          return 'UF deve ter 2 letras (ex: SP)';
+        case 'agencia':
+          return 'Agência deve ter 4 ou 5 dígitos';
+        case 'conta':
+          return 'Conta deve ter entre 5 e 12 dígitos';
+        case 'site':
+          return 'URL inválida (ex: https://exemplo.com)';
+        default:
+          return 'Formato inválido';
       }
     }
 

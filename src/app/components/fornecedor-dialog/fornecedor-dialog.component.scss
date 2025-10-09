@@ -1,10 +1,18 @@
 /* Fornecedor Dialog Component Styles */
 
+/* Container principal do dialog */
+::ng-deep .mat-mdc-dialog-container {
+  max-height: 90vh !important;
+  height: 90vh !important;
+  overflow: hidden !important;
+}
+
 .dialog-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 90vh;
   max-height: 90vh;
+  overflow: hidden;
 }
 
 /* --- Header --- */
@@ -14,6 +22,7 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0; /* Não permite que o header encolha */
 
   h2 {
     display: flex;
@@ -46,16 +55,56 @@
   flex: 1;
   overflow: hidden;
   padding: 0 !important;
+  min-height: 0;
+  position: relative;
 
   ::ng-deep .mat-mdc-tab-group {
     height: 100%;
     display: flex;
     flex-direction: column;
-  }
 
-  ::ng-deep .mat-mdc-tab-body-wrapper {
-    flex: 1;
-    overflow-y: auto;
+    .mat-mdc-tab-header {
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+
+      .mat-mdc-tab-body {
+        height: 100%;
+
+        .mat-mdc-tab-body-content {
+          height: 100%;
+          overflow-y: auto;
+          overflow-x: hidden;
+          position: relative;
+
+          /* Estilo da scrollbar */
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+
+            &:hover {
+              background: rgba(0, 0, 0, 0.5);
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -63,6 +112,8 @@
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;
+  min-height: fit-content;
+  overflow-y: visible;
 }
 
 /* --- Forms --- */
@@ -285,4 +336,37 @@
       }
     }
   }
+}
+
+/* --- Scroll Improvements --- */
+::ng-deep .mat-mdc-dialog-container {
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+::ng-deep .mat-mdc-tab-body-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
+/* --- Form Grid Adjustments --- */
+.form-grid {
+  padding-bottom: 2rem; /* Espaço extra no final para melhor scroll */
 }
