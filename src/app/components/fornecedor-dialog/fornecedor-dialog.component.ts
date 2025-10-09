@@ -455,7 +455,7 @@ export class FornecedorDialogComponent implements OnInit {
       ...data,
       // Converte tipo de string para enum number
       tipo: typeof data.tipo === 'string' ? parseInt(data.tipo) : data.tipo,
-      // Converte status de string para enum number  
+      // Converte status de string para enum number
       status: typeof data.status === 'string' ? parseInt(data.status) : data.status,
       endereco: data.endereco ? {
         ...data.endereco,
@@ -470,7 +470,7 @@ export class FornecedorDialogComponent implements OnInit {
    */
   private convertEnderecoTipo(tipo: any): TipoEndereco {
     if (typeof tipo === 'number') return tipo;
-    
+
     const tipoMap: { [key: string]: TipoEndereco } = {
       'Residencial': TipoEndereco.Residencial,
       'Comercial': TipoEndereco.Comercial,
