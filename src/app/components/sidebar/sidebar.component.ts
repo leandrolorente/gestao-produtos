@@ -57,6 +57,15 @@ export class Sidebar {
       route: '/vendas'
     },
     {
+      label: 'Financeiro',
+      icon: 'account_balance',
+      route: '/financeiro',
+      children: [
+        { label: 'Contas a Pagar', icon: 'payment', route: '/contas-pagar' },
+        { label: 'Contas a Receber', icon: 'account_balance_wallet', route: '/contas-receber' }
+      ]
+    },
+    {
       label: 'Relatórios',
       icon: 'analytics',
       route: '/relatorios',

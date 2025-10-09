@@ -1,0 +1,219 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ data.isEdit ? 'edit' : 'add' }}</mat-icon>
+      {{ getDialogTitle() }}
+    </h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Informações Básicas -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>info</mat-icon>
+          Informações Básicas
+        </h3>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-number">
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="numero" placeholder="Ex: PAG-001">
+            <button mat-icon-button matSuffix
+                    type="button"
+                    (click)="generateNumber()"
+                    matTooltip="Gerar número automaticamente">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <mat-error>{{ getFieldErrorMessage('numero') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-categoria">
+            <mat-label>Categoria</mat-label>
+            <mat-select formControlName="categoria">
+              <mat-option *ngFor="let categoria of categorias" [value]="categoria.value">
+                {{ categoria.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error>{{ getFieldErrorMessage('categoria') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descrição</mat-label>
+          <textarea matInput
+                    formControlName="descricao"
+                    placeholder="Descrição da conta a pagar"
+                    rows="3"></textarea>
+          <mat-error>{{ getFieldErrorMessage('descricao') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Fornecedor -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>business</mat-icon>
+          Fornecedor
+        </h3>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-fornecedor-id">
+            <mat-label>ID do Fornecedor</mat-label>
+            <input matInput
+                   type="number"
+                   formControlName="fornecedorId"
+                   placeholder="ID do fornecedor">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-fornecedor-nome">
+            <mat-label>Nome do Fornecedor</mat-label>
+            <input matInput
+                   formControlName="fornecedorNome"
+                   placeholder="Nome do fornecedor">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Valores e Datas -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>attach_money</mat-icon>
+          Valores e Prazos
+        </h3>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-valor">
+            <mat-label>Valor Original</mat-label>
+            <input matInput
+                   formControlName="valorOriginal"
+                   appCurrencyMask
+                   placeholder="R$ 0,00">
+            <span matTextPrefix>R$&nbsp;</span>
+            <mat-error>{{ getFieldErrorMessage('valorOriginal') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-pagamento">
+            <mat-label>Forma de Pagamento</mat-label>
+            <mat-select formControlName="formaPagamento">
+              <mat-option *ngFor="let forma of formasPagamento" [value]="forma.value">
+                {{ forma.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error>{{ getFieldErrorMessage('formaPagamento') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-data">
+            <mat-label>Data de Emissão</mat-label>
+            <input matInput
+                   [matDatepicker]="dataEmissaoPicker"
+                   formControlName="dataEmissao">
+            <mat-datepicker-toggle matIconSuffix [for]="dataEmissaoPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dataEmissaoPicker></mat-datepicker>
+            <mat-error>{{ getFieldErrorMessage('dataEmissao') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-data">
+            <mat-label>Data de Vencimento</mat-label>
+            <input matInput
+                   [matDatepicker]="dataVencimentoPicker"
+                   formControlName="dataVencimento">
+            <mat-datepicker-toggle matIconSuffix [for]="dataVencimentoPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dataVencimentoPicker></mat-datepicker>
+            <mat-error>{{ getFieldErrorMessage('dataVencimento') }}</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Recorrência -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>repeat</mat-icon>
+          Recorrência
+        </h3>
+
+        <div class="recorrencia-container">
+          <mat-checkbox formControlName="recorrente"
+                        (change)="onRecorrenteChange()"
+                        class="recorrente-checkbox">
+            Conta recorrente
+          </mat-checkbox>
+
+          <div *ngIf="form.get('recorrente')?.value" class="recorrencia-fields">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-tipo">
+                <mat-label>Tipo de Recorrência</mat-label>
+                <mat-select formControlName="tipoRecorrencia">
+                  <mat-option *ngFor="let tipo of tiposRecorrencia" [value]="tipo.value">
+                    {{ tipo.label }}
+                  </mat-option>
+                </mat-select>
+                <mat-error>{{ getFieldErrorMessage('tipoRecorrencia') }}</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-parcelas">
+                <mat-label>Quantidade de Parcelas</mat-label>
+                <input matInput
+                       type="number"
+                       formControlName="quantidadeParcelas"
+                       min="1"
+                       placeholder="1">
+                <mat-error>{{ getFieldErrorMessage('quantidadeParcelas') }}</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configurações Adicionais -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>settings</mat-icon>
+          Configurações Adicionais
+        </h3>
+
+        <mat-form-field appearance="outline" class="field-conta-bancaria">
+          <mat-label>Conta Bancária (ID)</mat-label>
+          <input matInput
+                 type="number"
+                 formControlName="contaBancariaId"
+                 placeholder="ID da conta bancária para pagamento">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Observações</mat-label>
+          <textarea matInput
+                    formControlName="observacoes"
+                    placeholder="Observações adicionais sobre a conta"
+                    rows="3"></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSaving()">
+      Cancelar
+    </button>
+
+    <button mat-raised-button
+            color="primary"
+            (click)="onSubmit()"
+            [disabled]="form.invalid || isSaving()">
+      <mat-icon *ngIf="isSaving()">
+        <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
+      </mat-icon>
+      <mat-icon *ngIf="!isSaving()">
+        {{ data.isEdit ? 'save' : 'add' }}
+      </mat-icon>
+      {{ getSaveButtonText() }}
+    </button>
+  </div>
+</div>

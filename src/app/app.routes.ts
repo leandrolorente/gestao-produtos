@@ -50,6 +50,14 @@ export const routes: Routes = [
         component: FornecedorListComponent
       },
       {
+        path: 'contas-pagar',
+        loadComponent: () => import('./pages/contas-pagar/conta-pagar-list/conta-pagar-list.component').then(m => m.ContaPagarListComponent)
+      },
+      {
+        path: 'contas-receber',
+        loadComponent: () => import('./pages/contas-receber/conta-receber-list/conta-receber-list.component').then(m => m.ContaReceberListComponent)
+      },
+      {
         path: 'usuarios',
         component: UserListComponent
       },
