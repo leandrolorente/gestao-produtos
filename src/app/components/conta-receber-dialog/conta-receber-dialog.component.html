@@ -49,37 +49,57 @@
           Cliente
         </h3>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="field-cliente-id">
-            <mat-label>ID do Cliente</mat-label>
-            <input matInput
-                   formControlName="clienteId"
-                   placeholder="ID do cliente">
-          </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cliente</mat-label>
+          <input
+            matInput
+            formControlName="clienteNome"
+            [matAutocomplete]="autoCliente"
+            placeholder="Digite o nome do cliente"
+            (focus)="onClienteFocus()"
+            (input)="onClienteInput($event)">
+          <mat-icon matSuffix>person_search</mat-icon>
+          <mat-autocomplete
+            #autoCliente="matAutocomplete"
+            [displayWith]="displayClienteFn"
+            [autoActiveFirstOption]="false"
+            (optionSelected)="onClienteOptionSelected($event)">
+            @for (cliente of clientesFiltrados(); track cliente.id) {
+              <mat-option [value]="cliente">
+                <div class="autocomplete-option">
+                  <div class="primary-text">{{ cliente.nome }}</div>
+                  <div class="secondary-text">{{ cliente.email }}</div>
+                </div>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
 
-          <mat-form-field appearance="outline" class="field-cliente-nome">
-            <mat-label>Nome do Cliente</mat-label>
-            <input matInput
-                   formControlName="clienteNome"
-                   placeholder="Nome do cliente">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="field-vendedor-id">
-            <mat-label>ID do Vendedor</mat-label>
-            <input matInput
-                   formControlName="vendedorId"
-                   placeholder="ID do vendedor">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field-vendedor-nome">
-            <mat-label>Nome do Vendedor</mat-label>
-            <input matInput
-                   formControlName="vendedorNome"
-                   placeholder="Nome do vendedor">
-          </mat-form-field>
-        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Vendedor</mat-label>
+          <input
+            matInput
+            formControlName="vendedorNome"
+            [matAutocomplete]="autoVendedor"
+            placeholder="Digite o nome do vendedor"
+            (focus)="onVendedorFocus()"
+            (input)="onVendedorInput($event)">
+          <mat-icon matSuffix>badge</mat-icon>
+          <mat-autocomplete
+            #autoVendedor="matAutocomplete"
+            [displayWith]="displayVendedorFn"
+            [autoActiveFirstOption]="false"
+            (optionSelected)="onVendedorOptionSelected($event)">
+            @for (vendedor of vendedoresFiltrados(); track vendedor.id) {
+              <mat-option [value]="vendedor">
+                <div class="autocomplete-option">
+                  <div class="primary-text">{{ vendedor.name }}</div>
+                  <div class="secondary-text">{{ vendedor.email }}</div>
+                </div>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
       </div>
 
       <!-- Valores e Datas -->
@@ -147,17 +167,21 @@
             Conta recorrente
           </mat-checkbox>
 
-          <div *ngIf="form.get('ehRecorrente')?.value" class="recorrencia-fields">
-            <mat-form-field appearance="outline" class="field-tipo">
-              <mat-label>Tipo de Recorrência</mat-label>
-              <mat-select formControlName="tipoRecorrencia">
-                <mat-option *ngFor="let tipo of tiposRecorrencia" [value]="tipo.value">
-                  {{ tipo.label }}
-                </mat-option>
-              </mat-select>
-              <mat-error>{{ getFieldErrorMessage('tipoRecorrencia') }}</mat-error>
-            </mat-form-field>
-          </div>
+          @if (form.get('ehRecorrente')?.value) {
+            <div class="recorrencia-fields">
+              <mat-form-field appearance="outline" class="field-tipo">
+                <mat-label>Tipo de Recorrência</mat-label>
+                <mat-select formControlName="tipoRecorrencia">
+                  @for (tipo of tiposRecorrencia; track tipo.value) {
+                    <mat-option [value]="tipo.value">
+                      {{ tipo.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+                <mat-error>{{ getFieldErrorMessage('tipoRecorrencia') }}</mat-error>
+              </mat-form-field>
+            </div>
+          }
         </div>
       </div>
 
@@ -191,12 +215,13 @@
             color="primary"
             (click)="onSubmit()"
             [disabled]="form.invalid || isSaving()">
-      <mat-icon *ngIf="isSaving()">
+      @if (isSaving()) {
         <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
-      </mat-icon>
-      <mat-icon *ngIf="!isSaving()">
-        {{ data.isEdit ? 'save' : 'add' }}
-      </mat-icon>
+      } @else {
+        <mat-icon>
+          {{ data.isEdit ? 'save' : 'add' }}
+        </mat-icon>
+      }
       {{ getSaveButtonText() }}
     </button>
   </div>

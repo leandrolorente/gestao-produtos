@@ -29,6 +29,27 @@
   color: var(--dialog-text);
 }
 
+// === AUTOCOMPLETE STYLES ===
+.autocomplete-option {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+
+  .primary-text {
+    font-weight: 500;
+    color: var(--dialog-text);
+    margin-bottom: 4px;
+  }
+
+  .secondary-text {
+    font-size: 0.875rem;
+    color: var(--dialog-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
 // === CABEÇALHO ===
 .dialog-header {
   display: flex;

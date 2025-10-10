@@ -1,26 +1,28 @@
-import { AfterViewInit, Component, ViewChild, OnInit, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { ContaReceber, StatusContaReceber } from '../../../models/ContaReceber';
+import { ContaReceber, StatusContaReceber, RecebimentoConta } from '../../../models/ContaReceber';
+import { FormaPagamento } from '../../../models/ContaPagar';
 import { ContaReceberService } from '../../../services/conta-receber.service';
+import { AuthService } from '../../../services/auth.service';
 import { ConfirmationDialogService } from '../../../services/confirmation-dialog.service';
 import { ContaReceberDialogComponent } from '../../../components/conta-receber-dialog/conta-receber-dialog.component';
 
@@ -32,16 +34,16 @@ import { ContaReceberDialogComponent } from '../../../components/conta-receber-d
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     MatSortModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatChipsModule,
     MatTooltipModule,
     MatMenuModule,
     MatDividerModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
     ReactiveFormsModule
@@ -49,41 +51,37 @@ import { ContaReceberDialogComponent } from '../../../components/conta-receber-d
   templateUrl: './conta-receber-list.component.html',
   styleUrls: ['./conta-receber-list.component.scss']
 })
-export class ContaReceberListComponent implements OnInit, AfterViewInit {
+export class ContaReceberListComponent implements OnInit {
+  @ViewChild(MatSort) sort!: MatSort;
+
+  // Signals para estado
+  contas = signal<ContaReceber[]>([]);
+  loading = signal<boolean>(false);
+
+  // DataSource para a tabela
+  dataSource = new MatTableDataSource<ContaReceber>([]);
+
+  // Colunas da tabela
   displayedColumns: string[] = [
     'numero',
     'descricao',
     'clienteNome',
-    'vendedorNome',
     'valorOriginal',
     'valorRestante',
     'dataVencimento',
     'status',
-    'actions'
+    'acoes'
   ];
 
-  dataSource = new MatTableDataSource<ContaReceber>();
-  @ViewChild(MatSort) sort!: MatSort;
+  // Filtros
+  searchControl = new FormControl('');
+  statusFilter = new FormControl('');
+  dateRangeStart = new FormControl<Date | null>(null);
+  dateRangeEnd = new FormControl<Date | null>(null);
 
-  // Estados reativo
-  isLoading = signal(false);
-  totalPendente = signal(0);
-  totalRecebido = signal(0);
-  totalVencido = signal(0);
-  quantidadePendente = signal(0);
-  quantidadeRecebida = signal(0);
-  quantidadeVencida = signal(0);
-
-  // Formulário de filtros
-  filterForm = new FormGroup({
-    busca: new FormControl(''),
-    status: new FormControl(''),
-    dataInicio: new FormControl<Date | null>(null),
-    dataFim: new FormControl<Date | null>(null)
-  });
-
-  // Arrays para selects
+  // Opções para filtros
   statusOptions = [
+    { value: '', label: 'Todos' },
     { value: StatusContaReceber.Pendente, label: 'Pendente' },
     { value: StatusContaReceber.Recebida, label: 'Recebida' },
     { value: StatusContaReceber.Cancelada, label: 'Cancelada' },
@@ -91,10 +89,40 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
     { value: StatusContaReceber.RecebimentoParcial, label: 'Recebimento Parcial' }
   ];
 
+  // Computed para estatísticas resumidas
+  contasHoje = computed(() => {
+    const hoje = new Date().toDateString();
+    return this.contas().filter(conta =>
+      new Date(conta.dataVencimento).toDateString() === hoje
+    ).length;
+  });
+
+  totalPendente = computed(() => {
+    return this.contas()
+      .filter(conta => conta.status === StatusContaReceber.Pendente)
+      .reduce((total, conta) => total + conta.valorRestante, 0);
+  });
+
+  totalRecebido = computed(() => {
+    return this.contas()
+      .filter(conta => conta.status === StatusContaReceber.Recebida)
+      .reduce((total, conta) => total + conta.valorRecebido, 0);
+  });
+
+  totalVencido = computed(() => {
+    return this.contas()
+      .filter(conta => conta.status === StatusContaReceber.Vencida)
+      .reduce((total, conta) => total + conta.valorRestante, 0);
+  });
+
+  quantidadePendente = computed(() => {
+    return this.contas().filter(conta => conta.status === StatusContaReceber.Pendente).length;
+  });
+
   constructor(
-    public dialog: MatDialog,
     private contaReceberService: ContaReceberService,
-    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private authService: AuthService,
     private confirmationService: ConfirmationDialogService
   ) {}
 
@@ -105,157 +133,103 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.setupCustomFilter();
   }
 
-  /**
-   * Carrega todas as contas a receber
-   */
-  loadContas(): void {
-    this.isLoading.set(true);
+  // Verifica se o usuário é admin
+  isAdmin(): boolean {
+    const currentUser = this.authService.currentUser();
+    return currentUser?.role === 'admin';
+  }
+
+  private loadContas(): void {
+    this.loading.set(true);
+
     this.contaReceberService.getAll().subscribe({
       next: (contas) => {
+        this.contas.set(contas);
         this.dataSource.data = contas;
-        this.calcularEstatisticas(contas);
-        this.isLoading.set(false);
+        this.loading.set(false);
       },
       error: (error) => {
         console.error('Erro ao carregar contas a receber:', error);
-        this.showSnackBar('Erro ao carregar contas a receber', 'error');
-        this.isLoading.set(false);
+        this.authService.showSnackbar('Erro ao carregar contas a receber', 'error');
+        this.loading.set(false);
       }
     });
   }
 
-  /**
-   * Calcula estatísticas das contas
-   */
-  calcularEstatisticas(contas: ContaReceber[]): void {
-    this.totalPendente.set(
-      contas
-        .filter(c => c.status === StatusContaReceber.Pendente)
-        .reduce((sum, c) => sum + c.valorRestante, 0)
-    );
-
-    this.totalRecebido.set(
-      contas
-        .filter(c => c.status === StatusContaReceber.Recebida)
-        .reduce((sum, c) => sum + c.valorRecebido, 0)
-    );
-
-    this.totalVencido.set(
-      contas
-        .filter(c => c.status === StatusContaReceber.Vencida)
-        .reduce((sum, c) => sum + c.valorRestante, 0)
-    );
-
-    this.quantidadePendente.set(
-      contas.filter(c => c.status === StatusContaReceber.Pendente).length
-    );
-
-    this.quantidadeRecebida.set(
-      contas.filter(c => c.status === StatusContaReceber.Recebida).length
-    );
-
-    this.quantidadeVencida.set(
-      contas.filter(c => c.status === StatusContaReceber.Vencida).length
-    );
-  }
-
-  /**
-   * Configurar filtros
-   */
-  setupFilters(): void {
-    // Listener para mudanças nos filtros
-    this.filterForm.valueChanges.subscribe(() => {
+  private setupFilters(): void {
+    // Filtro de busca por texto
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
       this.applyFilters();
     });
+
+    // Filtros de status e datas
+    this.statusFilter.valueChanges.subscribe(() => this.applyFilters());
+    this.dateRangeStart.valueChanges.subscribe(() => this.applyFilters());
+    this.dateRangeEnd.valueChanges.subscribe(() => this.applyFilters());
   }
 
-  /**
-   * Configurar filtro customizado
-   */
-  setupCustomFilter(): void {
-    this.dataSource.filterPredicate = (data: ContaReceber, filter: string) => {
-      const filterObj = JSON.parse(filter);
+  private applyFilters(): void {
+    let filteredData = [...this.contas()];
 
-      // Filtro por busca (descrição, cliente, número)
-      if (filterObj.busca) {
-        const busca = filterObj.busca.toLowerCase();
-        const matchBusca = data.descricao.toLowerCase().includes(busca) ||
-                          (data.clienteNome?.toLowerCase().includes(busca) || false) ||
-                          data.numero.toLowerCase().includes(busca) ||
-                          (data.vendedorNome?.toLowerCase().includes(busca) || false);
-        if (!matchBusca) return false;
-      }
-
-      // Filtro por status
-      if (filterObj.status && data.status !== parseInt(filterObj.status)) {
-        return false;
-      }
-
-      // Filtro por período
-      if (filterObj.dataInicio || filterObj.dataFim) {
-        const dataVencimento = new Date(data.dataVencimento);
-
-        if (filterObj.dataInicio) {
-          const dataInicio = new Date(filterObj.dataInicio);
-          if (dataVencimento < dataInicio) return false;
-        }
-
-        if (filterObj.dataFim) {
-          const dataFim = new Date(filterObj.dataFim);
-          if (dataVencimento > dataFim) return false;
-        }
-      }
-
-      return true;
-    };
-  }
-
-  /**
-   * Aplica filtros
-   */
-  applyFilters(): void {
-    const filterValue = {
-      busca: this.filterForm.get('busca')?.value || '',
-      status: this.filterForm.get('status')?.value || '',
-      dataInicio: this.filterForm.get('dataInicio')?.value || '',
-      dataFim: this.filterForm.get('dataFim')?.value || ''
-    };
-
-    this.dataSource.filter = JSON.stringify(filterValue);
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
+    // Filtro de busca
+    const searchTerm = this.searchControl.value?.toLowerCase();
+    if (searchTerm) {
+      filteredData = filteredData.filter(conta =>
+        conta.numero.toLowerCase().includes(searchTerm) ||
+        conta.descricao.toLowerCase().includes(searchTerm) ||
+        (conta.clienteNome?.toLowerCase().includes(searchTerm) || false) ||
+        (conta.vendedorNome?.toLowerCase().includes(searchTerm) || false)
+      );
     }
 
-    // Recalcula estatísticas com dados filtrados
-    this.calcularEstatisticas(this.dataSource.filteredData);
+    // Filtro de status
+    const statusSelected = this.statusFilter.value;
+    if (statusSelected !== null && statusSelected !== '') {
+      filteredData = filteredData.filter(conta => conta.status === Number(statusSelected));
+    }
+
+    // Filtro de período
+    const dataInicio = this.dateRangeStart.value;
+    const dataFim = this.dateRangeEnd.value;
+
+    if (dataInicio) {
+      filteredData = filteredData.filter(conta => 
+        new Date(conta.dataVencimento) >= dataInicio
+      );
+    }
+
+    if (dataFim) {
+      filteredData = filteredData.filter(conta => 
+        new Date(conta.dataVencimento) <= dataFim
+      );
+    }
+
+    this.dataSource.data = filteredData;
   }
 
-  /**
-   * Limpa filtros
-   */
   clearFilters(): void {
-    this.filterForm.reset();
-    this.dataSource.filter = '';
-    this.calcularEstatisticas(this.dataSource.data);
+    this.searchControl.setValue('');
+    this.statusFilter.setValue('');
+    this.dateRangeStart.setValue(null);
+    this.dateRangeEnd.setValue(null);
+    this.dataSource.data = this.contas();
   }
 
-  /**
-   * Abre o dialog de conta a receber
-   */
+  openCreateDialog(): void {
+    this.openContaDialog();
+  }
+
   openContaDialog(conta?: ContaReceber): void {
     const dialogRef = this.dialog.open(ContaReceberDialogComponent, {
-      width: '800px',
-      maxWidth: '90vw',
+      width: '900px',
       maxHeight: '90vh',
-      disableClose: true,
-      data: {
-        conta: conta,
-        isEdit: !!conta
-      }
+      data: { conta: conta, editMode: !!conta },
+      panelClass: 'custom-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -266,21 +240,73 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Receber conta
+   * Handle double-click on table row (excluding actions column)
    */
-  receberConta(conta: ContaReceber): void {
-    // TODO: Implementar dialog de recebimento
-    console.log('Receber conta:', conta);
+  onRowDoubleClick(event: Event, conta: ContaReceber): void {
+    const target = event.target as HTMLElement;
+    
+    // Ignore clicks on actions column
+    if (target.closest('.actions-column') || 
+        target.closest('button') || 
+        target.closest('.non-clickable')) {
+      return;
+    }
+    
+    // Only allow edit if conta can be edited
+    if (this.canEdit(conta)) {
+      this.openContaDialog(conta);
+    }
   }
 
-  /**
-   * Cancelar conta
-   */
-  cancelarConta(conta: ContaReceber): void {
-    this.confirmationService.confirmDelete(
-      `conta "${conta.descricao}"`,
+  receberConta(conta: ContaReceber): void {
+    if (conta.status !== StatusContaReceber.Pendente && conta.status !== StatusContaReceber.RecebimentoParcial) {
+      this.authService.showSnackbar('Apenas contas pendentes podem ser recebidas', 'error');
+      return;
+    }
+
+    this.confirmationService.confirmAction(
+      'Receber Conta',
+      `Deseja receber a conta ${conta.numero}?`,
+      'Receber',
       {
-        customMessage: `Tem certeza que deseja cancelar a conta "${conta.descricao}"?\n\nEsta ação não pode ser desfeita.`
+        icon: 'payment',
+        iconColor: 'primary',
+        actionColor: 'primary'
+      }
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.contaReceberService.receber(conta.id, {
+        valor: conta.valorRestante,
+        formaPagamento: FormaPagamento.PIX, // Padrão PIX, poderia ser um dialog para escolher
+        dataRecebimento: new Date().toISOString()
+      }).subscribe({
+        next: () => {
+          this.loadContas();
+          this.authService.showSnackbar(`Conta ${conta.numero} recebida com sucesso!`, 'success');
+        },
+        error: (error) => {
+          console.error('Erro ao receber conta:', error);
+          this.authService.showSnackbar('Erro ao receber conta', 'error');
+        }
+      });
+    });
+  }
+
+  cancelarConta(conta: ContaReceber): void {
+    if (conta.status === StatusContaReceber.Recebida || conta.status === StatusContaReceber.Cancelada) {
+      this.authService.showSnackbar('Esta conta não pode ser cancelada', 'error');
+      return;
+    }
+
+    this.confirmationService.confirmAction(
+      'Cancelar Conta',
+      `Tem certeza que deseja cancelar a conta ${conta.numero}?\n\nEsta ação não pode ser desfeita.`,
+      'Cancelar',
+      {
+        icon: 'cancel',
+        iconColor: 'warn',
+        actionColor: 'warn'
       }
     ).subscribe(confirmed => {
       if (!confirmed) return;
@@ -288,19 +314,16 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
       this.contaReceberService.cancelar(conta.id).subscribe({
         next: () => {
           this.loadContas();
-          this.showSnackBar('Conta cancelada com sucesso!', 'success');
+          this.authService.showSnackbar(`Conta ${conta.numero} cancelada com sucesso!`, 'success');
         },
         error: (error) => {
           console.error('Erro ao cancelar conta:', error);
-          this.showSnackBar('Erro ao cancelar conta', 'error');
+          this.authService.showSnackbar('Erro ao cancelar conta', 'error');
         }
       });
     });
   }
 
-  /**
-   * Deletar conta
-   */
   deleteConta(conta: ContaReceber): void {
     this.confirmationService.confirmDelete(
       `conta "${conta.descricao}"`,
@@ -312,36 +335,66 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
 
       this.contaReceberService.delete(conta.id).subscribe({
         next: () => {
-          this.loadContas();
-          this.showSnackBar('Conta excluída com sucesso!', 'success');
+          const contas = this.contas();
+          this.contas.set(contas.filter(c => c.id !== conta.id));
+          this.dataSource.data = this.contas();
+          this.authService.showSnackbar('Conta excluída com sucesso!', 'success');
         },
         error: (error) => {
           console.error('Erro ao excluir conta:', error);
-          this.showSnackBar('Erro ao excluir conta', 'error');
+          this.authService.showSnackbar('Erro ao excluir conta', 'error');
         }
       });
     });
   }
 
   /**
-   * Exportar para CSV
+   * Verifica se uma conta pode ser recebida
    */
+  podeReceber(conta: ContaReceber): boolean {
+    return conta.status === StatusContaReceber.Pendente || conta.status === StatusContaReceber.RecebimentoParcial;
+  }
+
+  /**
+   * Verifica se uma conta pode ser cancelada
+   */
+  podeCancelar(conta: ContaReceber): boolean {
+    return conta.status !== StatusContaReceber.Recebida && conta.status !== StatusContaReceber.Cancelada;
+  }
+
+  /**
+   * Verifica se uma conta pode ser editada
+   */
+  canEdit(conta: ContaReceber): boolean {
+    return conta.status !== StatusContaReceber.Cancelada;
+  }
+
   exportToCsv(): void {
-    const data = this.dataSource.filteredData;
+    const headers = ['Número', 'Descrição', 'Cliente', 'Valor Original', 'Valor Recebido', 'Valor Restante', 'Data Emissão', 'Data Vencimento', 'Status', 'Observações'];
+    const csvData = this.dataSource.data.map(conta => [
+      conta.numero,
+      conta.descricao,
+      conta.clienteNome || '',
+      conta.valorOriginal.toFixed(2).replace('.', ','),
+      conta.valorRecebido.toFixed(2).replace('.', ','),
+      conta.valorRestante.toFixed(2).replace('.', ','),
+      this.formatDate(conta.dataEmissao),
+      this.formatDate(conta.dataVencimento),
+      this.getStatusLabel(conta.status),
+      conta.observacoes || ''
+    ]);
 
-    if (data.length === 0) {
-      this.showSnackBar('Nenhum dado para exportar', 'warning');
-      return;
-    }
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(';'))
+      .join('\n');
 
-    const csvContent = this.convertToCSV(data);
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
 
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `contas-receber-${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `contas-receber_${this.formatDate(new Date())}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -349,59 +402,12 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /**
-   * Converte dados para CSV
-   */
-  private convertToCSV(data: ContaReceber[]): string {
-    const headers = [
-      'Número',
-      'Descrição',
-      'Cliente',
-      'Vendedor',
-      'Valor Original',
-      'Valor Recebido',
-      'Valor Restante',
-      'Data Emissão',
-      'Data Vencimento',
-      'Data Recebimento',
-      'Status',
-      'Observações'
-    ];
-
-    const csvData = data.map(conta => [
-      conta.numero,
-      conta.descricao,
-      conta.clienteNome || '',
-      conta.vendedorNome || '',
-      conta.valorOriginal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-      conta.valorRecebido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-      conta.valorRestante.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-      new Date(conta.dataEmissao).toLocaleDateString('pt-BR'),
-      new Date(conta.dataVencimento).toLocaleDateString('pt-BR'),
-      conta.dataRecebimento ? new Date(conta.dataRecebimento).toLocaleDateString('pt-BR') : '',
-      this.getStatusLabel(conta.status),
-      conta.observacoes || ''
-    ]);
-
-    const csvString = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
-
-    return csvString;
-  }
-
-  /**
-   * Obtém label do status
-   */
   getStatusLabel(status: StatusContaReceber): string {
     const option = this.statusOptions.find(s => s.value === status);
     return option?.label || 'Desconhecido';
   }
 
-  /**
-   * Obtém cor do status
-   */
-  getStatusColor(status: StatusContaReceber): string {
+  getStatusChipColor(status: StatusContaReceber): string {
     switch (status) {
       case StatusContaReceber.Pendente: return 'warn';
       case StatusContaReceber.Recebida: return 'primary';
@@ -412,39 +418,18 @@ export class ContaReceberListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /**
-   * Formata valor como moeda
-   */
-  formatCurrency(value: number): string {
-    return value.toLocaleString('pt-BR', {
+  formatPrice(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    });
+    }).format(value);
   }
 
-  /**
-   * Formata data
-   */
-  formatDate(date: string): string {
+  formatDate(date: string | Date): string {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
-  /**
-   * Verifica se conta está vencida
-   */
   isVencida(conta: ContaReceber): boolean {
     return conta.estaVencida && conta.status === StatusContaReceber.Pendente;
-  }
-
-  /**
-   * Exibe snackbar
-   */
-  private showSnackBar(message: string, type: 'success' | 'error' | 'warning' = 'success'): void {
-    this.snackBar.open(message, 'Fechar', {
-      duration: type === 'error' ? 5000 : 3000,
-      panelClass: [`snackbar-${type}`],
-      horizontalPosition: 'end',
-      verticalPosition: 'top'
-    });
   }
 }
