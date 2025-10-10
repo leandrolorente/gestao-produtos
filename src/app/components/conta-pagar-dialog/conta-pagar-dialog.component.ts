@@ -16,7 +16,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 import { ContaPagar, StatusContaPagar, FormaPagamento, CategoriaConta, TipoRecorrencia, ContaPagarCreateDTO, ContaPagarUpdateDTO } from '../../models/ContaPagar';
+import { Fornecedor } from '../../models/Fornecedor';
 import { ContaPagarService } from '../../services/conta-pagar.service';
+import { FornecedorService } from '../../services/fornecedor.service';
 
 export interface ContaPagarDialogData {
   conta?: ContaPagar;
@@ -49,6 +51,11 @@ export class ContaPagarDialogComponent implements OnInit {
   form: FormGroup;
   isLoading = signal(false);
   isSaving = signal(false);
+
+  // Signals para autocomplete de fornecedor
+  fornecedores = signal<Fornecedor[]>([]);
+  fornecedoresFiltrados = signal<Fornecedor[]>([]);
+  fornecedorAutoCompleteOpen = signal<boolean>(false);
 
   // Enums para selects
   formasPagamento = [
@@ -87,6 +94,7 @@ export class ContaPagarDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private contaPagarService: ContaPagarService,
+    private fornecedorService: FornecedorService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ContaPagarDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ContaPagarDialogData
@@ -95,6 +103,8 @@ export class ContaPagarDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadFornecedores();
+    
     if (this.data.isEdit && this.data.conta) {
       this.loadContaData();
     }
@@ -268,7 +278,8 @@ export class ContaPagarDialogComponent implements OnInit {
         dataEmissao: 'Data de Emissão',
         dataVencimento: 'Data de Vencimento',
         formaPagamento: 'Forma de Pagamento',
-        categoria: 'Categoria'
+        categoria: 'Categoria',
+        fornecedorId: 'Fornecedor'
       };
       return `${fieldLabels[fieldName] || fieldName} é obrigatório`;
     }
@@ -316,6 +327,89 @@ export class ContaPagarDialogComponent implements OnInit {
       return this.data.isEdit ? 'Atualizando...' : 'Criando...';
     }
     return this.data.isEdit ? 'Atualizar' : 'Criar';
+  }
+
+  /**
+   * Carrega fornecedores
+   */
+  private loadFornecedores(): void {
+    this.fornecedorService.getAll().subscribe({
+      next: (fornecedores: Fornecedor[]) => {
+        this.fornecedores.set(fornecedores);
+        this.fornecedoresFiltrados.set(fornecedores);
+      },
+      error: (error: any) => {
+        console.error('Erro ao carregar fornecedores:', error);
+        this.showSnackBar('Erro ao carregar fornecedores', 'error');
+      }
+    });
+  }
+
+  /**
+   * Filtra fornecedores para autocomplete
+   */
+  private filtrarFornecedores(value: string): Fornecedor[] {
+    if (!value || value.trim() === '') {
+      return this.fornecedores();
+    }
+    const filterValue = value.toLowerCase();
+    return this.fornecedores().filter(fornecedor =>
+      fornecedor.razaoSocial.toLowerCase().includes(filterValue) ||
+      (fornecedor.nomeFantasia && fornecedor.nomeFantasia.toLowerCase().includes(filterValue)) ||
+      fornecedor.cnpjCpf.includes(filterValue)
+    );
+  }
+
+  /**
+   * Exibe fornecedor no campo
+   */
+  displayFornecedorFn = (fornecedor: Fornecedor): string => {
+    return fornecedor ? `${fornecedor.razaoSocial}${fornecedor.nomeFantasia ? ' (' + fornecedor.nomeFantasia + ')' : ''}` : '';
+  };
+
+  /**
+   * Eventos do autocomplete de fornecedor
+   */
+  onFornecedorFocus(): void {
+    this.fornecedoresFiltrados.set(this.fornecedores());
+  }
+
+  onFornecedorInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const filteredFornecedores = this.filtrarFornecedores(input.value);
+    this.fornecedoresFiltrados.set(filteredFornecedores);
+  }
+
+  onFornecedorOptionSelected(event: any): void {
+    const fornecedor = event.option.value as Fornecedor;
+    this.form.patchValue({
+      fornecedorId: fornecedor.id,
+      fornecedorNome: this.displayFornecedorFn(fornecedor)
+    });
+  }
+
+  onFornecedorAutocompleteOpened(): void {
+    this.fornecedorAutoCompleteOpen.set(true);
+  }
+
+  onFornecedorAutocompleteClosed(): void {
+    this.fornecedorAutoCompleteOpen.set(false);
+    
+    // Validar se o fornecedor selecionado é válido
+    const fornecedorNome = this.form.get('fornecedorNome')?.value;
+    if (fornecedorNome && !this.fornecedorAutoCompleteOpen()) {
+      const fornecedorEncontrado = this.fornecedores().find(f => 
+        this.displayFornecedorFn(f) === fornecedorNome
+      );
+      
+      if (!fornecedorEncontrado) {
+        this.form.patchValue({
+          fornecedorId: null,
+          fornecedorNome: ''
+        });
+        this.showSnackBar('Por favor, selecione um fornecedor válido da lista', 'warning');
+      }
+    }
   }
 
   /**

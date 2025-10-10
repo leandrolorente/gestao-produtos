@@ -386,3 +386,36 @@
 ::ng-deep .mat-mdc-tooltip {
   font-size: 0.75rem;
 }
+
+// === AUTOCOMPLETE ===
+.autocomplete-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .primary-text {
+    font-weight: 500;
+    color: var(--dialog-text);
+  }
+
+  .secondary-text {
+    font-size: 0.75rem;
+    color: var(--dialog-text-secondary);
+  }
+}
+
+::ng-deep .mat-mdc-autocomplete-panel {
+  .mat-mdc-option {
+    line-height: normal !important;
+    height: auto !important;
+    padding: 12px 16px !important;
+
+    &:hover {
+      background-color: var(--dialog-hover) !important;
+    }
+
+    &.mat-mdc-option-active {
+      background-color: rgba(25, 118, 210, 0.1) !important;
+    }
+  }
+}

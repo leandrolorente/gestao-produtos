@@ -60,19 +60,35 @@
         </h3>
 
         <div class="form-row">
-          <mat-form-field appearance="outline" class="field-fornecedor-id">
-            <mat-label>ID do Fornecedor</mat-label>
-            <input matInput
-                   type="number"
-                   formControlName="fornecedorId"
-                   placeholder="ID do fornecedor">
-          </mat-form-field>
-
           <mat-form-field appearance="outline" class="field-fornecedor-nome">
-            <mat-label>Nome do Fornecedor</mat-label>
-            <input matInput
-                   formControlName="fornecedorNome"
-                   placeholder="Nome do fornecedor">
+            <mat-label>Fornecedor</mat-label>
+            <input
+              matInput
+              formControlName="fornecedorNome"
+              [matAutocomplete]="autoFornecedor"
+              placeholder="Digite o nome do fornecedor"
+              (focus)="onFornecedorFocus()"
+              (input)="onFornecedorInput($event)">
+            <mat-icon matSuffix>business_center</mat-icon>
+            <mat-autocomplete
+              #autoFornecedor="matAutocomplete"
+              [displayWith]="displayFornecedorFn"
+              [autoActiveFirstOption]="false"
+              (optionSelected)="onFornecedorOptionSelected($event)"
+              (opened)="onFornecedorAutocompleteOpened()"
+              (closed)="onFornecedorAutocompleteClosed()">
+              @for (fornecedor of fornecedoresFiltrados(); track fornecedor.id) {
+                <mat-option [value]="fornecedor">
+                  <div class="autocomplete-option">
+                    <div class="primary-text">{{ fornecedor.razaoSocial }}</div>
+                    <div class="secondary-text">
+                      {{ fornecedor.nomeFantasia || fornecedor.cnpjCpf }}
+                    </div>
+                  </div>
+                </mat-option>
+              }
+            </mat-autocomplete>
+            <mat-error>{{ getFieldErrorMessage('fornecedorId') }}</mat-error>
           </mat-form-field>
         </div>
       </div>

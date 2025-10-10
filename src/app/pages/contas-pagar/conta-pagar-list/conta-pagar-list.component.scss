@@ -1,129 +1,51 @@
-// Variáveis para modo escuro e claro
-:host {
-  --primary-color: #1976d2;
-  --accent-color: #ff4081;
-  --warn-color: #f44336;
-  --success-color: #4caf50;
-  --warning-color: #ff9800;
-  --error-color: #f44336;
+/* src/app/pages/contas-pagar/conta-pagar-list/conta-pagar-list.component.scss */
 
-  // Cores de background
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --bg-card: #ffffff;
-
-  // Cores de texto
-  --text-primary: rgba(0, 0, 0, 0.87);
-  --text-secondary: rgba(0, 0, 0, 0.6);
-  --text-disabled: rgba(0, 0, 0, 0.38);
-
-  // Bordas
-  --border-color: rgba(0, 0, 0, 0.12);
-
-  // Sombras
-  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+/* --- Layout Geral seguindo padrão do sistema --- */
+.container-card {
+  margin: 1rem;
+  background: var(--background-gradient);
 }
 
-// Modo escuro
-:host-context(.dark-theme) {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-card: #1e1e1e;
-
-  --text-primary: rgba(255, 255, 255, 0.87);
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-disabled: rgba(255, 255, 255, 0.38);
-
-  --border-color: rgba(255, 255, 255, 0.12);
-
-  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
-
-// Layout principal
-.page-container {
-  padding: 1.5rem;
-  min-height: 100vh;
-  background-color: var(--bg-secondary);
+/* --- Título da página --- */
+.page-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+  font-weight: 300;
+  font-size: 2rem;
+  line-height: 1.3;
+  word-spacing: 0.1em;
 
   @media (max-width: 768px) {
-    padding: 1rem;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+    word-spacing: 0.2em;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+    word-spacing: 0.3em;
+    padding: 0 0.5rem;
   }
 }
 
-// Header da página
-.page-header {
-  margin-bottom: 2rem;
-
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
-
-  .title-section {
-    flex: 1;
-
-    .page-title {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin: 0;
-      font-size: 2rem;
-      font-weight: 500;
-      color: var(--text-primary);
-
-      mat-icon {
-        font-size: 2rem;
-        width: 2rem;
-        height: 2rem;
-        color: var(--primary-color);
-      }
-    }
-
-    .page-subtitle {
-      margin: 0.5rem 0 0 0;
-      color: var(--text-secondary);
-      font-size: 1rem;
-    }
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 1rem;
-
-    .new-btn {
-      min-width: 140px;
-
-      mat-icon {
-        margin-right: 0.5rem;
-      }
-    }
-  }
-}
-
-// Cards de estatísticas
-.stats-grid {
+/* --- Seção de Estatísticas --- */
+.stats-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
   margin-bottom: 2rem;
 
   .stat-card {
+    color: white;
     border-radius: 12px;
-    box-shadow: var(--shadow-light);
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
-      box-shadow: var(--shadow-medium);
-      transform: translateY(-2px);
+      transform: translateY(-4px);
     }
 
     mat-card-content {
@@ -134,205 +56,345 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-    }
 
-    .stat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 3rem;
-      height: 3rem;
-      border-radius: 50%;
-
-      mat-icon {
-        font-size: 1.5rem;
-        width: 1.5rem;
-        height: 1.5rem;
-        color: white;
-      }
-    }
-
-    .stat-info {
-      flex: 1;
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
-
-    .stat-label {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    .stat-count {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      margin-top: 0.25rem;
-    }
-
-    // Cores específicas dos cards
-    &.pendente .stat-icon {
-      background-color: var(--warning-color);
-    }
-
-    &.pago .stat-icon {
-      background-color: var(--success-color);
-    }
-
-    &.vencido .stat-icon {
-      background-color: var(--error-color);
-    }
-  }
-}
-
-// Card de filtros
-.filter-card {
-  margin-bottom: 2rem;
-  border-radius: 12px;
-  box-shadow: var(--shadow-light);
-
-  .filter-form {
-    .filter-row {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-
-      &:last-child {
-        margin-bottom: 0;
+      .stat-icon {
+        font-size: 2rem;
+        width: 2rem;
+        height: 2rem;
+        opacity: 0.9;
       }
 
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-    }
+      .stat-info {
+        flex: 1;
 
-    .filter-field {
-      flex: 1;
-      min-width: 200px;
+        .stat-value {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+          line-height: 1;
+        }
 
-      @media (max-width: 768px) {
-        min-width: unset;
-      }
-    }
-
-    .filter-actions {
-      display: flex;
-      gap: 0.5rem;
-      align-items: flex-start;
-
-      @media (max-width: 768px) {
-        width: 100%;
-        justify-content: stretch;
-
-        button {
-          flex: 1;
+        .stat-label {
+          font-size: 0.75rem;
+          opacity: 0.9;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
       }
     }
+
+    // Cores específicas para cada tipo de card de contas a pagar
+    &.pending-card {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+      }
+    }
+
+    &.paid-card {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      }
+    }
+
+    &.overdue-card {
+      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+      }
+    }
   }
 }
 
-// Card da tabela
-.table-card {
-  border-radius: 12px;
-  box-shadow: var(--shadow-light);
+/* --- Header de Ações seguindo padrão --- */
+.actions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 0 2rem 0;
+}
 
-  mat-card-content {
-    padding: 0 !important;
+.import-export-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.export-btn,
+.clear-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none;
+
+  mat-icon {
+    font-size: 1.125rem;
   }
 }
 
-// Container de loading
+.add-btn {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border-radius: 24px;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    transform: translateY(-2px);
+  }
+
+  mat-icon {
+    margin-right: 0.5rem;
+  }
+}
+
+/* --- Campo de busca seguindo padrão --- */
+.search-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+
+  .mat-mdc-form-field-outline {
+    border-radius: 12px;
+  }
+
+  mat-icon {
+    color: var(--primary-color);
+  }
+}
+
+/* --- Filtros seguindo padrão --- */
+.filters-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  .filter-field {
+    min-width: 200px;
+    flex: 1;
+
+    .mat-mdc-form-field-outline {
+      border-radius: 8px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .filter-field {
+      min-width: unset;
+    }
+  }
+}
+
+/* --- Loading seguindo padrão --- */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 3rem;
+  text-align: center;
+
+  mat-progress-spinner {
+    margin-bottom: 1rem;
+  }
 
   p {
-    margin-top: 1rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(0, 0, 0, 0.6));
+    margin: 0;
   }
 }
 
-// Container da tabela
+/* --- Tabela seguindo padrão moderno --- */
+.desktop-view {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
 .table-container {
-  overflow-x: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-  .full-width-table {
-    width: 100%;
+.modern-table {
+  width: 100%;
+  background: white;
 
-    // Cabeçalho da tabela
-    .mat-mdc-header-cell {
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      font-weight: 600;
-      border-bottom: 1px solid var(--border-color);
+  .header-row {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600, #5e35b1) 100%);
+    color: white;
+    font-weight: 600;
+    height: 56px;
+
+    th {
+      color: white !important;
+      border-bottom: none;
+      font-size: 0.875rem;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .data-row {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--hover-purple, rgba(102, 126, 234, 0.04));
     }
 
-    // Células da tabela
-    .mat-mdc-cell {
-      border-bottom: 1px solid var(--border-color);
-      padding: 1rem 0.75rem;
-    }
-
-    // Linhas da tabela
-    .mat-mdc-row {
-      transition: background-color 0.2s ease;
+    &.vencida-row {
+      background-color: rgba(244, 67, 54, 0.05);
+      border-left: 3px solid #f44336;
 
       &:hover {
-        background-color: var(--bg-secondary);
+        background-color: rgba(244, 67, 54, 0.1);
       }
+    }
 
-      &.vencida-row {
-        background-color: rgba(244, 67, 54, 0.05);
+    td {
+      padding: 1rem 0.75rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-size: 0.875rem;
+    }
+  }
 
-        &:hover {
-          background-color: rgba(244, 67, 54, 0.1);
-        }
-      }
+  // Colunas específicas
+  .actions-column {
+    width: 120px;
+    text-align: center;
+  }
+
+  .currency-cell {
+    text-align: right;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+  }
+}
+
+/* --- Ações da tabela --- */
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  align-items: center;
+
+  button {
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
   }
 }
 
-// Células específicas
-.numero-conta {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 0.875rem;
-  color: var(--primary-color);
-  font-weight: 500;
+.non-clickable {
+  cursor: default !important;
 }
 
+/* --- Chips de status --- */
+.status-pendente {
+  background-color: #ff9800 !important;
+  color: white !important;
+}
+
+.status-paga {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.status-cancelada {
+  background-color: #757575 !important;
+  color: white !important;
+}
+
+.status-vencida {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+/* --- Cores dos menus de ação --- */
+.pay-action {
+  color: #4caf50 !important;
+}
+
+.cancel-action {
+  color: #ff9800 !important;
+}
+
+.delete-action {
+  color: #f44336 !important;
+}
+
+/* --- No data message --- */
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-secondary, rgba(0, 0, 0, 0.6));
+
+  mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0 0 1.5rem 0;
+    opacity: 0.8;
+  }
+
+  button {
+    mat-icon {
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+/* --- Células específicas --- */
 .descricao-cell {
   .descricao-titulo {
     display: block;
     font-weight: 500;
-    color: var(--text-primary);
   }
 
   .nota-fiscal {
     display: block;
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: var(--text-secondary, rgba(0, 0, 0, 0.6));
     margin-top: 0.25rem;
-  }
-}
-
-.currency-cell {
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 500;
-  text-align: right;
-
-  .valor-vencido {
-    color: var(--error-color);
-    font-weight: 600;
   }
 }
 
@@ -342,117 +404,56 @@
   gap: 0.5rem;
 
   .data-vencida {
-    color: var(--error-color);
+    color: #f44336;
     font-weight: 500;
   }
 
   .warning-icon {
-    font-size: 1rem;
-    width: 1rem;
-    height: 1rem;
-    color: var(--warning-color);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #f44336;
   }
+}
+
+.valor-vencido {
+  color: #f44336;
+  font-weight: 600;
 }
 
 .categoria-chip {
   font-size: 0.75rem;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  height: 24px;
+  background-color: var(--primary-color);
+  color: white;
 }
 
-.actions-cell {
-  text-align: center;
-
-  .delete-option {
-    color: var(--error-color);
-
-    mat-icon {
-      color: var(--error-color);
-    }
-  }
-}
-
-// Estado sem dados
-.no-data {
-  text-align: center;
-  padding: 3rem;
-
-  mat-icon {
-    font-size: 4rem;
-    width: 4rem;
-    height: 4rem;
-    color: var(--text-disabled);
-    margin-bottom: 1rem;
-  }
-
-  h3 {
-    margin: 0 0 0.5rem 0;
-    color: var(--text-primary);
-  }
-
-  p {
-    margin: 0 0 1.5rem 0;
-    color: var(--text-secondary);
-  }
-}
-
-// Responsividade
+/* --- Responsividade --- */
 @media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .modern-table {
+    font-size: 0.8rem;
+
+    .mat-column-fornecedorNome,
+    .mat-column-categoria {
+      display: none;
+    }
   }
 
-  .table-container {
-    .full-width-table {
-      .mat-mdc-cell,
-      .mat-mdc-header-cell {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.875rem;
+  .actions-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
 
-        &:first-child {
-          padding-left: 1rem;
-        }
-
-        &:last-child {
-          padding-right: 1rem;
-        }
-      }
+    .import-export-buttons {
+      justify-content: center;
     }
   }
 }
 
-// Ajustes para chips de status
-.mat-mdc-chip {
-  &.mat-primary {
-    background-color: var(--primary-color);
-    color: white;
-  }
-
-  &.mat-accent {
-    background-color: var(--accent-color);
-    color: white;
-  }
-
-  &.mat-warn {
-    background-color: var(--warn-color);
-    color: white;
-  }
-}
-
-// Snackbar customizado
-::ng-deep {
-  .snackbar-success {
-    background-color: var(--success-color);
-    color: white;
-  }
-
-  .snackbar-error {
-    background-color: var(--error-color);
-    color: white;
-  }
-
-  .snackbar-warning {
-    background-color: var(--warning-color);
-    color: white;
+@media (max-width: 480px) {
+  .modern-table {
+    .mat-column-valorOriginal {
+      display: none;
+    }
   }
 }
