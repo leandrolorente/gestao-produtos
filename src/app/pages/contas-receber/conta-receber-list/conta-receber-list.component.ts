@@ -198,13 +198,13 @@ export class ContaReceberListComponent implements OnInit {
     const dataFim = this.dateRangeEnd.value;
 
     if (dataInicio) {
-      filteredData = filteredData.filter(conta => 
+      filteredData = filteredData.filter(conta =>
         new Date(conta.dataVencimento) >= dataInicio
       );
     }
 
     if (dataFim) {
-      filteredData = filteredData.filter(conta => 
+      filteredData = filteredData.filter(conta =>
         new Date(conta.dataVencimento) <= dataFim
       );
     }
@@ -244,14 +244,14 @@ export class ContaReceberListComponent implements OnInit {
    */
   onRowDoubleClick(event: Event, conta: ContaReceber): void {
     const target = event.target as HTMLElement;
-    
+
     // Ignore clicks on actions column
-    if (target.closest('.actions-column') || 
-        target.closest('button') || 
+    if (target.closest('.actions-column') ||
+        target.closest('button') ||
         target.closest('.non-clickable')) {
       return;
     }
-    
+
     // Only allow edit if conta can be edited
     if (this.canEdit(conta)) {
       this.openContaDialog(conta);

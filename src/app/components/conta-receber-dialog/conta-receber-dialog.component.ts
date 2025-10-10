@@ -96,7 +96,7 @@ export class ContaReceberDialogComponent implements OnInit {
   ngOnInit(): void {
     this.loadClientes();
     this.loadVendedores();
-    
+
     if (this.data.isEdit && this.data.conta) {
       this.loadContaData();
     }
