@@ -17,10 +17,10 @@
 
     <!-- Seção de estatísticas -->
     <div class="stats-section">
-      <mat-card class="stat-card">
+      <mat-card class="stat-card pending-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">schedule</mat-icon>
+            <mat-icon class="stat-icon">pending_actions</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ formatPrice(totalPendente()) }}</div>
               <div class="stat-label">A Receber</div>
@@ -29,10 +29,10 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="stat-card received-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">payment</mat-icon>
+            <mat-icon class="stat-icon">check_circle</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ formatPrice(totalRecebido()) }}</div>
               <div class="stat-label">Recebido</div>
@@ -41,10 +41,10 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="stat-card overdue-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">error</mat-icon>
+            <mat-icon class="stat-icon">warning</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ formatPrice(totalVencido()) }}</div>
               <div class="stat-label">Vencido</div>
@@ -53,10 +53,10 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="stat-card today-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">today</mat-icon>
+            <mat-icon class="stat-icon">schedule</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ contasHoje() }}</div>
               <div class="stat-label">Vencem Hoje</div>

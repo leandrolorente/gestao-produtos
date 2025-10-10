@@ -11,12 +11,14 @@
         </mat-progress-spinner>
         <p>Carregando vendas...</p>
       </div>
-    }!-- Seção de estatísticas -->
+    }
+
+    <!-- Seção de estatísticas -->
     <div class="stats-section">
-      <mat-card class="stat-card">
+      <mat-card class="stat-card today-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">today</mat-icon>
+            <mat-icon class="stat-icon">shopping_cart</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ vendasHoje() }}</div>
               <div class="stat-label">Vendas Hoje</div>
@@ -25,10 +27,10 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="stat-card revenue-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">attach_money</mat-icon>
+            <mat-icon class="stat-icon">trending_up</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ formatPrice(faturamentoMes()) }}</div>
               <div class="stat-label">Faturamento Mês</div>
@@ -37,10 +39,10 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="stat-card">
+      <mat-card class="stat-card pending-card">
         <mat-card-content>
           <div class="stat-content">
-            <mat-icon class="stat-icon">pending</mat-icon>
+            <mat-icon class="stat-icon">pending_actions</mat-icon>
             <div class="stat-info">
               <div class="stat-value">{{ vendasPendentes() }}</div>
               <div class="stat-label">Pendentes</div>
@@ -50,10 +52,10 @@
       </mat-card>
 
       @if (stats()) {
-        <mat-card class="stat-card">
+        <mat-card class="stat-card ticket-card">
           <mat-card-content>
             <div class="stat-content">
-              <mat-icon class="stat-icon">trending_up</mat-icon>
+              <mat-icon class="stat-icon">analytics</mat-icon>
               <div class="stat-info">
                 <div class="stat-value">{{ formatPrice(stats()!.ticketMedio) }}</div>
                 <div class="stat-label">Ticket Médio</div>

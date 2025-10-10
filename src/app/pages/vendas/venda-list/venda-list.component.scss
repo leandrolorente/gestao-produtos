@@ -40,15 +40,12 @@
   margin-bottom: 2rem;
 
   .stat-card {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600, #5e35b1) 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     border-radius: 12px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
     }
 
     mat-card-content {
@@ -83,6 +80,43 @@
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
+      }
+    }
+
+    // Cores específicas para cada tipo de card de vendas
+    &.today-card {
+      background: linear-gradient(135deg, #673ab7 0%, #512da8 100%);
+      box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(103, 58, 183, 0.4);
+      }
+    }
+
+    &.revenue-card {
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      }
+    }
+
+    &.pending-card {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+      }
+    }
+
+    &.ticket-card {
+      background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+
+      &:hover {
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
       }
     }
   }
