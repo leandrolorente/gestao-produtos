@@ -2,7 +2,7 @@
 
 /* === LAYOUT MODERNIZADO === */
 .container-card {
-  background: #f9fafb;
+  background: var(--background-color, #f9fafb);
   border: none;
   box-shadow: none;
   margin: 0;
@@ -10,7 +10,16 @@
 
   mat-card-content {
     padding: 2rem !important;
-    background: #f9fafb;
+    background: var(--background-color, #f9fafb);
+  }
+
+  // Modo noturno
+  :host-context(.dark-theme) & {
+    background: var(--dark-background, #1a1a1a);
+
+    mat-card-content {
+      background: var(--dark-background, #1a1a1a);
+    }
   }
 }
 
@@ -47,7 +56,20 @@
   }
 
   .stat-card {
-    background: #ffffff;
+    background: var(--card-background, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+
+    // Modo noturno
+    :host-context(.dark-theme) & {
+      background: var(--dark-card-background, #2d2d2d);
+      border-color: var(--dark-border-color, #404040);
+      box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+    }
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     transition: all 0.3s ease;
@@ -102,7 +124,12 @@
           font-weight: 700;
           margin-bottom: 0.25rem;
           line-height: 1.2;
-          color: #111827;
+          color: var(--text-primary, #111827);
+
+          // Modo noturno
+          :host-context(.dark-theme) & {
+            color: var(--dark-text-primary, #ffffff);
+          }
 
           @media (max-width: 768px) {
             font-size: 1.25rem;
@@ -111,10 +138,15 @@
 
         .stat-label {
           font-size: 0.75rem;
-          color: #6b7280;
+          color: var(--text-secondary, #6b7280);
           font-weight: 500;
           text-transform: none;
           letter-spacing: 0.25px;
+
+          // Modo noturno
+          :host-context(.dark-theme) & {
+            color: var(--dark-text-secondary, #a0a0a0);
+          }
 
           @media (max-width: 768px) {
             font-size: 0.7rem;
