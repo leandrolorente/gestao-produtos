@@ -14,9 +14,10 @@
     </div>
 
     <!-- Formulário de login -->
-    <mat-card class="login-card" *ngIf="!showForgotPassword">
-      <mat-card-content>
-        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+    @if (!showForgotPassword) {
+      <mat-card class="login-card">
+        <mat-card-content>
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
           <!-- Campo de email -->
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>E-mail</mat-label>
@@ -68,8 +69,11 @@
                   class="login-button full-width"
                   [disabled]="loginForm.invalid || isLoading()"
                   color="primary">
-            <mat-icon *ngIf="isLoading()">hourglass_empty</mat-icon>
-            <mat-icon *ngIf="!isLoading()">login</mat-icon>
+            @if (isLoading()) {
+              <mat-icon>hourglass_empty</mat-icon>
+            } @else {
+              <mat-icon>login</mat-icon>
+            }
             {{ isLoading() ? 'Entrando...' : 'Entrar' }}
           </button>
         </form>
@@ -100,11 +104,13 @@
           </p>
         </div>
       </mat-card-content>
-    </mat-card>
+      </mat-card>
+    }
 
     <!-- Formulário "Esqueceu a senha" -->
-    <mat-card class="login-card forgot-password-card" *ngIf="showForgotPassword">
-      <mat-card-content>
+    @if (showForgotPassword) {
+      <mat-card class="login-card forgot-password-card">
+        <mat-card-content>
         <div class="forgot-password-header">
           <mat-icon class="forgot-icon">lock_reset</mat-icon>
           <h2>Esqueceu sua senha?</h2>
@@ -137,31 +143,37 @@
                     class="send-button"
                     [disabled]="forgotPasswordForm.invalid || isLoading()"
                     color="primary">
-              <mat-icon *ngIf="isLoading()">hourglass_empty</mat-icon>
-              <mat-icon *ngIf="!isLoading()">send</mat-icon>
+              @if (isLoading()) {
+                <mat-icon>hourglass_empty</mat-icon>
+              } @else {
+                <mat-icon>send</mat-icon>
+              }
               {{ isLoading() ? 'Enviando...' : 'Enviar' }}
             </button>
           </div>
         </form>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
+    }
 
     <!-- Mensagem de sucesso -->
-    <mat-card class="success-card" *ngIf="showSuccessMessage">
-      <mat-card-content>
-        <div class="success-content">
-          <mat-icon class="success-icon">check_circle</mat-icon>
-          <h3>E-mail enviado!</h3>
-          <p>Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.</p>
-          <button mat-button
-                  class="back-to-login"
-                  (click)="showLoginForm()">
-            <mat-icon>arrow_back</mat-icon>
-            Voltar ao login
-          </button>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    @if (showSuccessMessage) {
+      <mat-card class="success-card">
+        <mat-card-content>
+          <div class="success-content">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+            <h3>E-mail enviado!</h3>
+            <p>Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.</p>
+            <button mat-button
+                    class="back-to-login"
+                    (click)="showLoginForm()">
+              <mat-icon>arrow_back</mat-icon>
+              Voltar ao login
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
   </div>
 
   <!-- Footer -->

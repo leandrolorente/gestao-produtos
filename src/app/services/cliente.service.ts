@@ -2,24 +2,57 @@ import { Injectable, signal } from '@angular/core';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { BaseApiService } from './base-api.service';
-import { Cliente } from '../models/Cliente';
+import { Cliente, EnderecoCliente } from '../models/Cliente';
 
+// DTOs para criação (POST)
 export interface ClienteCreateDto {
   nome: string;
   email: string;
   telefone?: string;
   cpfCnpj: string;
-  endereco?: string;
-  cidade?: string;
-  estado?: string;
-  cep?: string;
-  tipo: 'Pessoa Física' | 'Pessoa Jurídica';
-  ativo?: boolean;
+  endereco: {
+    cep: string;
+    logradouro: string;
+    numero: string;
+    complemento?: string;
+    unidade?: string;
+    bairro: string;
+    localidade: string;
+    uf: string;
+    estado: string;
+    regiao?: string;
+    referencia?: string;
+    isPrincipal: boolean;
+    tipo?: string;
+  };
+  tipo: number; // 1 = Pessoa Física, 2 = Pessoa Jurídica
   observacoes?: string;
 }
 
-export interface ClienteUpdateDto extends Partial<ClienteCreateDto> {
-  id: number;
+// DTOs para atualização (PUT)
+export interface ClienteUpdateDto {
+  id: string;
+  nome: string;
+  email: string;
+  telefone?: string;
+  cpfCnpj: string;
+  endereco: {
+    cep: string;
+    logradouro: string;
+    numero: string;
+    complemento?: string;
+    unidade?: string;
+    bairro: string;
+    localidade: string;
+    uf: string;
+    estado: string;
+    regiao?: string;
+    referencia?: string;
+    isPrincipal: boolean;
+    tipo?: string;
+  };
+  tipo: number; // 1 = Pessoa Física, 2 = Pessoa Jurídica
+  observacoes?: string;
 }
 
 @Injectable({
@@ -34,14 +67,59 @@ export class ClienteService extends BaseApiService {
   public readonly clientes = this.clientesSignal.asReadonly();
 
   /**
-   * Converte dados da API (tipo numérico) para formato interno (tipo string)
+   * Converte dados da API (response GET) para formato interno
    */
   private convertFromApi(cliente: any): Cliente {
-    return {
+    console.log('🔄 Convertendo da API:', cliente);
+    console.log('🔄 Endereço na API:', cliente.endereco);
+    
+    const converted = {
       ...cliente,
-      tipo: cliente.tipo === 1 ? 'Pessoa Física' : 'Pessoa Jurídica',
+      id: cliente.id,
+      tipo: cliente.tipo === 1 || cliente.tipo === 'Pessoa Física' ? 'Pessoa Física' : 'Pessoa Jurídica',
+      endereco: {
+        ...cliente.endereco,
+        dataCriacao: cliente.endereco?.dataCriacao ? new Date(cliente.endereco.dataCriacao) : undefined,
+        dataAtualizacao: cliente.endereco?.dataAtualizacao ? new Date(cliente.endereco.dataAtualizacao) : undefined,
+      },
       dataCadastro: new Date(cliente.dataCadastro),
       ultimaCompra: cliente.ultimaCompra ? new Date(cliente.ultimaCompra) : undefined
+    };
+    
+    console.log('✅ Cliente convertido:', converted);
+    console.log('✅ Endereço convertido:', converted.endereco);
+    
+    return converted;
+  }
+
+  /**
+   * Converte dados do formulário interno para formato da API (POST/PUT)
+   */
+  private convertToApi(cliente: any): ClienteCreateDto {
+    return {
+      nome: cliente.nome,
+      email: cliente.email,
+      telefone: cliente.telefone,
+      cpfCnpj: cliente.cpfCnpj,
+      endereco: {
+        cep: cliente.endereco?.cep || cliente.cep || '',
+        logradouro: cliente.endereco?.logradouro || cliente.logradouro || '',
+        numero: cliente.endereco?.numero || cliente.numero || '',
+        complemento: cliente.endereco?.complemento || cliente.complemento || '',
+        unidade: cliente.endereco?.unidade || '',
+        bairro: cliente.endereco?.bairro || cliente.bairro || '',
+        localidade: cliente.endereco?.localidade || cliente.localidade || '',
+        uf: cliente.endereco?.uf || cliente.uf || '',
+        estado: cliente.endereco?.estado || cliente.estado || '',
+        regiao: cliente.endereco?.regiao || '',
+        referencia: cliente.endereco?.referencia || '',
+        isPrincipal: true,
+        tipo: cliente.endereco?.tipo || 'residencial'
+      },
+      tipo: typeof cliente.tipo === 'string' 
+        ? (cliente.tipo === 'Pessoa Física' ? 1 : 2)
+        : cliente.tipo,
+      observacoes: cliente.observacoes
     };
   }
 
@@ -86,14 +164,11 @@ export class ClienteService extends BaseApiService {
   /**
    * Cria um novo cliente
    */
-  createCliente(cliente: ClienteCreateDto): Observable<Cliente> {
+  createCliente(dadosFormulario: any): Observable<Cliente> {
     this.loadingSubject.next(true);
 
-    // Converte os dados para o formato esperado pela API
-    const clienteForApi = {
-      ...cliente,
-      tipo: cliente.tipo === 'Pessoa Física' ? 1 : 2 // Converte string para número
-    };
+    // Converte os dados do formulário para o formato da API
+    const clienteForApi = this.convertToApi(dadosFormulario);
 
     return this.http.post<any>(this.buildUrl('clientes'), clienteForApi, this.httpOptions)
       .pipe(
@@ -110,18 +185,25 @@ export class ClienteService extends BaseApiService {
 
           // Fallback: cria cliente localmente quando API falha
           const novoCliente: Cliente = {
-            id: new Date().getTime(), // ID temporário
-            nome: cliente.nome,
-            email: cliente.email,
-            telefone: cliente.telefone || '',
-            cpfCnpj: cliente.cpfCnpj,
-            endereco: cliente.endereco || '',
-            cidade: cliente.cidade || '',
-            estado: cliente.estado || '',
-            cep: cliente.cep || '',
-            tipo: cliente.tipo,
+            id: Date.now().toString(), // ID temporário como string
+            nome: dadosFormulario.nome,
+            email: dadosFormulario.email,
+            telefone: dadosFormulario.telefone || '',
+            cpfCnpj: dadosFormulario.cpfCnpj,
+            endereco: {
+              cep: dadosFormulario.cep || '',
+              logradouro: dadosFormulario.logradouro || '',
+              numero: dadosFormulario.numero || '',
+              complemento: dadosFormulario.complemento || '',
+              bairro: dadosFormulario.bairro || '',
+              localidade: dadosFormulario.localidade || '',
+              uf: dadosFormulario.uf || '',
+              estado: dadosFormulario.estado || '',
+              isPrincipal: true
+            },
+            tipo: dadosFormulario.tipo || 'Pessoa Física',
             ativo: true,
-            observacoes: cliente.observacoes || '',
+            observacoes: dadosFormulario.observacoes || '',
             dataCadastro: new Date()
           };
 
@@ -135,16 +217,16 @@ export class ClienteService extends BaseApiService {
   }  /**
    * Atualiza um cliente existente
    */
-  updateCliente(cliente: ClienteUpdateDto): Observable<Cliente> {
+  updateCliente(dadosFormulario: any): Observable<Cliente> {
     this.loadingSubject.next(true);
 
-    // Converte os dados para o formato esperado pela API se o tipo estiver presente
-    const clienteForApi = {
-      ...cliente,
-      ...(cliente.tipo && { tipo: cliente.tipo === 'Pessoa Física' ? 1 : 2 })
+    // Converte os dados do formulário para o formato da API
+    const clienteForApi: ClienteUpdateDto = {
+      id: dadosFormulario.id,
+      ...this.convertToApi(dadosFormulario)
     };
 
-    return this.http.put<any>(this.buildUrl(`clientes/${cliente.id}`), clienteForApi, this.httpOptions)
+    return this.http.put<any>(this.buildUrl(`clientes/${dadosFormulario.id}`), clienteForApi, this.httpOptions)
       .pipe(
         tap(updatedClienteApi => {
           // Converte e atualiza a lista local
@@ -168,7 +250,7 @@ export class ClienteService extends BaseApiService {
   /**
    * Remove um cliente
    */
-  deleteCliente(id: number): Observable<void> {
+  deleteCliente(id: string): Observable<void> {
     this.loadingSubject.next(true);
 
     return this.http.delete<void>(this.buildUrl(`clientes/${id}`), this.httpOptions)
@@ -218,7 +300,7 @@ export class ClienteService extends BaseApiService {
   /**
    * Ativa/desativa um cliente
    */
-  toggleClienteStatus(id: number, ativo: boolean): Observable<Cliente> {
+  toggleClienteStatus(id: string, ativo: boolean): Observable<Cliente> {
     this.loadingSubject.next(true);
 
     return this.http.patch<Cliente>(

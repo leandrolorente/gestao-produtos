@@ -1,5 +1,6 @@
 <mat-card class="container-card">
   <mat-card-content>
+
     <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-color); font-weight: 300; font-size: 2rem;">
       Gerenciamento de Produtos
     </h2>
@@ -63,13 +64,14 @@
           <ng-container matColumnDef="barcode">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Código de Barras </th>
             <td mat-cell *matCellDef="let element">
-              <span class="barcode-value" *ngIf="element.barcode; else noBarcodeTemplate">
-                <mat-icon class="barcode-icon">qr_code</mat-icon>
-                {{element.barcode}}
-              </span>
-              <ng-template #noBarcodeTemplate>
+              @if (element.barcode) {
+                <span class="barcode-value">
+                  <mat-icon class="barcode-icon">qr_code</mat-icon>
+                  {{element.barcode}}
+                </span>
+              } @else {
                 <span class="no-barcode">-</span>
-              </ng-template>
+              }
             </td>
           </ng-container>
 

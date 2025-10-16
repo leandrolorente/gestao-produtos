@@ -1,0 +1,228 @@
+<mat-card class="container-card">
+  <mat-card-content>
+    <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-color); font-weight: 300; font-size: 2rem;">
+      Gerenciamento de Fornecedores
+    </h2>
+
+    <!-- Estatísticas -->
+    <div class="statistics-container">
+      <div class="stat-card">
+        <mat-icon>business</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ totalFornecedores() }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+      <div class="stat-card active">
+        <mat-icon>check_circle</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ fornecedoresAtivos() }}</span>
+          <span class="stat-label">Ativos</span>
+        </div>
+      </div>
+      <div class="stat-card inactive">
+        <mat-icon>cancel</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ fornecedoresInativos() }}</span>
+          <span class="stat-label">Inativos</span>
+        </div>
+      </div>
+      <div class="stat-card blocked">
+        <mat-icon>block</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ fornecedoresBloqueados() }}</span>
+          <span class="stat-label">Bloqueados</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="actions-header">
+      <button mat-raised-button color="accent" (click)="exportToCsv()" aria-label="Exportar para CSV" class="export-btn">
+        <mat-icon>cloud_download</mat-icon>
+        Exportar CSV
+      </button>
+      <button mat-fab extended color="primary" (click)="openFornecedorDialog()" aria-label="Adicionar novo fornecedor" class="add-btn">
+        <mat-icon>add</mat-icon>
+        Adicionar Fornecedor
+      </button>
+    </div>
+
+    <!-- Campo de busca -->
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar fornecedor</mat-label>
+      <input matInput
+             #searchInput
+             (keyup)="applyFilter($event)"
+             placeholder="Digite o nome, razão social, CNPJ/CPF ou contato..."
+             autocomplete="off">
+      <mat-icon matSuffix>search</mat-icon>
+      @if (searchInput.value) {
+        <button mat-icon-button matSuffix (click)="clearFilter(searchInput)" aria-label="Limpar busca">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <!-- Loading spinner -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Carregando fornecedores...</p>
+      </div>
+    }
+
+    <!-- Tabela -->
+    @if (!isLoading()) {
+      <div class="mat-elevation-z8 table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="modern-table">
+
+          <!-- Coluna Nome Fantasia -->
+          <ng-container matColumnDef="nomeFantasia">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
+            <td mat-cell *matCellDef="let element" class="name-cell">
+              <div class="supplier-name">
+                <mat-icon [matTooltip]="getTipoLabel(element.tipo)" class="tipo-icon">
+                  {{ getTipoIcon(element.tipo) }}
+                </mat-icon>
+                <div>
+                  <strong>{{ element.nomeFantasia || element.razaoSocial }}</strong>
+                  @if (element.nomeFantasia && element.razaoSocial && element.razaoSocial !== element.nomeFantasia) {
+                    <small class="razao-social">{{ element.razaoSocial }}</small>
+                  }
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Coluna CNPJ/CPF -->
+          <ng-container matColumnDef="cnpjCpf">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> CNPJ/CPF </th>
+            <td mat-cell *matCellDef="let element">
+              <code class="cnpj-code">{{ formatCnpjCpf(element.cnpjCpf) }}</code>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Tipo -->
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [class]="'tipo-chip ' + getTipoLabel(element.tipo).toLowerCase()">
+                {{ getTipoLabel(element.tipo) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Email -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef> Email / Telefone </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="contact-info">
+                @if (element.email) {
+                  <span class="contact-item">
+                    <mat-icon class="contact-icon">email</mat-icon>
+                    {{ element.email }}
+                  </span>
+                }
+                @if (element.telefone) {
+                  <span class="contact-item">
+                    <mat-icon class="contact-icon">phone</mat-icon>
+                    {{ formatTelefone(element.telefone) }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Status -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+            <td mat-cell *matCellDef="let element">
+              <mat-chip [class]="getStatusClass(element.status)">
+                {{ getStatusLabel(element.status) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Total Comprado -->
+          <ng-container matColumnDef="totalComprado">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Comprado </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="compras-info">
+                <span class="price-value">{{ formatCurrency(element.totalComprado || 0) }}</span>
+                @if (element.ultimaCompra) {
+                  <small class="ultima-compra">
+                    Última: {{ element.ultimaCompra | date:'dd/MM/yyyy' }}
+                  </small>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Coluna Ações -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-column"> Ações </th>
+            <td mat-cell *matCellDef="let element" class="actions-column">
+              <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu de ações">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="openFornecedorDialog(element)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+
+                @if (element.status === statusFornecedor.Ativo) {
+                  <button mat-menu-item (click)="inativarFornecedor(element)">
+                    <mat-icon>cancel</mat-icon>
+                    <span>Inativar</span>
+                  </button>
+                  <button mat-menu-item (click)="bloquearFornecedor(element)">
+                    <mat-icon>block</mat-icon>
+                    <span>Bloquear</span>
+                  </button>
+                }
+
+                @if (element.status === statusFornecedor.Inativo) {
+                  <button mat-menu-item (click)="ativarFornecedor(element)">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Ativar</span>
+                  </button>
+                }
+
+                @if (element.status === statusFornecedor.Bloqueado) {
+                  <button mat-menu-item (click)="desbloquearFornecedor(element)">
+                    <mat-icon>lock_open</mat-icon>
+                    <span>Desbloquear</span>
+                  </button>
+                }
+
+                <mat-divider></mat-divider>
+
+                <button mat-menu-item (click)="deleteFornecedor(element)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  <span>Excluir</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+          <!-- Linha de "sem dados" -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+              <div class="no-data-message">
+                <mat-icon>inbox</mat-icon>
+                <p>Nenhum fornecedor encontrado</p>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </div>
+    }
+
+  </mat-card-content>
+</mat-card>

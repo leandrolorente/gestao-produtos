@@ -1,5 +1,5 @@
 // Environment de produção
 export const environment = {
   production: true,
-  apiUrl: 'https://gestao-produtos-api.onrender.com/api'
+  apiUrl: 'http://localhost:5278/api'
 };

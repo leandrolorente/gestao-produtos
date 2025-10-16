@@ -45,9 +45,18 @@ export class ProductDialogComponent {
     this.isEditMode = !!data?.id;
     this.form = this.fb.group({
       id: [data?.id],
-      name: [data?.name || '', [Validators.required, Validators.minLength(3)]],
-      sku: [data?.sku || '', [Validators.required, Validators.minLength(3)]],
-      barcode: [data?.barcode || '', [Validators.pattern(/^[0-9]{8,20}$/)]],
+      name: [
+        data?.name || '',
+        [Validators.required, Validators.minLength(3), Validators.maxLength(100)]
+      ],
+      sku: [
+        data?.sku || '',
+        [Validators.required, Validators.minLength(3), Validators.maxLength(20)]
+      ],
+      barcode: [
+        data?.barcode || '',
+        [Validators.pattern(/^[0-9]{8,20}$/), Validators.maxLength(50)]
+      ],
       quantity: [data?.quantity ?? '', [Validators.required, Validators.min(0)]],
       price: [data?.price ?? '', [Validators.required, Validators.min(0.01)]],
     });
@@ -116,6 +125,9 @@ export class ProductDialogComponent {
     }
     if (control?.hasError('minlength')) {
       return `${this.getFieldLabel(fieldName)} deve ter pelo menos ${control.errors?.['minlength'].requiredLength} caracteres`;
+    }
+    if (control?.hasError('maxlength')) {
+      return `${this.getFieldLabel(fieldName)} deve ter no máximo ${control.errors?.['maxlength'].requiredLength} caracteres`;
     }
     if (control?.hasError('min')) {
       return `${this.getFieldLabel(fieldName)} deve ser maior que ${control.errors?.['min'].min}`;

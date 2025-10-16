@@ -34,6 +34,27 @@
   // Hover e estados
   --hover-purple: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
   --shadow-purple: rgba(102, 126, 234, 0.15);
+
+  // Variáveis para modo claro
+  --background-color: #f9fafb;
+  --card-background: #ffffff;
+  --border-color: #e2e8f0;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+}
+
+// Variáveis para modo noturno
+.dark-theme {
+  --background-color: #1a1a1a;
+  --dark-background: #1a1a1a;
+  --dark-card-background: #2d2d2d;
+  --dark-border-color: #404040;
+  --dark-text-primary: #ffffff;
+  --dark-text-secondary: #a0a0a0;
+  --card-background: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #404040;
 }
 
 html {

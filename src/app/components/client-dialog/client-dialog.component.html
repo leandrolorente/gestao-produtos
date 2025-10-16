@@ -55,47 +55,85 @@
       </mat-form-field>
     </div>
 
-    <!-- Endereço -->
+    <!-- Endereço - CEP com busca automática -->
     <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Endereço</mat-label>
-        <input matInput formControlName="endereco" placeholder="Rua, Avenida, número">
-        <mat-error>{{ getFieldErrorMessage('endereco') }}</mat-error>
-      </mat-form-field>
-    </div>
-
-    <!-- Cidade, Estado e CEP -->
-    <div class="form-row three-columns">
-      <mat-form-field appearance="outline">
-        <mat-label>Cidade</mat-label>
-        <input matInput formControlName="cidade" placeholder="Nome da cidade">
-        <mat-error>{{ getFieldErrorMessage('cidade') }}</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Estado</mat-label>
-        <mat-select formControlName="estado">
-          <mat-option *ngFor="let estado of estados" [value]="estado">
-            {{ estado }}
-          </mat-option>
-        </mat-select>
-        <mat-error>{{ getFieldErrorMessage('estado') }}</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="half-width">
         <mat-label>CEP</mat-label>
         <input matInput formControlName="cep" placeholder="00000-000"
-               (input)="formatCep($event)">
+               (input)="formatCep($event)" (blur)="buscarDadosCep()">
+        <button matSuffix mat-icon-button type="button"
+                (click)="buscarDadosCep()"
+                [disabled]="buscandoCep() || !clienteForm.get('cep')?.value"
+                matTooltip="Buscar CEP">
+          @if (!buscandoCep()) {
+            <mat-icon>search</mat-icon>
+          }
+          @if (buscandoCep()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          }
+        </button>
         <mat-error>{{ getFieldErrorMessage('cep') }}</mat-error>
       </mat-form-field>
     </div>
 
-    <!-- Status Ativo -->
-    <div class="form-row" *ngIf="isEdit">
-      <mat-checkbox formControlName="ativo">
-        Cliente Ativo
-      </mat-checkbox>
+    <!-- Logradouro e Número -->
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline" class="flex-grow">
+        <mat-label>Logradouro</mat-label>
+        <input matInput formControlName="logradouro" placeholder="Rua, Avenida, etc.">
+        <mat-error>{{ getFieldErrorMessage('logradouro') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="number-field">
+        <mat-label>Número</mat-label>
+        <input matInput formControlName="numero" placeholder="123">
+        <mat-error>{{ getFieldErrorMessage('numero') }}</mat-error>
+      </mat-form-field>
     </div>
+
+    <!-- Complemento e Bairro -->
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Complemento</mat-label>
+        <input matInput formControlName="complemento" placeholder="Apto, Bloco, etc. (opcional)">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Bairro</mat-label>
+        <input matInput formControlName="bairro" placeholder="Nome do bairro">
+        <mat-error>{{ getFieldErrorMessage('bairro') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Estado e Cidade -->
+    <div class="form-row two-columns">
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="uf">
+          @for (estado of estados; track estado.sigla) {
+            <mat-option [value]="estado.sigla">
+              {{ estado.sigla }} - {{ estado.nome }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ getFieldErrorMessage('uf') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cidade</mat-label>
+        <input matInput formControlName="localidade" placeholder="Nome da cidade">
+        <mat-error>{{ getFieldErrorMessage('localidade') }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Status Ativo -->
+    @if (isEdit) {
+      <div class="form-row">
+        <mat-checkbox formControlName="ativo">
+          Cliente Ativo
+        </mat-checkbox>
+      </div>
+    }
 
     <!-- Observações -->
     <div class="form-row">

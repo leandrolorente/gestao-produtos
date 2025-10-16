@@ -1,0 +1,228 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ data.isEdit ? 'edit' : 'add' }}</mat-icon>
+      {{ getDialogTitle() }}
+    </h2>
+    <button mat-icon-button mat-dialog-close class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Informações Básicas -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>info</mat-icon>
+          Informações Básicas
+        </h3>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-number">
+            <mat-label>Número</mat-label>
+            <input matInput formControlName="numero" placeholder="Ex: REC-001">
+            <button mat-icon-button matSuffix
+                    type="button"
+                    (click)="generateNumber()"
+                    matTooltip="Gerar número automaticamente">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <mat-error>{{ getFieldErrorMessage('numero') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descrição</mat-label>
+          <textarea matInput
+                    formControlName="descricao"
+                    placeholder="Descrição da conta a receber"
+                    rows="3"></textarea>
+          <mat-error>{{ getFieldErrorMessage('descricao') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Cliente -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>person</mat-icon>
+          Cliente
+        </h3>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cliente</mat-label>
+          <input
+            matInput
+            formControlName="clienteNome"
+            [matAutocomplete]="autoCliente"
+            placeholder="Digite o nome do cliente"
+            (focus)="onClienteFocus()"
+            (input)="onClienteInput($event)">
+          <mat-icon matSuffix>person_search</mat-icon>
+          <mat-autocomplete
+            #autoCliente="matAutocomplete"
+            [displayWith]="displayClienteFn"
+            [autoActiveFirstOption]="false"
+            (optionSelected)="onClienteOptionSelected($event)">
+            @for (cliente of clientesFiltrados(); track cliente.id) {
+              <mat-option [value]="cliente">
+                <div class="autocomplete-option">
+                  <div class="primary-text">{{ cliente.nome }}</div>
+                  <div class="secondary-text">{{ cliente.email }}</div>
+                </div>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Vendedor</mat-label>
+          <input
+            matInput
+            formControlName="vendedorNome"
+            [matAutocomplete]="autoVendedor"
+            placeholder="Digite o nome do vendedor"
+            (focus)="onVendedorFocus()"
+            (input)="onVendedorInput($event)">
+          <mat-icon matSuffix>badge</mat-icon>
+          <mat-autocomplete
+            #autoVendedor="matAutocomplete"
+            [displayWith]="displayVendedorFn"
+            [autoActiveFirstOption]="false"
+            (optionSelected)="onVendedorOptionSelected($event)">
+            @for (vendedor of vendedoresFiltrados(); track vendedor.id) {
+              <mat-option [value]="vendedor">
+                <div class="autocomplete-option">
+                  <div class="primary-text">{{ vendedor.name }}</div>
+                  <div class="secondary-text">{{ vendedor.email }}</div>
+                </div>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+
+      <!-- Valores e Datas -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>attach_money</mat-icon>
+          Valores e Prazos
+        </h3>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-valor">
+            <mat-label>Valor Original</mat-label>
+            <input matInput
+                   type="number"
+                   formControlName="valorOriginal"
+                   placeholder="0,00">
+            <span matTextPrefix>R$&nbsp;</span>
+            <mat-error>{{ getFieldErrorMessage('valorOriginal') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-desconto">
+            <mat-label>Desconto</mat-label>
+            <input matInput
+                   type="number"
+                   formControlName="desconto"
+                   placeholder="0,00">
+            <span matTextPrefix>R$&nbsp;</span>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-data">
+            <mat-label>Data de Emissão</mat-label>
+            <input matInput
+                   [matDatepicker]="dataEmissaoPicker"
+                   formControlName="dataEmissao">
+            <mat-datepicker-toggle matIconSuffix [for]="dataEmissaoPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dataEmissaoPicker></mat-datepicker>
+            <mat-error>{{ getFieldErrorMessage('dataEmissao') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-data">
+            <mat-label>Data de Vencimento</mat-label>
+            <input matInput
+                   [matDatepicker]="dataVencimentoPicker"
+                   formControlName="dataVencimento">
+            <mat-datepicker-toggle matIconSuffix [for]="dataVencimentoPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dataVencimentoPicker></mat-datepicker>
+            <mat-error>{{ getFieldErrorMessage('dataVencimento') }}</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Recorrência -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>repeat</mat-icon>
+          Recorrência
+        </h3>
+
+        <div class="recorrencia-container">
+          <mat-checkbox formControlName="ehRecorrente"
+                        (change)="onRecorrenteChange()"
+                        class="recorrente-checkbox">
+            Conta recorrente
+          </mat-checkbox>
+
+          @if (form.get('ehRecorrente')?.value) {
+            <div class="recorrencia-fields">
+              <mat-form-field appearance="outline" class="field-tipo">
+                <mat-label>Tipo de Recorrência</mat-label>
+                <mat-select formControlName="tipoRecorrencia">
+                  @for (tipo of tiposRecorrencia; track tipo.value) {
+                    <mat-option [value]="tipo.value">
+                      {{ tipo.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+                <mat-error>{{ getFieldErrorMessage('tipoRecorrencia') }}</mat-error>
+              </mat-form-field>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Observações -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>note</mat-icon>
+          Observações
+        </h3>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Observações</mat-label>
+          <textarea matInput
+                    formControlName="observacoes"
+                    placeholder="Observações adicionais sobre a conta"
+                    rows="3"></textarea>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSaving()">
+      Cancelar
+    </button>
+
+    <button mat-raised-button
+            color="primary"
+            (click)="onSubmit()"
+            [disabled]="form.invalid || isSaving()">
+      @if (isSaving()) {
+        <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner>
+      } @else {
+        <mat-icon>
+          {{ data.isEdit ? 'save' : 'add' }}
+        </mat-icon>
+      }
+      {{ getSaveButtonText() }}
+    </button>
+  </div>
+</div>

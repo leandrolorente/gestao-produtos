@@ -1,0 +1,400 @@
+// Variáveis de tema
+:root {
+  --dialog-bg: #ffffff;
+  --dialog-text: rgba(0, 0, 0, 0.87);
+  --dialog-text-secondary: rgba(0, 0, 0, 0.54);
+  --dialog-border: rgba(0, 0, 0, 0.12);
+  --dialog-hover: rgba(0, 0, 0, 0.04);
+  --section-bg: #f8f9fa;
+  --section-border: #e0e0e0;
+}
+
+[data-theme="dark"] {
+  --dialog-bg: #303030;
+  --dialog-text: rgba(255, 255, 255, 0.87);
+  --dialog-text-secondary: rgba(255, 255, 255, 0.54);
+  --dialog-border: rgba(255, 255, 255, 0.12);
+  --dialog-hover: rgba(255, 255, 255, 0.04);
+  --section-bg: #424242;
+  --section-border: #616161;
+}
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  width: 100%;
+  max-width: 800px;
+  background: var(--dialog-bg);
+  color: var(--dialog-text);
+}
+
+// === AUTOCOMPLETE STYLES ===
+.autocomplete-option {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+
+  .primary-text {
+    font-weight: 500;
+    color: var(--dialog-text);
+    margin-bottom: 4px;
+  }
+
+  .secondary-text {
+    font-size: 0.875rem;
+    color: var(--dialog-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// === CABEÇALHO ===
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--dialog-border);
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--dialog-text);
+
+    mat-icon {
+      color: #4caf50; // Verde para recebimentos
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .close-button {
+    color: var(--dialog-text-secondary);
+
+    &:hover {
+      background-color: var(--dialog-hover);
+    }
+  }
+}
+
+// === CONTEÚDO ===
+.dialog-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+
+  form {
+    padding: 24px;
+  }
+}
+
+// === SEÇÕES ===
+.form-section {
+  margin-bottom: 32px;
+  padding: 20px;
+  background: var(--section-bg);
+  border: 1px solid var(--section-border);
+  border-radius: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--dialog-text);
+
+    mat-icon {
+      color: #4caf50; // Verde para recebimentos
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+}
+
+// === LAYOUT DE CAMPOS ===
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// === CAMPOS ESPECÍFICOS ===
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.field-number {
+  min-width: 200px;
+}
+
+.field-cliente-id {
+  min-width: 150px;
+}
+
+.field-cliente-nome {
+  flex: 1;
+}
+
+.field-vendedor-id {
+  min-width: 150px;
+}
+
+.field-vendedor-nome {
+  flex: 1;
+}
+
+.field-valor {
+  min-width: 200px;
+}
+
+.field-desconto {
+  min-width: 200px;
+}
+
+.field-data {
+  min-width: 180px;
+}
+
+.field-tipo {
+  width: 100%;
+}
+
+// === RECORRÊNCIA ===
+.recorrencia-container {
+  .recorrente-checkbox {
+    margin-bottom: 16px;
+
+    ::ng-deep .mat-checkbox-label {
+      font-weight: 500;
+    }
+  }
+
+  .recorrencia-fields {
+    padding-left: 32px;
+    border-left: 3px solid #4caf50; // Verde para recebimentos
+    background: rgba(76, 175, 80, 0.05);
+    border-radius: 4px;
+    padding: 16px;
+  }
+}
+
+// === AÇÕES ===
+.dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--dialog-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--dialog-bg);
+
+  button {
+    min-width: 100px;
+
+    mat-icon {
+      margin-right: 8px;
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    mat-progress-spinner {
+      margin-right: 8px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// === CAMPOS DE FORMULÁRIO ===
+::ng-deep {
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--dialog-bg);
+    }
+
+    .mat-mdc-form-field-label {
+      color: var(--dialog-text-secondary);
+    }
+
+    .mat-mdc-input-element {
+      color: var(--dialog-text);
+    }
+
+    // Textarea específico
+    .mat-mdc-input-element[rows] {
+      min-height: auto;
+    }
+  }
+
+  // Selects
+  .mat-mdc-select-value {
+    color: var(--dialog-text);
+  }
+
+  .mat-mdc-select-arrow {
+    color: var(--dialog-text-secondary);
+  }
+
+  // Datepicker
+  .mat-datepicker-toggle {
+    color: var(--dialog-text-secondary);
+  }
+
+  // Checkbox
+  .mat-mdc-checkbox {
+    .mat-mdc-checkbox-label {
+      color: var(--dialog-text);
+    }
+  }
+
+  // Erros
+  .mat-mdc-form-field-error {
+    color: #f44336;
+    font-size: 0.75rem;
+  }
+}
+
+// === SCROLLBAR ===
+.dialog-content {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--dialog-border);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--dialog-text-secondary);
+    }
+  }
+}
+
+// === RESPONSIVIDADE ===
+@media (max-width: 768px) {
+  .dialog-container {
+    max-width: 100%;
+    width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+  }
+
+  .dialog-header {
+    padding: 16px;
+
+    h2 {
+      font-size: 1.125rem;
+    }
+  }
+
+  .dialog-content form {
+    padding: 16px;
+  }
+
+  .form-section {
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .dialog-actions {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    .close-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+  }
+
+  .form-section {
+    padding: 12px;
+
+    .section-title {
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+// === ANIMAÇÕES ===
+.dialog-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// === MELHORIAS VISUAIS ===
+.form-section {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4caf50, #66bb6a); // Verde para recebimentos
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+// === TOOLTIPS ===
+::ng-deep .mat-mdc-tooltip {
+  font-size: 0.75rem;
+}

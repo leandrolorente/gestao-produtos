@@ -1,0 +1,372 @@
+/* Fornecedor Dialog Component Styles */
+
+/* Container principal do dialog */
+::ng-deep .mat-mdc-dialog-container {
+  max-height: 90vh !important;
+  height: 90vh !important;
+  overflow: hidden !important;
+}
+
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+/* --- Header --- */
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0; /* Não permite que o header encolha */
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 1.5rem;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .close-btn {
+    color: var(--text-secondary);
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text-primary);
+    }
+  }
+}
+
+/* --- Content --- */
+.dialog-content {
+  flex: 1;
+  overflow: hidden;
+  padding: 0 !important;
+  min-height: 0;
+  position: relative;
+
+  ::ng-deep .mat-mdc-tab-group {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .mat-mdc-tab-header {
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+
+      .mat-mdc-tab-body {
+        height: 100%;
+
+        .mat-mdc-tab-body-content {
+          height: 100%;
+          overflow-y: auto;
+          overflow-x: hidden;
+          position: relative;
+
+          /* Estilo da scrollbar */
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+          &::-webkit-scrollbar {
+            width: 8px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+
+            &:hover {
+              background: rgba(0, 0, 0, 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.tab-content {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: fit-content;
+  overflow-y: visible;
+}
+
+/* --- Forms --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+/* --- Section Title --- */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  font-size: 1.125rem;
+  margin: 1rem 0 0.5rem 0;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* --- Mat Divider --- */
+::ng-deep mat-divider {
+  margin: 1.5rem 0;
+}
+
+/* --- Form Fields --- */
+::ng-deep mat-form-field {
+  width: 100%;
+
+  .mat-mdc-form-field-icon-prefix {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+  }
+
+  .mat-mdc-form-field-hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .mat-mdc-form-field-error {
+    font-size: 0.75rem;
+  }
+}
+
+/* --- Loading Icon --- */
+.loading-icon {
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Actions --- */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  background: var(--background-light);
+
+  button {
+    min-width: 120px;
+    height: 42px;
+    font-weight: 500;
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .cancel-btn {
+    border-color: var(--text-secondary);
+    color: var(--text-secondary);
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+    }
+  }
+
+  .save-btn {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #5a67d8, #6b46c1) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px var(--shadow-purple);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* --- Tabs Customization --- */
+::ng-deep .mat-mdc-tab-labels {
+  background: var(--background-light);
+}
+
+::ng-deep .mat-mdc-tab {
+  font-weight: 500;
+
+  &.mat-mdc-tab-active {
+    .mat-mdc-tab-label-content {
+      color: var(--primary-color);
+    }
+  }
+}
+
+::ng-deep .mat-mdc-tab-label {
+  min-width: 120px;
+  padding: 0 1.5rem;
+  height: 56px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .dialog-header {
+    padding: 1rem;
+
+    h2 {
+      font-size: 1.25rem;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .tab-content {
+    padding: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .dialog-actions {
+    padding: 1rem;
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  ::ng-deep .mat-mdc-tab-label {
+    min-width: 80px;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-header h2 {
+    font-size: 1.125rem;
+
+    span {
+      display: none; // Oculta o texto "Editar/Novo" em telas muito pequenas
+    }
+  }
+
+  .tab-content {
+    padding: 0.75rem;
+  }
+}
+
+/* --- Checkbox Group --- */
+.checkbox-group {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.02);
+
+  ::ng-deep .mat-mdc-checkbox {
+    .mdc-checkbox {
+      padding: 8px;
+    }
+
+    .mdc-form-field {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      mat-icon {
+        color: var(--primary-color);
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+/* --- Scroll Improvements --- */
+::ng-deep .mat-mdc-dialog-container {
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+::ng-deep .mat-mdc-tab-body-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+  }
+}
+
+/* --- Form Grid Adjustments --- */
+.form-grid {
+  padding-bottom: 2rem; /* Espaço extra no final para melhor scroll */
+}

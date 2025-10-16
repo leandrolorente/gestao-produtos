@@ -1,0 +1,338 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ isEditMode ? 'edit' : 'add_business' }}</mat-icon>
+      {{ isEditMode ? 'Editar Fornecedor' : 'Novo Fornecedor' }}
+    </h2>
+    <button mat-icon-button mat-dialog-close class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <mat-tab-group animationDuration="300ms">
+
+      <!-- Aba 1: Dados Gerais -->
+      <mat-tab label="Dados Gerais">
+        <div class="tab-content">
+          <form [formGroup]="formGeral" class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Razão Social</mat-label>
+              <input matInput formControlName="razaoSocial" placeholder="Razão social completa"
+                     required maxlength="200">
+              <mat-icon matPrefix>domain</mat-icon>
+              @if (formGeral.get('razaoSocial')?.invalid && formGeral.get('razaoSocial')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('razaoSocial') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nome Fantasia</mat-label>
+              <input matInput formControlName="nomeFantasia" placeholder="Nome fantasia (opcional)"
+                     maxlength="200">
+              <mat-icon matPrefix>business</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>CNPJ/CPF</mat-label>
+              <input matInput formControlName="cnpjCpf" cnpjCpfMask
+                     placeholder="00.000.000/0000-00" required autocomplete="off" maxlength="18">
+              <mat-icon matPrefix>badge</mat-icon>
+              @if (formGeral.get('cnpjCpf')?.invalid && formGeral.get('cnpjCpf')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('cnpjCpf') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Inscrição Estadual</mat-label>
+              <input matInput formControlName="inscricaoEstadual" placeholder="000.000.000.000"
+                     maxlength="20">
+              <mat-icon matPrefix>description</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Inscrição Municipal</mat-label>
+              <input matInput formControlName="inscricaoMunicipal" placeholder="00000000"
+                     maxlength="20">
+              <mat-icon matPrefix>description</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo</mat-label>
+              <mat-select formControlName="tipo" required>
+                @for (tipo of tiposFornecedor; track tipo.value) {
+                  <mat-option [value]="tipo.value">{{ tipo.label }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>flag</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status" required>
+                @for (status of statusFornecedor; track status.value) {
+                  <mat-option [value]="status.value">{{ status.label }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>toggle_on</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Site</mat-label>
+              <input matInput formControlName="site" (blur)="formatUrl($event)"
+                     placeholder="https://exemplo.com.br">
+              <mat-icon matPrefix>language</mat-icon>
+              @if (formGeral.get('site')?.invalid && formGeral.get('site')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('site') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-divider class="full-width"></mat-divider>
+
+            <h3 class="section-title full-width">
+              <mat-icon>contact_phone</mat-icon>
+              Informações de Contato
+            </h3>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" formControlName="email"
+                     placeholder="contato@exemplo.com" required maxlength="100">
+              <mat-icon matPrefix>email</mat-icon>
+              @if (formGeral.get('email')?.invalid && formGeral.get('email')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('email') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Telefone</mat-label>
+              <input matInput formControlName="telefone" telefoneMask
+                     placeholder="(00) 00000-0000" required maxlength="15">
+              <mat-icon matPrefix>phone</mat-icon>
+              @if (formGeral.get('telefone')?.invalid && formGeral.get('telefone')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('telefone') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Contato Principal</mat-label>
+              <input matInput formControlName="contatoPrincipal" placeholder="Nome do responsável"
+                     maxlength="100">
+              <mat-icon matPrefix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Observações</mat-label>
+              <textarea matInput formControlName="observacoes" rows="3" maxlength="500"
+                        placeholder="Informações adicionais sobre o fornecedor"></textarea>
+              <mat-icon matPrefix>notes</mat-icon>
+            </mat-form-field>
+
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Aba 2: Endereço -->
+      <mat-tab label="Endereço">
+        <div class="tab-content">
+          <form [formGroup]="formEndereco" class="form-grid">
+
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Endereço</mat-label>
+              <mat-select formControlName="tipo">
+                @for (tipo of tiposEndereco; track tipo.value) {
+                  <mat-option [value]="tipo.value">{{ tipo.label }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>location_on</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>CEP</mat-label>
+              <input matInput formControlName="cep" cepMask
+                     (blur)="buscarCep()" placeholder="00000-000" maxlength="9">
+              <mat-icon matPrefix>pin_drop</mat-icon>
+              @if (isLoadingCep()) {
+                <mat-icon matSuffix class="loading-icon">
+                  <span class="spinner"></span>
+                </mat-icon>
+              }
+              @if (formEndereco.get('cep')?.invalid && formEndereco.get('cep')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('cep', formEndereco) }}</mat-error>
+              }
+              <mat-hint>Digite o CEP e pressione TAB para buscar</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Logradouro</mat-label>
+              <input matInput formControlName="logradouro" placeholder="Rua, Avenida..."
+                     maxlength="200">
+              <mat-icon matPrefix>signpost</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Número</mat-label>
+              <input matInput formControlName="numero" placeholder="123" maxlength="10">
+              <mat-icon matPrefix>tag</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Complemento</mat-label>
+              <input matInput formControlName="complemento" placeholder="Sala, Bloco..."
+                     maxlength="100">
+              <mat-icon matPrefix>apartment</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Bairro</mat-label>
+              <input matInput formControlName="bairro" placeholder="Centro" maxlength="100">
+              <mat-icon matPrefix>map</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Cidade</mat-label>
+              <input matInput formControlName="localidade" placeholder="São Paulo"
+                     maxlength="100">
+              <mat-icon matPrefix>location_city</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>UF</mat-label>
+              <input matInput formControlName="uf" ufMask
+                     placeholder="SP" maxlength="2">
+              <mat-icon matPrefix>flag</mat-icon>
+              @if (formEndereco.get('uf')?.invalid && formEndereco.get('uf')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('uf', formEndereco) }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Estado</mat-label>
+              <input matInput formControlName="estado" placeholder="São Paulo" maxlength="50">
+              <mat-icon matPrefix>public</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Unidade</mat-label>
+              <input matInput formControlName="unidade" placeholder="Apto, Loja..." maxlength="50">
+              <mat-icon matPrefix>store</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Região</mat-label>
+              <input matInput formControlName="regiao" placeholder="Centro, Zona Sul..."
+                     maxlength="50">
+              <mat-icon matPrefix>explore</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Ponto de Referência</mat-label>
+              <input matInput formControlName="referencia" placeholder="Próximo ao shopping..."
+                     maxlength="200">
+              <mat-icon matPrefix>place</mat-icon>
+            </mat-form-field>
+
+            <div class="checkbox-group full-width">
+              <mat-checkbox formControlName="isPrincipal">
+                <mat-icon>home</mat-icon>
+                Endereço Principal
+              </mat-checkbox>
+            </div>
+
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Aba 3: Dados Bancários -->
+      <mat-tab label="Dados Bancários">
+        <div class="tab-content">
+          <form [formGroup]="formBancario" class="form-grid">
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Banco</mat-label>
+              <input matInput formControlName="banco" placeholder="Nome do banco">
+              <mat-icon matPrefix>account_balance</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Agência</mat-label>
+              <input matInput formControlName="agencia" numbersOnlyMask
+                     placeholder="0000" maxlength="5">
+              <mat-icon matPrefix>store</mat-icon>
+              @if (formBancario.get('agencia')?.invalid && formBancario.get('agencia')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('agencia', formBancario) }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Conta</mat-label>
+              <input matInput formControlName="conta" numbersOnlyMask
+                     placeholder="00000-0" maxlength="12">
+              <mat-icon matPrefix>credit_card</mat-icon>
+              @if (formBancario.get('conta')?.invalid && formBancario.get('conta')?.touched) {
+                <mat-error>{{ getFieldErrorMessage('conta', formBancario) }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Chave PIX</mat-label>
+              <input matInput formControlName="pix" maxlength="200"
+                     placeholder="Email, telefone, CPF/CNPJ ou chave aleatória">
+              <mat-icon matPrefix>pix</mat-icon>
+              <mat-hint>Informe a chave PIX do fornecedor</mat-hint>
+            </mat-form-field>
+
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Aba 4: Condições Comerciais -->
+      <mat-tab label="Condições Comerciais">
+        <div class="tab-content">
+          <form [formGroup]="formComercial" class="form-grid">
+
+            <mat-form-field appearance="outline">
+              <mat-label>Prazo de Pagamento Padrão (dias)</mat-label>
+              <input matInput type="number" formControlName="prazoPagamentoPadrao" placeholder="30" required>
+              <mat-icon matPrefix>schedule</mat-icon>
+              @if (formComercial.get('prazoPagamentoPadrao')?.invalid && formComercial.get('prazoPagamentoPadrao')?.touched) {
+                <mat-error>Campo obrigatório</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Limite de Crédito</mat-label>
+              <input matInput type="number" formControlName="limiteCredito" placeholder="0.00" required>
+              <mat-icon matPrefix>account_balance</mat-icon>
+              @if (formComercial.get('limiteCredito')?.invalid && formComercial.get('limiteCredito')?.touched) {
+                <mat-error>Campo obrigatório</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Condições de Pagamento</mat-label>
+              <input matInput formControlName="condicoesPagamento"
+                     placeholder="Ex: 30/60/90 dias, Boleto, Transferência">
+              <mat-icon matPrefix>event_note</mat-icon>
+            </mat-form-field>
+
+          </form>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSave()"
+            [disabled]="!formGeral.valid" class="save-btn">
+      <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      {{ isEditMode ? 'Salvar' : 'Criar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

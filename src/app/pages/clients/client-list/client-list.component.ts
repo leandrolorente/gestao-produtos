@@ -132,7 +132,7 @@ export class ClientListComponent implements OnInit {
     'email',
     'telefone',
     'cpfCnpj',
-    'cidade',
+    'localidade', // atualizado de 'cidade' para 'localidade'
     'tipo',
     'ativo',
     'ultimaCompra',
@@ -150,6 +150,11 @@ export class ClientListComponent implements OnInit {
     this.isLoading.set(true);
     this.clienteService.getAllClientes().subscribe({
       next: (clientes) => {
+        console.log('🔍 Dados recebidos dos clientes:', clientes);
+        console.log('🔍 Primeiro cliente:', clientes[0]);
+        if (clientes[0]?.endereco) {
+          console.log('🔍 Endereço do primeiro cliente:', clientes[0].endereco);
+        }
         this.clientes.set(clientes);
         this.clientesFiltrados.set(clientes);
         this.isLoading.set(false);
@@ -204,7 +209,7 @@ export class ClientListComponent implements OnInit {
       cliente.nome.toLowerCase().includes(term) ||
       cliente.email.toLowerCase().includes(term) ||
       cliente.cpfCnpj.includes(term) ||
-      cliente.cidade.toLowerCase().includes(term)
+      cliente.endereco.localidade.toLowerCase().includes(term) // acessa localidade através do endereco
     );
     this.clientesFiltrados.set(filtered);
   }
@@ -387,10 +392,14 @@ export class ClientListComponent implements OnInit {
       Email: cliente.email,
       Telefone: cliente.telefone,
       'CPF/CNPJ': cliente.cpfCnpj,
-      Endereço: cliente.endereco,
-      Cidade: cliente.cidade,
-      Estado: cliente.estado,
-      CEP: cliente.cep,
+      CEP: cliente.endereco.cep,
+      Logradouro: cliente.endereco.logradouro,
+      Número: cliente.endereco.numero,
+      Complemento: cliente.endereco.complemento || '',
+      Bairro: cliente.endereco.bairro,
+      Cidade: cliente.endereco.localidade,
+      Estado: cliente.endereco.estado,
+      UF: cliente.endereco.uf,
       Tipo: cliente.tipo,
       Ativo: cliente.ativo ? 'Sim' : 'Não',
       'Data Cadastro': cliente.dataCadastro.toLocaleDateString('pt-BR'),
