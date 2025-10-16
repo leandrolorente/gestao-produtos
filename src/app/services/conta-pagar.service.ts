@@ -105,15 +105,15 @@ export class ContaPagarService {
   /**
    * Realiza pagamento de uma conta
    */
-  pagar(id: string, pagamento: PagamentoConta): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/pagar`, pagamento);
+  pagar(id: string, pagamento: PagamentoConta): Observable<ContaPagar> {
+    return this.http.post<ContaPagar>(`${this.apiUrl}/${id}/pagar`, pagamento);
   }
 
   /**
    * Cancela uma conta
    */
-  cancelar(id: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/cancelar`, {});
+  cancelar(id: string): Observable<ContaPagar> {
+    return this.http.post<ContaPagar>(`${this.apiUrl}/${id}/cancelar`, {});
   }
 
   /**
@@ -148,14 +148,58 @@ export class ContaPagarService {
   /**
    * Atualiza status das contas
    */
-  atualizarStatus(): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/atualizar-status`, {});
+  atualizarStatus(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/atualizar-status`, {});
   }
 
   /**
    * Processa contas recorrentes
    */
-  processarRecorrentes(): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/processar-recorrentes`, {});
+  processarRecorrentes(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/processar-recorrentes`, {});
+  }
+
+  /**
+   * Métodos de conveniência para validação
+   */
+  canEdit(conta: ContaPagar): boolean {
+    return conta.status === StatusContaPagar.Pendente;
+  }
+
+  canDelete(conta: ContaPagar): boolean {
+    return conta.status === StatusContaPagar.Pendente || conta.status === StatusContaPagar.Cancelada;
+  }
+
+  canPay(conta: ContaPagar): boolean {
+    return conta.status === StatusContaPagar.Pendente || conta.status === StatusContaPagar.Vencida;
+  }
+
+  canCancel(conta: ContaPagar): boolean {
+    return conta.status === StatusContaPagar.Pendente || conta.status === StatusContaPagar.Vencida;
+  }
+
+  /**
+   * Calcula valor líquido (original - desconto)
+   */
+  calcularValorLiquido(conta: ContaPagar): number {
+    return conta.valorOriginal - (conta.desconto || 0);
+  }
+
+  /**
+   * Verifica se a conta está vencida
+   */
+  isVencida(conta: ContaPagar): boolean {
+    if (conta.status === StatusContaPagar.Paga) return false;
+    return new Date(conta.dataVencimento) < new Date();
+  }
+
+  /**
+   * Calcula dias até o vencimento
+   */
+  diasParaVencimento(conta: ContaPagar): number {
+    const hoje = new Date();
+    const vencimento = new Date(conta.dataVencimento);
+    const diffTime = vencimento.getTime() - hoje.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 }

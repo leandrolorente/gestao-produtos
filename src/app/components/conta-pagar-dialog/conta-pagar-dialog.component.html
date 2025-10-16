@@ -91,6 +91,23 @@
             <mat-error>{{ getFieldErrorMessage('fornecedorId') }}</mat-error>
           </mat-form-field>
         </div>
+
+        <!-- Campos adicionais -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="field-nota">
+            <mat-label>Nota Fiscal</mat-label>
+            <input matInput formControlName="notaFiscal" placeholder="Ex: NF-12345">
+            <mat-icon matSuffix>receipt</mat-icon>
+            <mat-error>{{ getFieldErrorMessage('notaFiscal') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-centro-custo">
+            <mat-label>Centro de Custo</mat-label>
+            <input matInput formControlName="centroCusto" placeholder="Ex: Produção">
+            <mat-icon matSuffix>business_center</mat-icon>
+            <mat-error>{{ getFieldErrorMessage('centroCusto') }}</mat-error>
+          </mat-form-field>
+        </div>
       </div>
 
       <!-- Valores e Datas -->
@@ -110,6 +127,19 @@
             <span matTextPrefix>R$&nbsp;</span>
             <mat-error>{{ getFieldErrorMessage('valorOriginal') }}</mat-error>
           </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-valor">
+            <mat-label>Desconto</mat-label>
+            <input matInput
+                   formControlName="desconto"
+                   appCurrencyMask
+                   placeholder="R$ 0,00">
+            <span matTextPrefix>R$&nbsp;</span>
+            <mat-error>{{ getFieldErrorMessage('desconto') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
 
           <mat-form-field appearance="outline" class="field-pagamento">
             <mat-label>Forma de Pagamento</mat-label>
@@ -167,8 +197,19 @@
                   <mat-option *ngFor="let tipo of tiposRecorrencia" [value]="tipo.value">
                     {{ tipo.label }}
                   </mat-option>
+                  <mat-option [value]="null">Personalizada</mat-option>
                 </mat-select>
                 <mat-error>{{ getFieldErrorMessage('tipoRecorrencia') }}</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-dias" *ngIf="!form.get('tipoRecorrencia')?.value">
+                <mat-label>Dias para Recorrência</mat-label>
+                <input matInput
+                       type="number"
+                       formControlName="diasRecorrencia"
+                       min="1"
+                       placeholder="30">
+                <mat-error>{{ getFieldErrorMessage('diasRecorrencia') }}</mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="field-parcelas">

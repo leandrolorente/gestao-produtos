@@ -104,7 +104,8 @@ export type ContaPagarUpdateDTO = UpdateContaPagar;
 export interface PagamentoConta {
   valor: number;
   formaPagamento: FormaPagamento;
-  dataPagamento: string;
+  dataPagamento?: string; // Opcional - padrão é agora
+  observacoes?: string; // Campo observações do pagamento
 }
 
 /**

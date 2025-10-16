@@ -103,10 +103,20 @@ export class ContaPagarDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadFornecedores();
+    console.log('Dialog dados recebidos:', this.data);
     
+    // Primeiro carrega os fornecedores
+    this.loadFornecedores();
+
+    // Depois carrega os dados da conta se for edição
     if (this.data.isEdit && this.data.conta) {
-      this.loadContaData();
+      console.log('Modo edição - conta:', this.data.conta);
+      // Aguarda um tick para garantir que os fornecedores foram carregados
+      setTimeout(() => {
+        this.loadContaData();
+      }, 100);
+    } else {
+      console.log('Modo criação');
     }
   }
 
@@ -117,16 +127,21 @@ export class ContaPagarDialogComponent implements OnInit {
     return this.fb.group({
       numero: ['', Validators.required],
       descricao: ['', [Validators.required, Validators.minLength(3)]],
-      fornecedorId: [null],
-      fornecedorNome: [''],
+      fornecedorId: [null, Validators.required],
+      fornecedorNome: ['', Validators.required],
+      compraId: [null], // Campo opcional para compra relacionada
+      notaFiscal: [''], // Campo para nota fiscal
       valorOriginal: [0, [Validators.required, Validators.min(0.01)]],
+      desconto: [0, [Validators.min(0)]], // Campo desconto
       dataEmissao: [new Date(), Validators.required],
       dataVencimento: [null, Validators.required],
       formaPagamento: [FormaPagamento.PIX, Validators.required],
       categoria: [CategoriaConta.Outros, Validators.required],
       observacoes: [''],
+      centroCusto: [''], // Campo centro de custo
       recorrente: [false],
       tipoRecorrencia: [null],
+      diasRecorrencia: [null], // Campo para dias de recorrência personalizada
       quantidadeParcelas: [1],
       contaBancariaId: [null]
     });
@@ -139,20 +154,77 @@ export class ContaPagarDialogComponent implements OnInit {
     if (!this.data.conta) return;
 
     const conta = this.data.conta;
-    this.form.patchValue({
-      numero: conta.numero,
-      descricao: conta.descricao,
-      fornecedorId: conta.fornecedorId,
-      fornecedorNome: conta.fornecedorNome,
-      valorOriginal: conta.valorOriginal,
-      dataEmissao: new Date(conta.dataEmissao),
-      dataVencimento: new Date(conta.dataVencimento),
-      formaPagamento: conta.formaPagamento,
-      categoria: conta.categoria,
-      observacoes: conta.observacoes,
-      ehRecorrente: conta.ehRecorrente,
-      tipoRecorrencia: conta.tipoRecorrencia
-    });
+    console.log('Carregando dados da conta para edição:', conta);
+    
+    // Criar objeto com valores padrão para campos que podem não existir
+    const formValues = {
+      numero: conta.numero || '',
+      descricao: conta.descricao || '',
+      fornecedorId: conta.fornecedorId || null,
+      fornecedorNome: conta.fornecedorNome || '',
+      compraId: conta.compraId || null,
+      notaFiscal: conta.notaFiscal || '',
+      valorOriginal: conta.valorOriginal || 0,
+      desconto: conta.desconto || 0,
+      dataEmissao: conta.dataEmissao ? new Date(conta.dataEmissao) : new Date(),
+      dataVencimento: conta.dataVencimento ? new Date(conta.dataVencimento) : null,
+      formaPagamento: this.convertToNumber(conta.formaPagamento) || FormaPagamento.PIX,
+      categoria: this.convertToNumber(conta.categoria) || CategoriaConta.Outros, // Converter para número
+      observacoes: conta.observacoes || '',
+      centroCusto: conta.centroCusto || '',
+      recorrente: Boolean(conta.ehRecorrente), // Garantir boolean
+      tipoRecorrencia: conta.tipoRecorrencia ? this.convertToNumber(conta.tipoRecorrencia) : null, // Converter para número
+      diasRecorrencia: conta.diasRecorrencia || null
+    };
+
+    console.log('Categoria da conta:', conta.categoria, 'Tipo:', typeof conta.categoria);
+    console.log('Tipo recorrência da conta:', conta.tipoRecorrencia, 'Tipo:', typeof conta.tipoRecorrencia);
+    console.log('É recorrente:', conta.ehRecorrente, 'Tipo:', typeof conta.ehRecorrente);
+
+    console.log('Valores que serão carregados no formulário:', formValues);
+    
+    // Log específico para campos problemáticos
+    console.log('Verificando categoria:');
+    console.log('- Valor da API:', conta.categoria, '(tipo:', typeof conta.categoria, ')');
+    console.log('- Valor no form:', formValues.categoria, '(tipo:', typeof formValues.categoria, ')');
+    console.log('- Categorias disponíveis:', this.categorias);
+    
+    console.log('Verificando recorrência:');
+    console.log('- ehRecorrente API:', conta.ehRecorrente, '(tipo:', typeof conta.ehRecorrente, ')');
+    console.log('- recorrente form:', formValues.recorrente, '(tipo:', typeof formValues.recorrente, ')');
+    
+    console.log('Verificando tipo recorrência:');
+    console.log('- Valor da API:', conta.tipoRecorrencia, '(tipo:', typeof conta.tipoRecorrencia, ')');
+    console.log('- Valor no form:', formValues.tipoRecorrencia, '(tipo:', typeof formValues.tipoRecorrencia, ')');
+    console.log('- Tipos disponíveis:', this.tiposRecorrencia);
+    
+    this.form.patchValue(formValues);
+
+    console.log('Formulário após carregamento:', this.form.value);
+
+    // Se há fornecedorId mas não há fornecedorNome, buscar o nome do fornecedor
+    if (conta.fornecedorId && !conta.fornecedorNome) {
+      const fornecedor = this.fornecedores().find(f => f.id === conta.fornecedorId);
+      if (fornecedor) {
+        this.form.patchValue({
+          fornecedorNome: fornecedor.razaoSocial
+        });
+        console.log('Nome do fornecedor atualizado:', fornecedor.razaoSocial);
+      }
+    }
+  }
+
+  /**
+   * Converte valor para número
+   */
+  private convertToNumber(value: any): number | null {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const num = parseInt(value, 10);
+      return isNaN(num) ? null : num;
+    }
+    return null;
   }
 
   /**
@@ -182,14 +254,18 @@ export class ContaPagarDialogComponent implements OnInit {
       descricao: formValue.descricao,
       fornecedorId: formValue.fornecedorId,
       fornecedorNome: formValue.fornecedorNome,
+      compraId: formValue.compraId || undefined,
+      notaFiscal: formValue.notaFiscal || undefined,
       valorOriginal: formValue.valorOriginal,
-      desconto: 0,
+      desconto: formValue.desconto || 0,
       dataEmissao: formValue.dataEmissao.toISOString(),
       dataVencimento: formValue.dataVencimento.toISOString(),
       categoria: formValue.categoria,
       observacoes: formValue.observacoes || '',
-      ehRecorrente: formValue.recorrente,
-      tipoRecorrencia: formValue.recorrente ? formValue.tipoRecorrencia : undefined
+      centroCusto: formValue.centroCusto || undefined,
+      ehRecorrente: formValue.recorrente || false,
+      tipoRecorrencia: formValue.recorrente ? formValue.tipoRecorrencia : undefined,
+      diasRecorrencia: formValue.recorrente && formValue.diasRecorrencia ? formValue.diasRecorrencia : undefined
     };
 
     this.contaPagarService.create(contaData).subscribe({
@@ -218,14 +294,18 @@ export class ContaPagarDialogComponent implements OnInit {
       descricao: formValue.descricao,
       fornecedorId: formValue.fornecedorId,
       fornecedorNome: formValue.fornecedorNome,
+      compraId: formValue.compraId || undefined,
+      notaFiscal: formValue.notaFiscal || undefined,
       valorOriginal: formValue.valorOriginal,
-      desconto: 0,
+      desconto: formValue.desconto || 0,
       dataEmissao: formValue.dataEmissao.toISOString(),
       dataVencimento: formValue.dataVencimento.toISOString(),
       categoria: formValue.categoria,
       observacoes: formValue.observacoes || '',
-      ehRecorrente: formValue.recorrente,
-      tipoRecorrencia: formValue.recorrente ? formValue.tipoRecorrencia : undefined
+      centroCusto: formValue.centroCusto || undefined,
+      ehRecorrente: formValue.recorrente || false,
+      tipoRecorrencia: formValue.recorrente ? formValue.tipoRecorrencia : undefined,
+      diasRecorrencia: formValue.recorrente && formValue.diasRecorrencia ? formValue.diasRecorrencia : undefined
     };
 
     this.contaPagarService.update(this.data.conta.id, contaData).subscribe({
@@ -275,11 +355,18 @@ export class ContaPagarDialogComponent implements OnInit {
         numero: 'Número',
         descricao: 'Descrição',
         valorOriginal: 'Valor',
+        desconto: 'Desconto',
         dataEmissao: 'Data de Emissão',
         dataVencimento: 'Data de Vencimento',
         formaPagamento: 'Forma de Pagamento',
         categoria: 'Categoria',
-        fornecedorId: 'Fornecedor'
+        fornecedorId: 'Fornecedor',
+        fornecedorNome: 'Nome do Fornecedor',
+        notaFiscal: 'Nota Fiscal',
+        centroCusto: 'Centro de Custo',
+        tipoRecorrencia: 'Tipo de Recorrência',
+        diasRecorrencia: 'Dias de Recorrência',
+        quantidadeParcelas: 'Quantidade de Parcelas'
       };
       return `${fieldLabels[fieldName] || fieldName} é obrigatório`;
     }
@@ -363,29 +450,55 @@ export class ContaPagarDialogComponent implements OnInit {
   /**
    * Exibe fornecedor no campo
    */
-  displayFornecedorFn = (fornecedor: Fornecedor): string => {
-    return fornecedor ? `${fornecedor.razaoSocial}${fornecedor.nomeFantasia ? ' (' + fornecedor.nomeFantasia + ')' : ''}` : '';
+  displayFornecedorFn = (value: any): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && value.razaoSocial) {
+      return `${value.razaoSocial}${value.nomeFantasia ? ' (' + value.nomeFantasia + ')' : ''}`;
+    }
+    return '';
   };
 
   /**
    * Eventos do autocomplete de fornecedor
    */
   onFornecedorFocus(): void {
-    this.fornecedoresFiltrados.set(this.fornecedores());
+    const fornecedorNomeControl = this.form.get('fornecedorNome');
+    const currentValue = fornecedorNomeControl?.value;
+
+    // Se o campo está vazio, mostra todos os fornecedores ao focar
+    if (!currentValue || currentValue.trim() === '') {
+      this.fornecedoresFiltrados.set(this.fornecedores());
+    }
   }
 
   onFornecedorInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const filteredFornecedores = this.filtrarFornecedores(input.value);
-    this.fornecedoresFiltrados.set(filteredFornecedores);
+    const value = input.value;
+    
+    if (value && value.trim() !== '') {
+      // Filtra conforme digita
+      const filteredFornecedores = this.filtrarFornecedores(value);
+      this.fornecedoresFiltrados.set(filteredFornecedores);
+    } else {
+      // Se limpar o campo, mostra todos novamente
+      this.fornecedoresFiltrados.set(this.fornecedores());
+      // Limpa o ID se o campo for esvaziado
+      this.form.patchValue({
+        fornecedorId: null
+      });
+    }
   }
 
   onFornecedorOptionSelected(event: any): void {
-    const fornecedor = event.option.value as Fornecedor;
-    this.form.patchValue({
-      fornecedorId: fornecedor.id,
-      fornecedorNome: this.displayFornecedorFn(fornecedor)
-    });
+    const fornecedor = event.option.value;
+    console.log('Fornecedor selecionado via option:', fornecedor);
+    if (fornecedor && typeof fornecedor === 'object') {
+      this.form.patchValue({
+        fornecedorId: fornecedor.id,
+        fornecedorNome: fornecedor.razaoSocial
+      });
+    }
   }
 
   onFornecedorAutocompleteOpened(): void {
@@ -394,15 +507,26 @@ export class ContaPagarDialogComponent implements OnInit {
 
   onFornecedorAutocompleteClosed(): void {
     this.fornecedorAutoCompleteOpen.set(false);
-    
+
     // Validar se o fornecedor selecionado é válido
     const fornecedorNome = this.form.get('fornecedorNome')?.value;
-    if (fornecedorNome && !this.fornecedorAutoCompleteOpen()) {
-      const fornecedorEncontrado = this.fornecedores().find(f => 
-        this.displayFornecedorFn(f) === fornecedorNome
+    const fornecedorId = this.form.get('fornecedorId')?.value;
+    
+    if (fornecedorNome && !fornecedorId) {
+      // Buscar fornecedor que corresponde ao nome digitado
+      const fornecedorEncontrado = this.fornecedores().find(f =>
+        f.razaoSocial?.toLowerCase() === fornecedorNome.toLowerCase() ||
+        this.displayFornecedorFn(f).toLowerCase() === fornecedorNome.toLowerCase()
       );
-      
-      if (!fornecedorEncontrado) {
+
+      if (fornecedorEncontrado) {
+        // Se encontrou, atualiza o ID
+        this.form.patchValue({
+          fornecedorId: fornecedorEncontrado.id,
+          fornecedorNome: fornecedorEncontrado.razaoSocial
+        });
+      } else {
+        // Se não encontrou, limpa os campos
         this.form.patchValue({
           fornecedorId: null,
           fornecedorNome: ''
