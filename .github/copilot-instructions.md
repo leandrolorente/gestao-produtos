@@ -681,7 +681,6 @@ For dashboard-style statistics sections:
   <!-- More stat cards... -->
 </div>
 ```
-
 ### Advanced Menu Actions Pattern
 For complex workflow menus with conditional actions:
 ```html

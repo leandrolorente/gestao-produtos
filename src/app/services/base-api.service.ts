@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class BaseApiService {
-  protected readonly apiUrl = environment.apiUrl;
+  protected readonly apiUrl: string;
 
   protected readonly httpOptions = {
     headers: new HttpHeaders({
@@ -16,7 +16,32 @@ export class BaseApiService {
     })
   };
 
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient) {
+    // Detecta automaticamente o ambiente e configura a API URL
+    this.apiUrl = this.getApiUrl();
+
+    console.log('🚀 BaseApiService inicializado');
+    console.log('🌍 Hostname:', typeof window !== 'undefined' ? window.location.hostname : 'SSR');
+    console.log('📡 API URL:', this.apiUrl);
+    console.log('🔧 Environment:', environment.production ? 'PRODUCTION' : 'DEVELOPMENT');
+  }
+
+  private getApiUrl(): string {
+    // Se estiver no servidor (SSR), usa environment
+    if (typeof window === 'undefined') {
+      return environment.apiUrl;
+    }
+
+    const hostname = window.location.hostname;
+
+    // Desenvolvimento local
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:5278/api';
+    }
+
+    // Netlify ou produção
+    return 'https://gestao-produtos-api.onrender.com/api';
+  }
 
   protected handleError(error: any): Observable<never> {
     console.error('Erro na API:', error);

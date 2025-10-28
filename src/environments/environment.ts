@@ -1,5 +1,5 @@
-// Environment de produção
+// Environment de produção padrão
 export const environment = {
   production: true,
-  apiUrl: 'https://gestao-produtos-api.onrender.com/api'
+  apiUrl: 'http://localhost:5278/api' // Será substituído em prod pelo environment.netlify.ts
 };
